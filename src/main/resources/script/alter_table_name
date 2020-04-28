@@ -1,0 +1,12 @@
+
+# 电竞
+ALTER TABLE `t_esports_pb` RENAME TO  `t_esports_pb` ;
+ALTER TABLE `t_esports_rg` RENAME TO  `t_esports_rg` ;
+ALTER TABLE `t_esports_tf` RENAME TO  `t_esports_tf` ;
+ALTER TABLE `t_esports_im` RENAME TO  `t_esports_im` ;
+
+# 报水
+ALTER TABLE `t_water_yield` RENAME TO  `t_water_yield` ;
+
+# 日志
+ALTER TABLE `t_log` RENAME TO  `t_log` ;

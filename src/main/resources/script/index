@@ -1,0 +1,13 @@
+
+# 电竞
+ALTER TABLE `t_esports_pb`
+ADD INDEX `INDEX_TASKID` (`task_id` ASC) VISIBLE;
+
+ALTER TABLE `t_esports_rg`
+ADD INDEX `INDEX_TASKID` (`task_id` ASC) VISIBLE;
+
+ALTER TABLE `t_esports_tf`
+ADD INDEX `INDEX_TASKID` (`task_id` ASC) VISIBLE;
+
+ALTER TABLE `t_esports_im`
+ADD INDEX `INDEX_TASKID` (`task_id` ASC) VISIBLE;
