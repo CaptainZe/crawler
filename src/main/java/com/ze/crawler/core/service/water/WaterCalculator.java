@@ -3,7 +3,7 @@ package com.ze.crawler.core.service.water;
 import com.alibaba.fastjson.JSON;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
-import com.ze.crawler.core.entity.Esports;
+import com.ze.crawler.core.entity.Sports;
 import com.ze.crawler.core.entity.WaterYield;
 import com.ze.crawler.core.repository.WaterYieldRepository;
 import com.ze.crawler.core.service.display.DisplayService;
@@ -34,28 +34,28 @@ public class WaterCalculator {
     /**
      * 计算电竞水量
      */
-    public void calculateEsportsWater(Map<Integer, List<? extends Esports>> esportsMap, double threshold, Integer main) {
+    public void calculateEsportsWater(Map<Integer, List<? extends Sports>> sportsMap, double threshold, Integer main) {
         Set<Integer> alreadyDoMain = new HashSet<>();
 
         if (main == null) {
             // 两两比较
-            for (Integer mainKey : esportsMap.keySet()) {
+            for (Integer mainKey : sportsMap.keySet()) {
                 alreadyDoMain.add(mainKey);
 
-                List<Esports> mianEsportsList = (List<Esports>) esportsMap.get(mainKey);
-                if (!CollectionUtils.isEmpty(mianEsportsList)) {
-                    for (Integer rp : esportsMap.keySet()) {
+                List<Sports> mianSportsList = (List<Sports>) sportsMap.get(mainKey);
+                if (!CollectionUtils.isEmpty(mianSportsList)) {
+                    for (Integer rp : sportsMap.keySet()) {
                         if (alreadyDoMain.contains(rp)) {
                             continue;
                         }
 
-                        List<Esports> rpEsportsList = (List<Esports>) esportsMap.get(rp);
-                        if (!CollectionUtils.isEmpty(rpEsportsList)) {
+                        List<Sports> rpSportsList = (List<Sports>) sportsMap.get(rp);
+                        if (!CollectionUtils.isEmpty(rpSportsList)) {
                             List<WaterYield> waterYieldList = new ArrayList<>();
-                            for (Esports mainEsports : mianEsportsList) {
-                                for (Esports rpEsports : rpEsportsList) {
+                            for (Sports mainSports : mianSportsList) {
+                                for (Sports rpSports : rpSportsList) {
                                     // 匹配对手盘
-                                    List<WaterYield> waterYields = matchRivalPlateAndCalculateAndDisplay(mainKey, mainEsports, rp, rpEsports, threshold);
+                                    List<WaterYield> waterYields = matchRivalPlateAndCalculateAndDisplay(mainKey, mainSports, rp, rpSports, threshold);
                                     if (!CollectionUtils.isEmpty(waterYields)) {
                                         waterYieldList.addAll(waterYields);
                                     }
@@ -69,20 +69,20 @@ public class WaterCalculator {
             }
         } else {
             // 指定主盘口
-            List<Esports> mianEsportsList = (List<Esports>) esportsMap.get(main);
-            if (!CollectionUtils.isEmpty(mianEsportsList)) {
-                for (Integer rp : esportsMap.keySet()) {
+            List<Sports> mianSportsList = (List<Sports>) sportsMap.get(main);
+            if (!CollectionUtils.isEmpty(mianSportsList)) {
+                for (Integer rp : sportsMap.keySet()) {
                     if (rp.equals(main)) {
                         continue;
                     }
 
-                    List<Esports> rpEsportsList = (List<Esports>) esportsMap.get(rp);
-                    if (!CollectionUtils.isEmpty(rpEsportsList)) {
+                    List<Sports> rpSportsList = (List<Sports>) sportsMap.get(rp);
+                    if (!CollectionUtils.isEmpty(rpSportsList)) {
                         List<WaterYield> waterYieldList = new ArrayList<>();
-                        for (Esports mainEsports : mianEsportsList) {
-                            for (Esports rpEsports : rpEsportsList) {
+                        for (Sports mainSports : mianSportsList) {
+                            for (Sports rpSports : rpSportsList) {
                                 // 匹配对手盘
-                                List<WaterYield> waterYields = matchRivalPlateAndCalculateAndDisplay(main, mainEsports, rp, rpEsports, threshold);
+                                List<WaterYield> waterYields = matchRivalPlateAndCalculateAndDisplay(main, mainSports, rp, rpSports, threshold);
                                 if (!CollectionUtils.isEmpty(waterYields)) {
                                     waterYieldList.addAll(waterYields);
                                 }
@@ -99,20 +99,20 @@ public class WaterCalculator {
     /**
      * 匹配对手盘 & 计算水量 & 报水存储和推送
      */
-    private List<WaterYield> matchRivalPlateAndCalculateAndDisplay(Integer mainDish, Esports mainEsports, Integer rpDish, Esports rpEsports, double threshold) {
+    private List<WaterYield> matchRivalPlateAndCalculateAndDisplay(Integer mainDish, Sports mainSports, Integer rpDish, Sports rpSports, double threshold) {
         List<WaterYield> waterYields = new ArrayList<>();
 
         // 基础判断
-        if (rpEsports.getType().equals(mainEsports.getType())
-                && rpEsports.getDishId().equals(mainEsports.getDishId())
-                && rpEsports.getLeagueId().equals(mainEsports.getLeagueId())) {
+        if (rpSports.getType().equals(mainSports.getType())
+                && rpSports.getDishId().equals(mainSports.getDishId())
+                && rpSports.getLeagueId().equals(mainSports.getLeagueId())) {
 
             // 盘口类型
-            String dishType = Dictionary.ESPORT_DISH_TYPE_MAPPING.get(mainEsports.getDishId());
+            String dishType = Dictionary.ESPORT_DISH_TYPE_MAPPING.get(mainSports.getDishId());
 
             // 由于各个盘口的主客队定义不一样，只要两队一样，就认为是同一场比赛
-            if (rpEsports.getHomeTeamId().equals(mainEsports.getHomeTeamId())
-                    && rpEsports.getGuestTeamId().equals(mainEsports.getGuestTeamId())) {
+            if (rpSports.getHomeTeamId().equals(mainSports.getHomeTeamId())
+                    && rpSports.getGuestTeamId().equals(mainSports.getGuestTeamId())) {
                 // 对手盘的主客队与主盘口一致
                 boolean match = false;
                 if (Constant.DISH_TYPE_SYP.equals(dishType)
@@ -123,26 +123,26 @@ public class WaterCalculator {
                         || Constant.DISH_TYPE_DXP.equals(dishType)
                         || Constant.DISH_TYPE_DXP_IGNORE.equals(dishType)) {
                     // 让分盘需要判断让分是否一致；大小盘需要判断大小数是否一致
-                    if (mainEsports.getHomeTeamItem().equals(rpEsports.getHomeTeamItem())) {
+                    if (mainSports.getHomeTeamItem().equals(rpSports.getHomeTeamItem())) {
                         match = true;
                     }
                 }
 
                 if (match) {
                     // 都要计算两次
-                    String waterYield1 = CommonUtils.calculateWaterYield(mainEsports.getHomeTeamOdds(), rpEsports.getGuestTeamOdds());
+                    String waterYield1 = CommonUtils.calculateWaterYield(mainSports.getHomeTeamOdds(), rpSports.getGuestTeamOdds());
                     if (controlWaterYield(waterYield1, threshold)) {
-                        String display = displayService.displayESports(dishType, waterYield1, mainDish, mainEsports, true, rpDish, rpEsports, true);
-                        waterYields.add(getWaterYield(waterYield1, mainDish, mainEsports, true, rpDish, rpEsports, true, display));
+                        String display = displayService.displayESports(dishType, waterYield1, mainDish, mainSports, true, rpDish, rpSports, true);
+                        waterYields.add(getWaterYield(waterYield1, mainDish, mainSports, true, rpDish, rpSports, true, display));
                     }
-                    String waterYield2 = CommonUtils.calculateWaterYield(mainEsports.getGuestTeamOdds(), rpEsports.getHomeTeamOdds());
+                    String waterYield2 = CommonUtils.calculateWaterYield(mainSports.getGuestTeamOdds(), rpSports.getHomeTeamOdds());
                     if (controlWaterYield(waterYield2, threshold)) {
-                        String display = displayService.displayESports(dishType, waterYield2, mainDish, mainEsports, false, rpDish, rpEsports, false);
-                        waterYields.add(getWaterYield(waterYield2, mainDish, mainEsports, false, rpDish, rpEsports, false, display));
+                        String display = displayService.displayESports(dishType, waterYield2, mainDish, mainSports, false, rpDish, rpSports, false);
+                        waterYields.add(getWaterYield(waterYield2, mainDish, mainSports, false, rpDish, rpSports, false, display));
                     }
                 }
-            } else if (rpEsports.getGuestTeamId().equals(mainEsports.getHomeTeamId())
-                        && rpEsports.getHomeTeamId().equals(mainEsports.getGuestTeamId())) {
+            } else if (rpSports.getGuestTeamId().equals(mainSports.getHomeTeamId())
+                        && rpSports.getHomeTeamId().equals(mainSports.getGuestTeamId())) {
                 // 对手盘的主客队与主盘口不一致
                 boolean match = false;
                 if (Constant.DISH_TYPE_SYP.equals(dishType)
@@ -151,12 +151,12 @@ public class WaterCalculator {
                     match = true;
                 } else if (Constant.DISH_TYPE_RFP.equals(dishType)) {
                     // 让分盘需要判断让分是否一致；大小盘需要判断大小数是否一致
-                    if (mainEsports.getHomeTeamItem().equals(rpEsports.getGuestTeamItem())) {
+                    if (mainSports.getHomeTeamItem().equals(rpSports.getGuestTeamItem())) {
                         match = true;
                     }
                 } else if (Constant.DISH_TYPE_DXP.equals(dishType)
                             || Constant.DISH_TYPE_DXP_IGNORE.equals(dishType)) {
-                    if (mainEsports.getHomeTeamItem().equals(rpEsports.getHomeTeamItem())) {
+                    if (mainSports.getHomeTeamItem().equals(rpSports.getHomeTeamItem())) {
                         match = true;
                     }
                 }
@@ -168,27 +168,27 @@ public class WaterCalculator {
                         || Constant.DISH_TYPE_DXP_IGNORE.equals(dishType)
                         || Constant.DISH_TYPE_DXP.equals(dishType)) {
                         // 都要计算两次
-                        String waterYield1 = CommonUtils.calculateWaterYield(mainEsports.getHomeTeamOdds(), rpEsports.getGuestTeamOdds());
+                        String waterYield1 = CommonUtils.calculateWaterYield(mainSports.getHomeTeamOdds(), rpSports.getGuestTeamOdds());
                         if (controlWaterYield(waterYield1, threshold)) {
-                            String display = displayService.displayESports(dishType, waterYield1, mainDish, mainEsports, true, rpDish, rpEsports, true);
-                            waterYields.add(getWaterYield(waterYield1, mainDish, mainEsports, true, rpDish, rpEsports, true, display));
+                            String display = displayService.displayESports(dishType, waterYield1, mainDish, mainSports, true, rpDish, rpSports, true);
+                            waterYields.add(getWaterYield(waterYield1, mainDish, mainSports, true, rpDish, rpSports, true, display));
                         }
-                        String waterYield2 = CommonUtils.calculateWaterYield(mainEsports.getGuestTeamOdds(), rpEsports.getHomeTeamOdds());
+                        String waterYield2 = CommonUtils.calculateWaterYield(mainSports.getGuestTeamOdds(), rpSports.getHomeTeamOdds());
                         if (controlWaterYield(waterYield2, threshold)) {
-                            String display = displayService.displayESports(dishType, waterYield2, mainDish, mainEsports, false, rpDish, rpEsports, false);
-                            waterYields.add(getWaterYield(waterYield2, mainDish, mainEsports, false, rpDish, rpEsports, false, display));
+                            String display = displayService.displayESports(dishType, waterYield2, mainDish, mainSports, false, rpDish, rpSports, false);
+                            waterYields.add(getWaterYield(waterYield2, mainDish, mainSports, false, rpDish, rpSports, false, display));
                         }
                     } else {
                         // 需要反转
-                        String waterYield1 = CommonUtils.calculateWaterYield(mainEsports.getHomeTeamOdds(), rpEsports.getHomeTeamOdds());
+                        String waterYield1 = CommonUtils.calculateWaterYield(mainSports.getHomeTeamOdds(), rpSports.getHomeTeamOdds());
                         if (controlWaterYield(waterYield1, threshold)) {
-                            String display = displayService.displayESports(dishType, waterYield1, mainDish, mainEsports, true, rpDish, rpEsports, false);
-                            waterYields.add(getWaterYield(waterYield1, mainDish, mainEsports, true, rpDish, rpEsports, false, display));
+                            String display = displayService.displayESports(dishType, waterYield1, mainDish, mainSports, true, rpDish, rpSports, false);
+                            waterYields.add(getWaterYield(waterYield1, mainDish, mainSports, true, rpDish, rpSports, false, display));
                         }
-                        String waterYield2 = CommonUtils.calculateWaterYield(mainEsports.getGuestTeamOdds(), rpEsports.getGuestTeamOdds());
+                        String waterYield2 = CommonUtils.calculateWaterYield(mainSports.getGuestTeamOdds(), rpSports.getGuestTeamOdds());
                         if (controlWaterYield(waterYield2, threshold)) {
-                            String display = displayService.displayESports(dishType, waterYield2, mainDish, mainEsports, false, rpDish, rpEsports, true);
-                            waterYields.add(getWaterYield(waterYield2, mainDish, mainEsports, false, rpDish, rpEsports, true, display));
+                            String display = displayService.displayESports(dishType, waterYield2, mainDish, mainSports, false, rpDish, rpSports, true);
+                            waterYields.add(getWaterYield(waterYield2, mainDish, mainSports, false, rpDish, rpSports, true, display));
                         }
                     }
                 }
@@ -211,27 +211,27 @@ public class WaterCalculator {
     /**
      * 获取报水存储数据
      */
-    private WaterYield getWaterYield(String waterYield, Integer mainDish, Esports mainEsports, boolean home,
-                                     Integer rpDish, Esports rpEsports, boolean guest, String display) {
+    private WaterYield getWaterYield(String waterYield, Integer mainDish, Sports mainSports, boolean home,
+                                     Integer rpDish, Sports rpSports, boolean guest, String display) {
         WaterYield water = new WaterYield();
         water.setId(LangUtils.generateUuid());
-        water.setTaskId(mainEsports.getTaskId());
-        water.setType(mainEsports.getType());
+        water.setTaskId(mainSports.getTaskId());
+        water.setType(mainSports.getType());
         water.setMainDish(mainDish);
         water.setRpDish(rpDish);
-        water.setDishId(mainEsports.getDishId());
-        water.setDishName(mainEsports.getDishName());
-        water.setLeagueId(mainEsports.getLeagueId());
-        water.setLeagueName(mainEsports.getLeagueName());
-        water.setHomeTeamId(mainEsports.getHomeTeamId());
-        water.setHomeTeamName(mainEsports.getHomeTeamName());
-        water.setGuestTeamId(mainEsports.getGuestTeamId());
-        water.setGuestTeamName(mainEsports.getHomeTeamName());
+        water.setDishId(mainSports.getDishId());
+        water.setDishName(mainSports.getDishName());
+        water.setLeagueId(mainSports.getLeagueId());
+        water.setLeagueName(mainSports.getLeagueName());
+        water.setHomeTeamId(mainSports.getHomeTeamId());
+        water.setHomeTeamName(mainSports.getHomeTeamName());
+        water.setGuestTeamId(mainSports.getGuestTeamId());
+        water.setGuestTeamName(mainSports.getHomeTeamName());
 
         Map<String, Object> contrastInfo = new LinkedHashMap<>();
-        contrastInfo.put("main_id", mainEsports.getId());
+        contrastInfo.put("main_id", mainSports.getId());
         contrastInfo.put("home", home);
-        contrastInfo.put("rp_id", rpEsports.getId());
+        contrastInfo.put("rp_id", rpSports.getId());
         contrastInfo.put("guest", guest);
         water.setContrastInfo(JSON.toJSONString(contrastInfo));
 

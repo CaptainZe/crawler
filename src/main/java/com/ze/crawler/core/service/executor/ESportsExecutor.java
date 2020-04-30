@@ -2,6 +2,7 @@ package com.ze.crawler.core.service.executor;
 
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.entity.*;
+import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.ImEsportsRepository;
 import com.ze.crawler.core.repository.PbEsportsRepository;
 import com.ze.crawler.core.repository.RgEsportsRepository;
@@ -12,10 +13,7 @@ import com.ze.crawler.core.service.water.WaterCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,15 +50,18 @@ public class ESportsExecutor {
 
     /**
      * 执行器
+     * @param appointedLeagues  指定联赛
+     * @param appointedTeams    指定队伍
      * @param threshold     阈值
      * @param main          指定主盘口
      */
-    public void executor(String taskId, String type, double threshold, Integer main) {
+    public void executor(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams,
+                         double threshold, Integer main) {
         List<Callable<CrawlerThread>> threads = new ArrayList<>();
-        CrawlerThread pb = new CrawlerThread(taskId, type, pbESportsService);
-        CrawlerThread rg = new CrawlerThread(taskId, type, rgESportsService);
-        CrawlerThread tf = new CrawlerThread(taskId, type, tfESportsService);
-        CrawlerThread im = new CrawlerThread(taskId, type, imESportsService);
+        CrawlerThread pb = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, pbESportsService);
+        CrawlerThread rg = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, rgESportsService);
+        CrawlerThread tf = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, tfESportsService);
+        CrawlerThread im = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, imESportsService);
         threads.add(pb);
         threads.add(rg);
         threads.add(tf);
@@ -83,13 +84,13 @@ public class ESportsExecutor {
             List<RgEsports> rgEsportsList = rgEsportsRepository.findByTaskId(taskId);
             List<TfEsports> tfEsportsList = tfEsportsRepository.findByTaskId(taskId);
             List<ImEsports> imEsportsList = imEsportsRepository.findByTaskId(taskId);
-            Map<Integer, List<? extends Esports>> esportsMap = new LinkedHashMap<>();
+            Map<Integer, List<? extends Sports>> esportsMap = new LinkedHashMap<>();
             esportsMap.put(Constant.ESPORTS_DISH_PB, pbEsportsList);
             esportsMap.put(Constant.ESPORTS_DISH_RG, rgEsportsList);
             esportsMap.put(Constant.ESPORTS_DISH_TF, tfEsportsList);
             esportsMap.put(Constant.ESPORTS_DISH_IM, imEsportsList);
 
-            Map<Integer, List<? extends Esports>> esportsMapOrder = new LinkedHashMap<>();
+            Map<Integer, List<? extends Sports>> esportsMapOrder = new LinkedHashMap<>();
             if (main != null) {
                 // 指定主盘口, 进行排序
                 if (main.equals(Constant.ESPORTS_DISH_PB)) {
@@ -122,17 +123,21 @@ public class ESportsExecutor {
 
         private String taskId;
         private String type;
-        private ESportsService eSportsService;
+        private Set<String> appointedLeagues;
+        private List<TeamFilterModel> appointedTeams;
+        private BaseService baseService;
 
-        public CrawlerThread(String taskId, String type, ESportsService eSportsService) {
+        public CrawlerThread(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams, BaseService baseService) {
             this.taskId = taskId;
             this.type = type;
-            this.eSportsService = eSportsService;
+            this.appointedLeagues = appointedLeagues;
+            this.appointedTeams = appointedTeams;
+            this.baseService = baseService;
         }
 
         @Override
         public CrawlerThread call() {
-            eSportsService.crawler(taskId, type);
+            baseService.crawler(taskId, type, appointedLeagues, appointedTeams);
             return null;
         }
     }

@@ -5,6 +5,9 @@ ALTER TABLE `t_esports_rg` RENAME TO  `t_esports_rg` ;
 ALTER TABLE `t_esports_tf` RENAME TO  `t_esports_tf` ;
 ALTER TABLE `t_esports_im` RENAME TO  `t_esports_im` ;
 
+# 体育
+ALTER TABLE `t_sports_pb` RENAME TO  `t_sports_pb` ;
+
 # 报水
 ALTER TABLE `t_water_yield` RENAME TO  `t_water_yield` ;
 

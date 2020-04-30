@@ -7,9 +7,10 @@ import com.ze.crawler.core.constants.Dictionary;
 import com.ze.crawler.core.constants.ImConstant;
 import com.ze.crawler.core.constants.enums.ImSpecialDishEnum;
 import com.ze.crawler.core.entity.ImEsports;
-import com.ze.crawler.core.entity.RgEsports;
+import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.ImEsportsRepository;
 import com.ze.crawler.core.service.log.LogService;
+import com.ze.crawler.core.utils.FilterUtils;
 import com.ze.crawler.core.utils.HttpClientUtils;
 import com.ze.crawler.core.utils.LangUtils;
 import com.ze.crawler.core.utils.TimeUtils;
@@ -28,7 +29,7 @@ import java.util.*;
 @SuppressWarnings("all")
 @Slf4j
 @Service
-public class ImESportsService implements ESportsService {
+public class ImESportsService implements BaseService {
     @Autowired
     private ImEsportsRepository imEsportsRepository;
     @Autowired
@@ -38,9 +39,11 @@ public class ImESportsService implements ESportsService {
      * IM电竞爬虫
      * @param taskId
      * @param type  赛事类型，LOL、DOTA2、CSGO
+     * @param appointedLeagues  指定联赛
+     * @param appointedTeams    指定队伍
      */
     @Override
-    public void crawler(String taskId, String type) {
+    public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("IM电竞_" + type + "_" + taskId);
 
         JSONObject body = getBaseBody(null, null);
@@ -51,7 +54,7 @@ public class ImESportsService implements ESportsService {
                 List<List<Object>> d = (List<List<Object>>) map.get("d");
                 if (!CollectionUtils.isEmpty(d)) {
                     try {
-                        parseEsports(taskId, type, d);
+                        parseEsports(taskId, type, d, appointedLeagues, appointedTeams);
                     } catch (Exception e) {
                         Map<String, String> data = new HashMap<>();
                         data.put("url", ImConstant.IM_BASE_URL);
@@ -76,7 +79,7 @@ public class ImESportsService implements ESportsService {
      * @param type
      * @param d
      */
-    private void parseEsports(String taskId, String type, List<List<Object>> d) {
+    private void parseEsports(String taskId, String type, List<List<Object>> d, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         Integer sportId = null;
         if (Constant.ESPORTS_TYPE_LOL.equalsIgnoreCase(type)) {
             sportId = ImConstant.SPORT_ID_LOL;
@@ -109,6 +112,11 @@ public class ImESportsService implements ESportsService {
                     continue;
                 }
 
+                // 如果存在指定联赛, 进行过滤判断
+                if (!FilterUtils.filterLeague(appointedLeagues, leagueId)) {
+                    continue;
+                }
+
                 // [10]比赛列表
                 List<List<Object>> games = (List<List<Object>>) league.get(10);
                 if (!CollectionUtils.isEmpty(games)) {
@@ -138,6 +146,11 @@ public class ImESportsService implements ESportsService {
                             if (guestTeamId == null) {
                                 logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_IM.toString(), type + ":" + leagueId + "#" + guestTeamName);
                             }
+                            continue;
+                        }
+
+                        // 如果存在指定队伍, 进行过滤判断
+                        if (!FilterUtils.filterTeam(appointedTeams, homeTeamId, guestTeamId)) {
                             continue;
                         }
 

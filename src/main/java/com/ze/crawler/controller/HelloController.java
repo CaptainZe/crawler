@@ -1,6 +1,7 @@
 package com.ze.crawler.controller;
 
 import com.ze.crawler.core.constants.Constant;
+import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.service.ImESportsService;
 import com.ze.crawler.core.service.PbESportsService;
 import com.ze.crawler.core.service.RgESportsService;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,12 +41,16 @@ public class HelloController {
 
     @RequestMapping("/test")
     public void test() {
-        imESportsService.crawler("1", Constant.ESPORTS_TYPE_LOL);
+        TeamFilterModel teamFilterModel = new TeamFilterModel();
+        teamFilterModel.setTeamOne("10106");
+        teamFilterModel.setTeamTwo("10101");
+
+        pbESportsService.crawler("110", Constant.ESPORTS_TYPE_LOL, Collections.singleton("101"), Collections.singletonList(teamFilterModel));
     }
 
     @RequestMapping("/executor")
     public void executor() {
-        eSportsExecutor.executor("1", Constant.ESPORTS_TYPE_LOL, -200, null);
+        eSportsExecutor.executor("1", Constant.ESPORTS_TYPE_LOL, null, null, -200, null);
     }
 
     @RequestMapping("/inform")

@@ -7,7 +7,6 @@ public class Constant {
     // 请求头
     public final static String REQUEST_HEADER_USER_AGENT = "user-agent";
     public final static String REQUEST_HEADER_AUTHORIZATION = "Authorization";
-    public final static String REQUEST_HEADER_CONTENT_TYPE = "Content-Type";
     public final static String REQUEST_HEADER_CONTENT_TYPE_APPLICATION_JSON = "application/json";
     // 浏览器Agent
     public final static String CHROME_BROWSER_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36";
@@ -31,9 +30,12 @@ public class Constant {
     // 日志类型
     public final static int LOG_TYPE_LEAGUE_NOT_FOUND = 1;                      // 联赛名未找到
     public final static int LOG_TYPE_TEAM_NOT_FOUND = 2;                        // 队伍名未找到
+    // 电竞
     public final static int LOG_TYPE_PARSE_ESPORTS_ERROR = 3;                   // 电竞解析错误
     public final static int LOG_TYPE_ESPORTS_INVOKE_ERROR = 4;                  // 电竞爬虫调用错误
     public final static int LOG_TYPE_ESPORTS_WATER_CALCULATE_ERROR = 5;         // 电竞水量计算错误
+    // 体育
+    public final static int LOG_TYPE_PARSE_SPORTS_ERROR = 6;                   // 体育解析错误
 
     // 各下注盘类型
     public final static String DISH_TYPE_SYP = "输赢盘";
@@ -52,4 +54,10 @@ public class Constant {
     public final static Integer ESPORTS_DISH_RG = 2;
     public final static Integer ESPORTS_DISH_TF = 3;
     public final static Integer ESPORTS_DISH_IM = 4;
+
+    // 体育 - 类型
+    public final static String SPORTS_TYPE_SOCCER = "SOCCER";
+    public final static String SPORTS_TYPE_BASKETBALL = "BASKETBALL";
+    // 体育 - 盘口类型
+    public final static Integer SPORTS_DISH_PB = 5;
 }

@@ -8,6 +8,7 @@ import com.ze.crawler.core.entity.TfEsports;
 import com.ze.crawler.core.model.*;
 import com.ze.crawler.core.repository.TfEsportsRepository;
 import com.ze.crawler.core.service.log.LogService;
+import com.ze.crawler.core.utils.FilterUtils;
 import com.ze.crawler.core.utils.HttpClientUtils;
 import com.ze.crawler.core.utils.LangUtils;
 import com.ze.crawler.core.utils.TimeUtils;
@@ -17,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * TF电竞盘口
@@ -28,7 +26,7 @@ import java.util.Map;
 @SuppressWarnings("all")
 @Slf4j
 @Service
-public class TfESportsService implements ESportsService {
+public class TfESportsService implements BaseService {
     @Autowired
     private TfEsportsRepository tfEsportsRepository;
     @Autowired
@@ -41,9 +39,11 @@ public class TfESportsService implements ESportsService {
      * TF电竞爬虫
      * @param taskId
      * @param type  赛事类型，LOL、DOTA2、CSGO
+     * @param appointedLeagues  指定联赛
+     * @param appointedTeams    指定队伍
      */
     @Override
-    public void crawler(String taskId, String type) {
+    public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("TF电竞_" + type + "_" + taskId);
 
         Integer gameId = null;
@@ -63,7 +63,7 @@ public class TfESportsService implements ESportsService {
                 List tfESportsResultModels = HttpClientUtils.get(url, List.class, AUTHORIZATION);
                 if (!CollectionUtils.isEmpty(tfESportsResultModels)) {
                     try {
-                        parseEsports(taskId, type, tfESportsResultModels);
+                        parseEsports(taskId, type, tfESportsResultModels, appointedLeagues, appointedTeams);
                     } catch (Exception e) {
                         Map<String, String> data = new HashMap<>();
                         data.put("url", url);
@@ -87,7 +87,7 @@ public class TfESportsService implements ESportsService {
                 List tfESportsResultModels = HttpClientUtils.get(url, List.class, AUTHORIZATION);
                 if (!CollectionUtils.isEmpty(tfESportsResultModels)) {
                     try {
-                        parseEsports(taskId, type, tfESportsResultModels);
+                        parseEsports(taskId, type, tfESportsResultModels, appointedLeagues, appointedTeams);
                     } catch (Exception e) {
                         Map<String, String> data = new HashMap<>();
                         data.put("url", url);
@@ -112,7 +112,7 @@ public class TfESportsService implements ESportsService {
      * @param type
      * @param result
      */
-    private void parseEsports(String taskId, String type, List result) {
+    private void parseEsports(String taskId, String type, List result, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         // 获取对应盘口字典表
         Map<String, String> dishMapping = Dictionary.getEsportDishMappingByTypeAndDishType(type, Constant.ESPORTS_DISH_TF);
 
@@ -126,6 +126,11 @@ public class TfESportsService implements ESportsService {
             }
             String leagueId = Dictionary.ESPORT_TF_LEAGUE_MAPPING.get(leagueName);
             if (leagueId == null) {
+                continue;
+            }
+
+            // 如果存在指定联赛, 进行过滤判断
+            if (!FilterUtils.filterLeague(appointedLeagues, leagueId)) {
                 continue;
             }
 
@@ -151,6 +156,11 @@ public class TfESportsService implements ESportsService {
                 if (guestTeamId == null) {
                     logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_TF.toString(), type + ":" + leagueId + "#" + guestTeamName);
                 }
+                continue;
+            }
+
+            // 如果存在指定队伍, 进行过滤判断
+            if (!FilterUtils.filterTeam(appointedTeams, homeTeamId, guestTeamId)) {
                 continue;
             }
 

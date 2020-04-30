@@ -5,8 +5,10 @@ import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
 import com.ze.crawler.core.constants.PBConstant;
 import com.ze.crawler.core.entity.PbEsports;
+import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.PbEsportsRepository;
 import com.ze.crawler.core.service.log.LogService;
+import com.ze.crawler.core.utils.FilterUtils;
 import com.ze.crawler.core.utils.HttpClientUtils;
 import com.ze.crawler.core.utils.LangUtils;
 import com.ze.crawler.core.utils.TimeUtils;
@@ -26,7 +28,7 @@ import java.util.*;
 @SuppressWarnings("all")
 @Slf4j
 @Service
-public class PbESportsService implements ESportsService {
+public class PbESportsService implements BaseService {
     @Autowired
     private PbEsportsRepository pbEsportsRepository;
     @Autowired
@@ -36,9 +38,11 @@ public class PbESportsService implements ESportsService {
      * 平博电竞爬虫
      * @param taskId
      * @param type  赛事类型，LOL、DOTA2、CSGO
+     * @param appointedLeagues  指定联赛
+     * @param appointedTeams    指定队伍
      */
     @Override
-    public void crawler(String taskId, String type) {
+    public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("平博电竞_" + type + "_" + taskId);
 
         int retryCount = 0;
@@ -48,7 +52,7 @@ public class PbESportsService implements ESportsService {
             Map<String, Object> map = HttpClientUtils.get(url, Map.class);
             if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
                 try {
-                    parseEsports(taskId, type, map);
+                    parseEsports(taskId, type, map, appointedLeagues, appointedTeams);
                 } catch (Exception e) {
                     Map<String, String> data = new HashMap<>();
                     data.put("url", url);
@@ -72,7 +76,7 @@ public class PbESportsService implements ESportsService {
             Map<String, Object> map = HttpClientUtils.get(url, Map.class);
             if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
                 try {
-                    parseEsports(taskId, type, map);
+                    parseEsports(taskId, type, map, appointedLeagues, appointedTeams);
                 } catch (Exception e) {
                     Map<String, String> data = new HashMap<>();
                     data.put("url", url);
@@ -96,7 +100,7 @@ public class PbESportsService implements ESportsService {
      * @param type
      * @param map
      */
-    private void parseEsports(String taskId, String type, Map<String, Object> map) {
+    private void parseEsports(String taskId, String type, Map<String, Object> map, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         if (map != null) {
             List<Object> n = (List<Object>) map.get("n");
             if (!CollectionUtils.isEmpty(n)) {
@@ -137,6 +141,11 @@ public class PbESportsService implements ESportsService {
                             }
                             String leagueId = Dictionary.ESPORT_PB_LEAGUE_MAPPING.get(leagueName);
                             if (leagueId == null) {
+                                continue;
+                            }
+
+                            // 如果存在指定联赛, 进行过滤判断
+                            if (!FilterUtils.filterLeague(appointedLeagues, leagueId)) {
                                 continue;
                             }
 
@@ -181,6 +190,11 @@ public class PbESportsService implements ESportsService {
                                         if (guestTeamId == null) {
                                             logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_PB.toString(), type + ":" + leagueId + "#" + guestTeamName);
                                         }
+                                        continue;
+                                    }
+
+                                    // 如果存在指定队伍, 进行过滤判断
+                                    if (!FilterUtils.filterTeam(appointedTeams, homeTeamId, guestTeamId)) {
                                         continue;
                                     }
 
@@ -670,7 +684,7 @@ public class PbESportsService implements ESportsService {
      */
     private List<PbEsports> moreKillDishHandler1(PbEsports pbEsports, String key, List<Object> totalKill, Map<String, String> dishMapping) {
         List<PbEsports> pbEsportsList = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(totalKill)) {
+            if (!CollectionUtils.isEmpty(totalKill)) {
             // 1. 主队进球
             String homeDishName = null;
             if ("1".equals(key)) {

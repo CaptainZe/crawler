@@ -8,6 +8,7 @@ import com.ze.crawler.core.entity.RgEsports;
 import com.ze.crawler.core.model.*;
 import com.ze.crawler.core.repository.RgEsportsRepository;
 import com.ze.crawler.core.service.log.LogService;
+import com.ze.crawler.core.utils.FilterUtils;
 import com.ze.crawler.core.utils.HttpClientUtils;
 import com.ze.crawler.core.utils.LangUtils;
 import com.ze.crawler.core.utils.TimeUtils;
@@ -24,7 +25,7 @@ import java.util.*;
  */
 @Slf4j
 @Service
-public class RgESportsService implements ESportsService {
+public class RgESportsService implements BaseService {
     @Autowired
     private RgEsportsRepository rgEsportsRepository;
     @Autowired
@@ -34,9 +35,11 @@ public class RgESportsService implements ESportsService {
      * RG电竞爬虫
      * @param taskId
      * @param type
+     * @param appointedLeagues  指定联赛
+     * @param appointedTeams    指定队伍
      */
     @Override
-    public void crawler(String taskId, String type) {
+    public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("RG电竞_" + type + "_" + taskId);
 
         // 今日
@@ -47,7 +50,7 @@ public class RgESportsService implements ESportsService {
                 RgESportsResultModel rgESportsResultModel = HttpClientUtils.get(url, RgESportsResultModel.class);
                 if (rgESportsResultModel != null && !CollectionUtils.isEmpty(rgESportsResultModel.getResult())) {
                     try {
-                        parseEsports(taskId, type, rgESportsResultModel.getResult(), false);
+                        parseEsports(taskId, type, rgESportsResultModel.getResult(), false, appointedLeagues, appointedTeams);
                     } catch (Exception e) {
                         Map<String, String> data = new HashMap<>();
                         data.put("url", url);
@@ -73,7 +76,7 @@ public class RgESportsService implements ESportsService {
                 RgESportsResultModel rgESportsResultModel = HttpClientUtils.get(url, RgESportsResultModel.class);
                 if (rgESportsResultModel != null && !CollectionUtils.isEmpty(rgESportsResultModel.getResult())) {
                     try {
-                        parseEsports(taskId, type, rgESportsResultModel.getResult(), true);
+                        parseEsports(taskId, type, rgESportsResultModel.getResult(), true, appointedLeagues, appointedTeams);
                     } catch (Exception e) {
                         Map<String, String> data = new HashMap<>();
                         data.put("url", url);
@@ -99,7 +102,7 @@ public class RgESportsService implements ESportsService {
      * @param result
      * @param isZp  判断是不是早盘。 如果是早盘需要对开赛时间进行处理（只取第二天的）
      */
-    private void parseEsports(String taskId, String type, List<RgESportsResultItemModel> result, boolean isZp) {
+    private void parseEsports(String taskId, String type, List<RgESportsResultItemModel> result, boolean isZp, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         // 第二天最后时刻。早盘需要使用
         String nextDayLastTime = TimeUtils.getNextDayLastTime();
 
@@ -146,6 +149,11 @@ public class RgESportsService implements ESportsService {
                 continue;
             }
 
+            // 如果存在指定联赛, 进行过滤判断
+            if (!FilterUtils.filterLeague(appointedLeagues, leagueId)) {
+                continue;
+            }
+
             // 队伍信息
             Integer homeTeamId = null;
             String homeTeamName = null;
@@ -176,6 +184,11 @@ public class RgESportsService implements ESportsService {
                 if (dishGuestTeamId == null) {
                     logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_RG.toString(), type + ":" + leagueId + "#" + guestTeamName);
                 }
+                continue;
+            }
+
+            // 如果存在指定队伍, 进行过滤判断
+            if (!FilterUtils.filterTeam(appointedTeams, dishHomeTeamId, dishGuestTeamId)) {
                 continue;
             }
 

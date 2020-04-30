@@ -34,7 +34,11 @@ public class PBConstant {
     public static final String LEAGUE_PREFIX_DOTA2 = "Dota 2";
     public static final String LEAGUE_PREFIX_CSGO = "CS:GO";
 
-    // 自定义的盘口名 （这个几个字典表中的名字不可变）
+    // 盘口的一些描述信息
+    public static final String EXTRA_DISH_NAME_DP = "大盘";
+    public static final String EXTRA_DISH_NAME_XP = "小盘";
+
+    // 电竞 - 自定义的盘口名 （这个几个字典表中的名字不可变）
     public static final String CUSTOM_DISH_NAME_WHOLE_SYP = "比赛_输赢盘";
     public static final String CUSTOM_DISH_NAME_WHOLE_RFP = "比赛_让分盘";
     public static final String CUSTOM_DISH_NAME_WHOLE_DXP = "比赛_大小盘";
@@ -55,7 +59,16 @@ public class PBConstant {
     public static final String CUSTOM_DISH_NAME_KILL_MAP3_HOME_TEAM_TOTAL = "地图3_球队总得分_主队进球";
     public static final String CUSTOM_DISH_NAME_KILL_MAP3_GUEST_TEAM_TOTAL = "地图3_球队总得分_客队进球";
 
-    // 盘口的一些描述信息
-    public static final String EXTRA_DISH_NAME_DP = "大盘";
-    public static final String EXTRA_DISH_NAME_XP = "小盘";
+    // 体育 - 自定义的盘口名 （这个几个字典表中的名字不可变）
+    public static final String CUSTOM_DISH_NAME_FULL_SYP = "全场_独赢";
+    public static final String CUSTOM_DISH_NAME_FULL_RFP = "全场_让分盘";
+    public static final String CUSTOM_DISH_NAME_FULL_DXP = "全场_大小盘";
+    public static final String CUSTOM_DISH_NAME_FULL_HOME_TEAM_TOTAL = "全场_球队总得分_主队进球";
+    public static final String CUSTOM_DISH_NAME_FULL_GUEST_TEAM_TOTAL = "全场_球队总得分_客队进球";
+
+    public static final String CUSTOM_DISH_NAME_FIRST_HALF_SYP = "上半场_独赢";
+    public static final String CUSTOM_DISH_NAME_FIRST_HALF_RFP = "上半场_让分盘";
+    public static final String CUSTOM_DISH_NAME_FIRST_HALF_DXP = "上半场_大小盘";
+    public static final String CUSTOM_DISH_NAME_FIRST_HALF_HOME_TEAM_TOTAL = "上半场_球队总得分_主队进球";
+    public static final String CUSTOM_DISH_NAME_FIRST_HALF_GUEST_TEAM_TOTAL = "上半场_球队总得分_客队进球";
 }

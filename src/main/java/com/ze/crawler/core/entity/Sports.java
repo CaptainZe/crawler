@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @MappedSuperclass
-public class Esports implements Serializable {
+public class Sports implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String id;

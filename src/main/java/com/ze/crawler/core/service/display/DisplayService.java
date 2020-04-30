@@ -1,7 +1,7 @@
 package com.ze.crawler.core.service.display;
 
 import com.ze.crawler.core.constants.Constant;
-import com.ze.crawler.core.entity.Esports;
+import com.ze.crawler.core.entity.Sports;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,96 +15,96 @@ public class DisplayService {
      * @param dishType      盘口类型
      * @param waterYield    水量
      * @param mainDish      主盘类型
-     * @param mainEsports   主盘记录
-     * @param home          true表示mainEsports使用home部分；false表示mainEsports使用guest部分
+     * @param mainSports   主盘记录
+     * @param home          true表示mainSports使用home部分；false表示mainSports使用guest部分
      * @param rpDish        对手盘类型
-     * @param rpEsports     对手盘记录
-     * @param guest         true表示rpEsports使用guest部分；false表示rpEsports使用home部分
+     * @param rpSports     对手盘记录
+     * @param guest         true表示rpSports使用guest部分；false表示rpSports使用home部分
      * @return
      */
     public String displayESports(String dishType, String waterYield,
-                                 Integer mainDish, Esports mainEsports, boolean home,
-                                 Integer rpDish, Esports rpEsports, boolean guest) {
+                                 Integer mainDish, Sports mainSports, boolean home,
+                                 Integer rpDish, Sports rpSports, boolean guest) {
         String mainDishName = getEsportsDishName(mainDish);
         String rpDishName = getEsportsDishName(rpDish);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("类型：").append(mainEsports.getType()).append("_").append(mainEsports.getDishName());
+        sb.append("类型：").append(mainSports.getType()).append("_").append(mainSports.getDishName());
         sb.append(Constant.NEW_LINE);
-        sb.append(mainDishName).append("：").append(mainEsports.getLeagueName());
+        sb.append(mainDishName).append("：").append(mainSports.getLeagueName());
         sb.append(Constant.NEW_LINE);
-        sb.append(mainDishName).append("：").append(mainEsports.getHomeTeamName()).append(Constant.VS).append(mainEsports.getGuestTeamName());
+        sb.append(mainDishName).append("：").append(mainSports.getHomeTeamName()).append(Constant.VS).append(mainSports.getGuestTeamName());
         sb.append(Constant.NEW_LINE);
-        sb.append(rpDishName).append("：").append(rpEsports.getLeagueName());
+        sb.append(rpDishName).append("：").append(rpSports.getLeagueName());
         sb.append(Constant.NEW_LINE);
-        sb.append(rpDishName).append("：").append(rpEsports.getHomeTeamName()).append(Constant.VS).append(rpEsports.getGuestTeamName());
+        sb.append(rpDishName).append("：").append(rpSports.getHomeTeamName()).append(Constant.VS).append(rpSports.getGuestTeamName());
         sb.append(Constant.NEW_LINE);
-        sb.append(mainDishName).append("开赛时间：").append(mainEsports.getStartTime());
+        sb.append(mainDishName).append("开赛时间：").append(mainSports.getStartTime());
         sb.append(Constant.NEW_LINE);
-        sb.append(rpDishName).append("开赛时间：").append(rpEsports.getStartTime());
+        sb.append(rpDishName).append("开赛时间：").append(rpSports.getStartTime());
         sb.append(Constant.NEW_LINE);
 
         // 关键显示
         // 盘口名可能存在通配符,进行替换显示
-        String mainDishNameDisplay = mainEsports.getDishName();
+        String mainDishNameDisplay = mainSports.getDishName();
         if (mainDishNameDisplay.contains(Constant.DISH_NAME_WILDCARD_T1)) {
-            mainDishNameDisplay = mainDishNameDisplay.replace(Constant.DISH_NAME_WILDCARD_T1, mainEsports.getHomeTeamName());
+            mainDishNameDisplay = mainDishNameDisplay.replace(Constant.DISH_NAME_WILDCARD_T1, mainSports.getHomeTeamName());
         } else if (mainDishNameDisplay.contains(Constant.DISH_NAME_WILDCARD_T2)) {
-            mainDishNameDisplay = mainDishNameDisplay.replace(Constant.DISH_NAME_WILDCARD_T2, mainEsports.getGuestTeamName());
+            mainDishNameDisplay = mainDishNameDisplay.replace(Constant.DISH_NAME_WILDCARD_T2, mainSports.getGuestTeamName());
         }
-        String rpDishNameDisplay = rpEsports.getDishName();
+        String rpDishNameDisplay = rpSports.getDishName();
         if (rpDishNameDisplay.contains(Constant.DISH_NAME_WILDCARD_T1)) {
-            rpDishNameDisplay = rpDishNameDisplay.replace(Constant.DISH_NAME_WILDCARD_T1, rpEsports.getHomeTeamName());
+            rpDishNameDisplay = rpDishNameDisplay.replace(Constant.DISH_NAME_WILDCARD_T1, rpSports.getHomeTeamName());
         } else if (rpDishNameDisplay.contains(Constant.DISH_NAME_WILDCARD_T2)) {
-            rpDishNameDisplay = rpDishNameDisplay.replace(Constant.DISH_NAME_WILDCARD_T2, rpEsports.getGuestTeamName());
+            rpDishNameDisplay = rpDishNameDisplay.replace(Constant.DISH_NAME_WILDCARD_T2, rpSports.getGuestTeamName());
         }
 
         if (Constant.DISH_TYPE_SYP.equals(dishType)) {
-            String mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_[" + mainEsports.getHomeTeamName() + "]_(" + mainEsports.getHomeTeamOdds() + ")";
+            String mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_[" + mainSports.getHomeTeamName() + "]_(" + mainSports.getHomeTeamOdds() + ")";
             if (!home) {
-                mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_[" + mainEsports.getGuestTeamName() + "]_(" + mainEsports.getGuestTeamOdds() + ")";
+                mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_[" + mainSports.getGuestTeamName() + "]_(" + mainSports.getGuestTeamOdds() + ")";
             }
             sb.append(mainDishDisplay);
             sb.append(Constant.NEW_LINE);
-            String rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_[" + rpEsports.getGuestTeamName() + "]_(" + rpEsports.getGuestTeamOdds() + ")";
+            String rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_[" + rpSports.getGuestTeamName() + "]_(" + rpSports.getGuestTeamOdds() + ")";
             if (!guest) {
-                rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_[" + rpEsports.getHomeTeamName() + "]_(" + rpEsports.getHomeTeamOdds() + ")";
+                rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_[" + rpSports.getHomeTeamName() + "]_(" + rpSports.getHomeTeamOdds() + ")";
             }
             sb.append(rpDishDisplay);
         } else if (Constant.DISH_TYPE_RFP.equals(dishType)) {
-            String mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_[" + mainEsports.getHomeTeamName() + "]_" + mainEsports.getHomeTeamItem() + "_(" + mainEsports.getHomeTeamOdds() + ")";
+            String mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_[" + mainSports.getHomeTeamName() + "]_" + mainSports.getHomeTeamItem() + "_(" + mainSports.getHomeTeamOdds() + ")";
             if (!home) {
-                mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_[" + mainEsports.getGuestTeamName() + "]_" + mainEsports.getGuestTeamItem() + "_(" + mainEsports.getGuestTeamOdds() + ")";
+                mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_[" + mainSports.getGuestTeamName() + "]_" + mainSports.getGuestTeamItem() + "_(" + mainSports.getGuestTeamOdds() + ")";
             }
             sb.append(mainDishDisplay);
             sb.append(Constant.NEW_LINE);
-            String rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_[" + rpEsports.getGuestTeamName() + "]_" + rpEsports.getGuestTeamItem() + "_(" + rpEsports.getGuestTeamOdds() + ")";
+            String rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_[" + rpSports.getGuestTeamName() + "]_" + rpSports.getGuestTeamItem() + "_(" + rpSports.getGuestTeamOdds() + ")";
             if (!guest) {
-                rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_[" + rpEsports.getHomeTeamName() + "]_" + rpEsports.getHomeTeamItem() + "_(" + rpEsports.getHomeTeamOdds() + ")";
+                rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_[" + rpSports.getHomeTeamName() + "]_" + rpSports.getHomeTeamItem() + "_(" + rpSports.getHomeTeamOdds() + ")";
             }
             sb.append(rpDishDisplay);
         } else if (Constant.DISH_TYPE_DXP.equals(dishType) || Constant.DISH_TYPE_DXP_IGNORE.equals(dishType)) {
-            String mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_" + mainEsports.getHomeExtraDishName() + "_" + mainEsports.getHomeTeamItem() + "_(" + mainEsports.getHomeTeamOdds() + ")";
+            String mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_" + mainSports.getHomeExtraDishName() + "_" + mainSports.getHomeTeamItem() + "_(" + mainSports.getHomeTeamOdds() + ")";
             if (!home) {
-                mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_" + mainEsports.getGuestExtraDishName() + "_" + mainEsports.getHomeTeamItem() + "_(" + mainEsports.getGuestTeamOdds() + ")";
+                mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_" + mainSports.getGuestExtraDishName() + "_" + mainSports.getHomeTeamItem() + "_(" + mainSports.getGuestTeamOdds() + ")";
             }
             sb.append(mainDishDisplay);
             sb.append(Constant.NEW_LINE);
-            String rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_" + rpEsports.getGuestExtraDishName() + "_" + rpEsports.getHomeTeamItem() + "_(" + rpEsports.getGuestTeamOdds() + ")";
+            String rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_" + rpSports.getGuestExtraDishName() + "_" + rpSports.getHomeTeamItem() + "_(" + rpSports.getGuestTeamOdds() + ")";
             if (!guest) {
-                rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_" + rpEsports.getHomeExtraDishName() + "_" + rpEsports.getHomeTeamItem() + "_(" + rpEsports.getHomeTeamOdds() + ")";
+                rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_" + rpSports.getHomeExtraDishName() + "_" + rpSports.getHomeTeamItem() + "_(" + rpSports.getHomeTeamOdds() + ")";
             }
             sb.append(rpDishDisplay);
         } else if (Constant.DISH_TYPE_DSP.equals(dishType) || Constant.DISH_TYPE_SFP.equals(dishType)) {
-            String mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_" + mainEsports.getHomeExtraDishName() + "_(" + mainEsports.getHomeTeamOdds() + ")";
+            String mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_" + mainSports.getHomeExtraDishName() + "_(" + mainSports.getHomeTeamOdds() + ")";
             if (!home) {
-                mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_" + mainEsports.getGuestExtraDishName() + "_(" + mainEsports.getGuestTeamOdds() + ")";
+                mainDishDisplay = mainDishName + "：" + mainDishNameDisplay + "_" + mainSports.getGuestExtraDishName() + "_(" + mainSports.getGuestTeamOdds() + ")";
             }
             sb.append(mainDishDisplay);
             sb.append(Constant.NEW_LINE);
-            String rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_" + rpEsports.getGuestExtraDishName() + "_(" + rpEsports.getGuestTeamOdds() + ")";
+            String rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_" + rpSports.getGuestExtraDishName() + "_(" + rpSports.getGuestTeamOdds() + ")";
             if (!guest) {
-                rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_" + rpEsports.getHomeExtraDishName() + "_(" + rpEsports.getHomeTeamOdds() + ")";
+                rpDishDisplay = rpDishName + "：" + rpDishNameDisplay + "_" + rpSports.getHomeExtraDishName() + "_(" + rpSports.getHomeTeamOdds() + ")";
             }
             sb.append(rpDishDisplay);
         }
