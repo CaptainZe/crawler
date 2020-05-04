@@ -25,6 +25,11 @@ public class WaterController {
         aLog2.setId(CrawlerTask.SWITCH_ID);
         aLog2.setFromDish("1");
         logRepository.save(aLog2);
+
+        ALog aLog3 = new ALog();
+        aLog3.setId(CrawlerTask.APPOINTED_ID);
+        aLog3.setFromDish("0");
+        logRepository.save(aLog3);
         return true;
     }
 
@@ -40,6 +45,16 @@ public class WaterController {
     public boolean taskSwitch(@RequestParam String open) {
         ALog aLog = logRepository.getOne(CrawlerTask.SWITCH_ID);
         aLog.setFromDish(open);
+        logRepository.save(aLog);
+        return true;
+    }
+
+    @RequestMapping("/appointed")
+    public boolean appointed(@RequestParam String league, @RequestParam String teamA, @RequestParam String teamB) {
+        ALog aLog = logRepository.getOne(CrawlerTask.APPOINTED_ID);
+        aLog.setFromDish(league);
+        aLog.setData(teamA);
+        aLog.setMsg(teamB);
         logRepository.save(aLog);
         return true;
     }

@@ -16,25 +16,8 @@ public class WkController {
     private WeiKongService weiKongService;
 
     /**
-     * 添加账号信息
+     * 测试微信是否可用
      */
-    @RequestMapping("/add")
-    public void add(@RequestParam String wId, @RequestParam String wcId, @RequestParam String nickName, @RequestParam String targetWcId) {
-
-        weiKongService.addWk(wId, wcId, nickName, targetWcId);
-        weiKongService.refreshWkInfo();
-    }
-
-    /**
-     * 添加账号信息
-     */
-    @RequestMapping("/update")
-    public void update(@RequestParam String wId, @RequestParam String wcId, @RequestParam String nickName, @RequestParam String targetWcId) {
-
-        weiKongService.updateWk(wId, wcId, nickName, targetWcId);
-        weiKongService.refreshWkInfo();
-    }
-
     @RequestMapping("/check")
     public Map<String, String> check() {
         Map<String, String> map = new HashMap<>();
@@ -43,5 +26,13 @@ public class WkController {
             map.put(wid, s);
         }
         return map;
+    }
+
+    /**
+     * 全部登录
+     */
+    @RequestMapping("/login")
+    public String login() {
+        return weiKongService.reLoginAll();
     }
 }

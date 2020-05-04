@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
+import java.sql.Time;
 import java.util.*;
 
 /**
@@ -30,9 +31,24 @@ public class WeiKongService {
     // 发送失败Code
     private final static String FAIL_CODE_1 = "10001";
     private final static String FAIL_CODE_2 = "1001";
+    // 重试文本
+    private final static String TRY_AGAIN = "请再试一次！";
 
     // 微控账号信息   Key: wId  Value:target
     public final static Map<String, String> WK_INFO = new HashMap<>();
+
+    /**
+     * 初始化
+     */
+    @PostConstruct
+    void initWk() {
+        List<Wk> wkList = wkRepository.findAll();
+        if (!CollectionUtils.isEmpty(wkList)) {
+            for (Wk wk : wkList) {
+                WK_INFO.put(wk.getwId(), wk.getTargetWcId());
+            }
+        }
+    }
 
     /**
      * 发送文本消息
@@ -87,6 +103,65 @@ public class WeiKongService {
         return JSON.toJSONString(response);
     }
 
+    @SuppressWarnings("all")
+    public String reLoginAll() {
+        // 1. 开发者账号退出微控平台（目的：使所有已登录的微信号下线）
+        String logoutApi = "/member/logout";
+        Map<String, Object> r1 = HttpClientUtils.post(getUrl(logoutApi), new JSONObject(), Map.class, AUTHORIZATION);
+        if (r1.get("message").equals("失败")) {
+            return TRY_AGAIN;
+        }
+
+        // 2. 登录开发者账号
+        String loginApi = "/member/login";
+        JSONObject loginBody = new JSONObject();
+        loginBody.put("account", "15959046894");
+        loginBody.put("password", "123456");
+        Map<String, Object> r2 = HttpClientUtils.post(getUrl(loginApi), loginBody, Map.class);
+        if (r2.get("message").equals("失败")) {
+            return TRY_AGAIN;
+        }
+
+        // 3. 二次登录
+        String secondLoginApi = "/secondLogin";
+        List<Wk> list = wkRepository.findAll();
+        if (!CollectionUtils.isEmpty(list)) {
+            for (Wk wk : list) {
+                JSONObject secondLoginBody = new JSONObject();
+                secondLoginBody.put("wcId", wk.getWcId());
+                secondLoginBody.put("type", 2);
+                Map<String, Object> response = HttpClientUtils.post(getUrl(secondLoginApi), secondLoginBody, Map.class, AUTHORIZATION);
+                if (response.get("message").equals("失败")) {
+                    return TRY_AGAIN;
+                }
+
+                Map<String, Object> data = (Map<String, Object>) response.get("data");
+                String wId = (String) data.get("wId");
+                wk.setwId(wId);
+                wk.setLoginTime(TimeUtils.format(new Date().getTime()));
+                wkRepository.save(wk);
+            }
+        }
+
+        // 4. 刷新缓存
+        refreshWkInfo();
+
+        return "成功！";
+    }
+
+    /**
+     * 刷新
+     */
+    private void refreshWkInfo() {
+        WK_INFO.clear();
+        List<Wk> wkList = wkRepository.findAll();
+        if (!CollectionUtils.isEmpty(wkList)) {
+            for (Wk wk : wkList) {
+                WK_INFO.put(wk.getwId(), wk.getTargetWcId());
+            }
+        }
+    }
+
     /**
      * 获取URL
      */
@@ -121,56 +196,5 @@ public class WeiKongService {
             }
         }
         return WK_INFO.keySet().iterator().next();
-    }
-
-    /**
-     * 初始化
-     */
-    @PostConstruct
-    void initWk() {
-        List<Wk> wkList = wkRepository.findAll();
-        if (!CollectionUtils.isEmpty(wkList)) {
-            for (Wk wk : wkList) {
-                WK_INFO.put(wk.getwId(), wk.getTargetWcId());
-            }
-        }
-    }
-
-    /**
-     * 刷新
-     */
-    public void refreshWkInfo() {
-        List<Wk> wkList = wkRepository.findAll();
-        if (!CollectionUtils.isEmpty(wkList)) {
-            for (Wk wk : wkList) {
-                WK_INFO.put(wk.getwId(), wk.getTargetWcId());
-            }
-        }
-    }
-
-    /**
-     * 添加微控信息
-     */
-    public void addWk(String wId, String wcId, String nickName, String targetWcId) {
-        Wk wk = new Wk();
-        wk.setWcId(wcId);
-        wk.setwId(wId);
-        wk.setWcName(nickName);
-        wk.setTargetWcId(targetWcId);
-        wk.setLoginTime(TimeUtils.format(new Date().getTime()));
-        wkRepository.save(wk);
-    }
-
-    /**
-     * 更新微控信息
-     */
-    public void updateWk(String wId, String wcId, String nickName, String targetWcId) {
-        Wk wk = wkRepository.getOne(wcId);;
-        wk.setWcId(wcId);
-        wk.setwId(wId);
-        wk.setWcName(nickName);
-        wk.setTargetWcId(targetWcId);
-        wk.setLoginTime(TimeUtils.format(new Date().getTime()));
-        wkRepository.save(wk);
     }
 }
