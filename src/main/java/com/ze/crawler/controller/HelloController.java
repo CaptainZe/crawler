@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("hello")
@@ -50,7 +47,11 @@ public class HelloController {
 
     @RequestMapping("/executor")
     public void executor() {
-        eSportsExecutor.executor("1", Constant.ESPORTS_TYPE_LOL, null, null, -200, null);
+        TeamFilterModel teamFilterModel = new TeamFilterModel();
+        teamFilterModel.setTeamOne("31707");
+        teamFilterModel.setTeamTwo("31708");
+        eSportsExecutor.executor("1", Constant.ESPORTS_TYPE_CSGO,
+                Collections.singleton("317"), Collections.singletonList(teamFilterModel), -20, null);
     }
 
     @RequestMapping("/inform")

@@ -3,6 +3,7 @@ package com.ze.crawler.core.service.water;
 import com.alibaba.fastjson.JSON;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
+import com.ze.crawler.core.constants.PBConstant;
 import com.ze.crawler.core.entity.Sports;
 import com.ze.crawler.core.entity.WaterYield;
 import com.ze.crawler.core.repository.WaterYieldRepository;
@@ -150,14 +151,33 @@ public class WaterCalculator {
                         || Constant.DISH_TYPE_SFP.equals(dishType)) {
                     match = true;
                 } else if (Constant.DISH_TYPE_RFP.equals(dishType)) {
-                    // 让分盘需要判断让分是否一致；大小盘需要判断大小数是否一致
+                    // 让分盘需要判断让分是否一致
                     if (mainSports.getHomeTeamItem().equals(rpSports.getGuestTeamItem())) {
                         match = true;
                     }
                 } else if (Constant.DISH_TYPE_DXP.equals(dishType)
                             || Constant.DISH_TYPE_DXP_IGNORE.equals(dishType)) {
+                    // 大小盘需要判断大小数是否一致
                     if (mainSports.getHomeTeamItem().equals(rpSports.getHomeTeamItem())) {
                         match = true;
+                    }
+
+                    // 特殊判断
+                    // 球队总得分_主/客队进球，在主客队定义不一致时不能使用
+                    if (mainSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP1_HOME_TEAM_TOTAL)
+                            || mainSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP1_GUEST_TEAM_TOTAL)
+                            || mainSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP2_HOME_TEAM_TOTAL)
+                            || mainSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP2_GUEST_TEAM_TOTAL)
+                            || mainSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP3_HOME_TEAM_TOTAL)
+                            || mainSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP3_GUEST_TEAM_TOTAL)
+                            || rpSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP1_HOME_TEAM_TOTAL)
+                            || rpSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP1_GUEST_TEAM_TOTAL)
+                            || rpSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP2_HOME_TEAM_TOTAL)
+                            || rpSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP2_GUEST_TEAM_TOTAL)
+                            || rpSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP3_HOME_TEAM_TOTAL)
+                            || rpSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP3_GUEST_TEAM_TOTAL)
+                    ) {
+                        match = false;
                     }
                 }
 
