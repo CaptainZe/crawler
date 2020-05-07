@@ -33,9 +33,9 @@ public class WaterCalculator {
     private WeiKongService weiKongService;
 
     /**
-     * 计算电竞水量
+     * 计算水量
      */
-    public void calculateEsportsWater(Map<Integer, List<? extends Sports>> sportsMap, double threshold, Integer main) {
+    public void calculateWater(Map<Integer, List<? extends Sports>> sportsMap, double threshold, Integer main, Integer sendType) {
         Set<Integer> alreadyDoMain = new HashSet<>();
 
         if (main == null) {
@@ -64,6 +64,8 @@ public class WaterCalculator {
                             }
                             // 保存
                             saveWaterYield(waterYieldList);
+                            // fixme 后期不用微信推送
+                            informWater(waterYieldList, sendType);
                         }
                     }
                 }
@@ -91,6 +93,8 @@ public class WaterCalculator {
                         }
                         // 保存
                         saveWaterYield(waterYieldList);
+                        // fixme 后期不用微信推送
+                        informWater(waterYieldList, sendType);
                     }
                 }
             }
@@ -98,7 +102,7 @@ public class WaterCalculator {
     }
 
     /**
-     * 匹配对手盘 & 计算水量 & 报水存储和推送
+     * 匹配对手盘 & 计算水量 & 报水存储
      */
     private List<WaterYield> matchRivalPlateAndCalculateAndDisplay(Integer mainDish, Sports mainSports, Integer rpDish, Sports rpSports, double threshold) {
         List<WaterYield> waterYields = new ArrayList<>();
@@ -133,12 +137,12 @@ public class WaterCalculator {
                     // 都要计算两次
                     String waterYield1 = CommonUtils.calculateWaterYield(mainSports.getHomeTeamOdds(), rpSports.getGuestTeamOdds());
                     if (controlWaterYield(waterYield1, threshold)) {
-                        String display = displayService.displayESports(dishType, waterYield1, mainDish, mainSports, true, rpDish, rpSports, true);
+                        String display = displayService.display(dishType, waterYield1, mainDish, mainSports, true, rpDish, rpSports, true);
                         waterYields.add(getWaterYield(waterYield1, mainDish, mainSports, true, rpDish, rpSports, true, display));
                     }
                     String waterYield2 = CommonUtils.calculateWaterYield(mainSports.getGuestTeamOdds(), rpSports.getHomeTeamOdds());
                     if (controlWaterYield(waterYield2, threshold)) {
-                        String display = displayService.displayESports(dishType, waterYield2, mainDish, mainSports, false, rpDish, rpSports, false);
+                        String display = displayService.display(dishType, waterYield2, mainDish, mainSports, false, rpDish, rpSports, false);
                         waterYields.add(getWaterYield(waterYield2, mainDish, mainSports, false, rpDish, rpSports, false, display));
                     }
                 }
@@ -162,7 +166,7 @@ public class WaterCalculator {
                         match = true;
                     }
 
-                    // 特殊判断
+                    // 特殊判断（目前电竞会遇到）
                     // 球队总得分_主/客队进球，在主客队定义不一致时不能使用
                     if (mainSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP1_HOME_TEAM_TOTAL)
                             || mainSports.getDishName().equals(PBConstant.CUSTOM_DISH_NAME_KILL_MAP1_GUEST_TEAM_TOTAL)
@@ -190,24 +194,24 @@ public class WaterCalculator {
                         // 都要计算两次
                         String waterYield1 = CommonUtils.calculateWaterYield(mainSports.getHomeTeamOdds(), rpSports.getGuestTeamOdds());
                         if (controlWaterYield(waterYield1, threshold)) {
-                            String display = displayService.displayESports(dishType, waterYield1, mainDish, mainSports, true, rpDish, rpSports, true);
+                            String display = displayService.display(dishType, waterYield1, mainDish, mainSports, true, rpDish, rpSports, true);
                             waterYields.add(getWaterYield(waterYield1, mainDish, mainSports, true, rpDish, rpSports, true, display));
                         }
                         String waterYield2 = CommonUtils.calculateWaterYield(mainSports.getGuestTeamOdds(), rpSports.getHomeTeamOdds());
                         if (controlWaterYield(waterYield2, threshold)) {
-                            String display = displayService.displayESports(dishType, waterYield2, mainDish, mainSports, false, rpDish, rpSports, false);
+                            String display = displayService.display(dishType, waterYield2, mainDish, mainSports, false, rpDish, rpSports, false);
                             waterYields.add(getWaterYield(waterYield2, mainDish, mainSports, false, rpDish, rpSports, false, display));
                         }
                     } else {
                         // 需要反转
                         String waterYield1 = CommonUtils.calculateWaterYield(mainSports.getHomeTeamOdds(), rpSports.getHomeTeamOdds());
                         if (controlWaterYield(waterYield1, threshold)) {
-                            String display = displayService.displayESports(dishType, waterYield1, mainDish, mainSports, true, rpDish, rpSports, false);
+                            String display = displayService.display(dishType, waterYield1, mainDish, mainSports, true, rpDish, rpSports, false);
                             waterYields.add(getWaterYield(waterYield1, mainDish, mainSports, true, rpDish, rpSports, false, display));
                         }
                         String waterYield2 = CommonUtils.calculateWaterYield(mainSports.getGuestTeamOdds(), rpSports.getGuestTeamOdds());
                         if (controlWaterYield(waterYield2, threshold)) {
-                            String display = displayService.displayESports(dishType, waterYield2, mainDish, mainSports, false, rpDish, rpSports, true);
+                            String display = displayService.display(dishType, waterYield2, mainDish, mainSports, false, rpDish, rpSports, true);
                             waterYields.add(getWaterYield(waterYield2, mainDish, mainSports, false, rpDish, rpSports, true, display));
                         }
                     }
@@ -268,32 +272,31 @@ public class WaterCalculator {
         if (!CollectionUtils.isEmpty(waterYieldList)) {
             waterYieldRepository.saveAll(waterYieldList);
             waterYieldRepository.flush();
-
-            // fixme 后期不用微信推送
-            informWater(waterYieldList);
         }
     }
 
     /**
      * 向微信推送
      */
-    private void informWater(List<WaterYield> waterYieldList) {
-        int pageSize = 5;
-        int total = waterYieldList.size();
-        int pageCount = (total / pageSize) + ((total % pageSize > 0) ? 1 : 0);
-        for (int i = 0; i < pageCount; i++) {
-            int fromIndex = i * pageSize;
-            int toIndex = (i == pageCount - 1 ? total : (i+1) * pageSize);
-            List<WaterYield> subList = waterYieldList.subList(fromIndex, toIndex);
-            for (WaterYield waterYield : subList) {
-                weiKongService.sendText(waterYield.getDisplay());
-            }
+    private void informWater(List<WaterYield> waterYieldList, Integer sendType) {
+        if (!CollectionUtils.isEmpty(waterYieldList)) {
+            int pageSize = 5;
+            int total = waterYieldList.size();
+            int pageCount = (total / pageSize) + ((total % pageSize > 0) ? 1 : 0);
+            for (int i = 0; i < pageCount; i++) {
+                int fromIndex = i * pageSize;
+                int toIndex = (i == pageCount - 1 ? total : (i+1) * pageSize);
+                List<WaterYield> subList = waterYieldList.subList(fromIndex, toIndex);
+                for (WaterYield waterYield : subList) {
+                    weiKongService.sendText(waterYield.getDisplay(), sendType);
+                }
 
-            try {
-                // 睡眠2秒,防止频率太快
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                try {
+                    // 睡眠2秒,防止频率太快
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

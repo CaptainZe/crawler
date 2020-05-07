@@ -1,6 +1,7 @@
 package com.ze.crawler.core.service.executor;
 
 import com.ze.crawler.core.constants.Constant;
+import com.ze.crawler.core.constants.WkConstant;
 import com.ze.crawler.core.entity.*;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.ImEsportsRepository;
@@ -52,8 +53,8 @@ public class ESportsExecutor {
      * 执行器
      * @param appointedLeagues  指定联赛
      * @param appointedTeams    指定队伍
-     * @param threshold     阈值
-     * @param main          指定主盘口
+     * @param threshold         阈值
+     * @param main              指定主盘口
      */
     public void executor(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams,
                          double threshold, Integer main) {
@@ -76,10 +77,6 @@ public class ESportsExecutor {
 
         try {
             // 执行完成, 进行水量计算
-//            List<PbEsports> pbEsportsList = pbEsportsRepository.findByTaskIdOrderByLeagueIdAscDishIdAsc(taskId);
-//            List<RgEsports> rgEsportsList = rgEsportsRepository.findByTaskIdOrderByLeagueIdAscDishIdAsc(taskId);
-//            List<TfEsports> tfEsportsList = tfEsportsRepository.findByTaskIdOrderByLeagueIdAscDishIdAsc(taskId);
-//            List<ImEsports> imEsportsList = imEsportsRepository.findByTaskIdOrderByLeagueIdAscDishIdAsc(taskId);
             List<PbEsports> pbEsportsList = pbEsportsRepository.findByTaskId(taskId);
             List<RgEsports> rgEsportsList = rgEsportsRepository.findByTaskId(taskId);
             List<TfEsports> tfEsportsList = tfEsportsRepository.findByTaskId(taskId);
@@ -110,7 +107,7 @@ public class ESportsExecutor {
             }
 
             // 报水
-            waterCalculator.calculateEsportsWater(esportsMapOrder, threshold, main);
+            waterCalculator.calculateWater(esportsMapOrder, threshold, main, appointedLeagues == null ? WkConstant.ESPORTS_YL : WkConstant.ESPORTS_BP);
         } catch (Exception e) {
             logService.log(Constant.LOG_TYPE_ESPORTS_WATER_CALCULATE_ERROR, "esports", taskId + "_" + type, e);
         }

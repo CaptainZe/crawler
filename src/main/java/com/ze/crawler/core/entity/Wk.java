@@ -6,10 +6,10 @@ import java.util.Objects;
 @Entity
 @Table(name = "t_wk", schema = "crawler")
 public class Wk {
-    private String wId;
     private String wcId;
-    private String wcName;
-    private String targetWcId;
+    private String wId;
+    private String roomA;
+    private String roomB;
     private String loginTime;
 
     @Id
@@ -33,23 +33,23 @@ public class Wk {
     }
 
     @Basic
-    @Column(name = "wc_name")
-    public String getWcName() {
-        return wcName;
+    @Column(name = "room_a")
+    public String getRoomA() {
+        return roomA;
     }
 
-    public void setWcName(String wcName) {
-        this.wcName = wcName;
+    public void setRoomA(String roomA) {
+        this.roomA = roomA;
     }
 
     @Basic
-    @Column(name = "target_wc_id")
-    public String getTargetWcId() {
-        return targetWcId;
+    @Column(name = "room_b")
+    public String getRoomB() {
+        return roomB;
     }
 
-    public void setTargetWcId(String targetWcId) {
-        this.targetWcId = targetWcId;
+    public void setRoomB(String roomB) {
+        this.roomB = roomB;
     }
 
     @Basic
@@ -67,15 +67,15 @@ public class Wk {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Wk wk = (Wk) o;
-        return Objects.equals(wId, wk.wId) &&
-                Objects.equals(wcId, wk.wcId) &&
-                Objects.equals(wcName, wk.wcName) &&
-                Objects.equals(targetWcId, wk.targetWcId) &&
+        return Objects.equals(wcId, wk.wcId) &&
+                Objects.equals(wId, wk.wId) &&
+                Objects.equals(roomA, wk.roomA) &&
+                Objects.equals(roomB, wk.roomB) &&
                 Objects.equals(loginTime, wk.loginTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(wId, wcId, wcName, targetWcId, loginTime);
+        return Objects.hash(wcId, wId, roomA, roomB, loginTime);
     }
 }

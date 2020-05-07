@@ -11,18 +11,18 @@ import org.springframework.stereotype.Service;
 public class DisplayService {
 
     /**
-     * 电竞 - 报水显示
+     * 报水显示
      * @param dishType      盘口类型
      * @param waterYield    水量
      * @param mainDish      主盘类型
-     * @param mainSports   主盘记录
+     * @param mainSports    主盘记录
      * @param home          true表示mainSports使用home部分；false表示mainSports使用guest部分
      * @param rpDish        对手盘类型
-     * @param rpSports     对手盘记录
+     * @param rpSports      对手盘记录
      * @param guest         true表示rpSports使用guest部分；false表示rpSports使用home部分
      * @return
      */
-    public String displayESports(String dishType, String waterYield,
+    public String display(String dishType, String waterYield,
                                  Integer mainDish, Sports mainSports, boolean home,
                                  Integer rpDish, Sports rpSports, boolean guest) {
         String mainDishName = getEsportsDishName(mainDish);
@@ -116,6 +116,7 @@ public class DisplayService {
 
     /**
      * 获取盘口名
+     * fixme 扩展点
      * @param dish
      * @return
      */

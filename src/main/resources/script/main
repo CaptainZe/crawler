@@ -43,3 +43,19 @@ CREATE TABLE `t_wk` (
   PRIMARY KEY (`wc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='微控信息';
 
+ALTER TABLE `t_wk`
+CHANGE COLUMN `w_id` `w_id` VARCHAR(100) NULL COMMENT '微信实例ID' ,
+CHANGE COLUMN `wc_name` `room_a` VARCHAR(100) NULL COMMENT '群1 - 电竞娱乐使用' ,
+CHANGE COLUMN `target_wc_id` `room_b` VARCHAR(100) NULL DEFAULT NULL COMMENT '群2 - 电竞包赔使用' ;
+
+DROP TABLE IF EXISTS `t_water_control`;
+CREATE TABLE `t_water_control` (
+  `id` VARCHAR(36) NOT NULL,
+  `enable` VARCHAR(45) NULL COMMENT '爬虫开关',
+  `threshold` VARCHAR(45) NULL COMMENT '水量控制',
+  `league` VARCHAR(45) NULL COMMENT '指定联赛',
+  `team_a` VARCHAR(45) NULL COMMENT '指定队伍1',
+  `team_b` VARCHAR(45) NULL COMMENT '指定队伍2',
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci COMMENT = '临时水量控制表';
+

@@ -1,9 +1,11 @@
 package com.ze.crawler.core.component;
 
+import com.ze.crawler.controller.WaterController;
 import com.ze.crawler.core.constants.Constant;
-import com.ze.crawler.core.entity.ALog;
+import com.ze.crawler.core.entity.WaterControl;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.LogRepository;
+import com.ze.crawler.core.repository.WaterControlRepository;
 import com.ze.crawler.core.service.executor.ESportsExecutor;
 import com.ze.crawler.core.utils.LangUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,58 +23,95 @@ public class CrawlerTask {
     private ESportsExecutor eSportsExecutor;
     @Autowired
     private LogRepository logRepository;
+    @Autowired
+    private WaterControlRepository waterControlRepository;
+
     // 水量控制
+    public final static String YL_CONTROL_ID = "00000"; // 娱乐
+    public final static String BP_CONTROL_ID = "11111"; // 包赔
     public final static String THRESHOLD_ID = "00000";
     public final static String SWITCH_ID = "11111";
     public final static String APPOINTED_ID = "22222";
 
     /**
+     * 包赔
+     */
+    @Scheduled(initialDelay = 1000 * 30, fixedDelay = 1000 * 60 * 5)
+    public void bpTask() {
+        WaterControl waterControl = waterControlRepository.getOne(BP_CONTROL_ID);
+        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
+            double threshold = Double.parseDouble(waterControl.getThreshold());
+
+            TeamFilterModel teamFilterModel = new TeamFilterModel();
+            teamFilterModel.setTeamOne(waterControl.getTeamA());
+            teamFilterModel.setTeamTwo(waterControl.getTeamB());
+            eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_LOL,
+                        Collections.singleton(waterControl.getLeague()), Collections.singletonList(teamFilterModel), threshold, null);
+        }
+    }
+
+    /* 娱乐使用 */
+    /**
      * LOL
      */
-    @Scheduled(initialDelay = 1000 * 60 * 2, fixedDelay = 1000 * 60 * 5)
+    @Scheduled(initialDelay = 1000 * 60, fixedDelay = 1000 * 60 * 5)
     public void lolTask() {
-        ALog switchLog = logRepository.getOne(SWITCH_ID);
-        if ("1".equals(switchLog.getFromDish())) {
-            ALog aLog = logRepository.getOne(THRESHOLD_ID);
-            double threshold = Double.parseDouble(aLog.getFromDish());
+        WaterControl waterControl = waterControlRepository.getOne(YL_CONTROL_ID);
+        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
+            double threshold = Double.parseDouble(waterControl.getThreshold());
 
-            ALog appointedLog = logRepository.getOne(APPOINTED_ID);
-            if (!appointedLog.getFromDish().equals("0")) {
-                TeamFilterModel teamFilterModel = new TeamFilterModel();
-                teamFilterModel.setTeamOne(appointedLog.getData());
-                teamFilterModel.setTeamTwo(appointedLog.getMsg());
-
-                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_LOL,
-                        Collections.singleton(appointedLog.getFromDish()), Collections.singletonList(teamFilterModel), threshold, null);
-            } else {
-                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_LOL, null, null, threshold, null);
-            }
+            eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_LOL, null, null, threshold, null);
         }
+
+//        ALog switchLog = logRepository.getOne(SWITCH_ID);
+//        if ("1".equals(switchLog.getFromDish())) {
+//            ALog aLog = logRepository.getOne(THRESHOLD_ID);
+//            double threshold = Double.parseDouble(aLog.getFromDish());
+//
+//            ALog appointedLog = logRepository.getOne(APPOINTED_ID);
+//            if (!appointedLog.getFromDish().equals("0")) {
+//                TeamFilterModel teamFilterModel = new TeamFilterModel();
+//                teamFilterModel.setTeamOne(appointedLog.getData());
+//                teamFilterModel.setTeamTwo(appointedLog.getMsg());
+//
+//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_LOL,
+//                        Collections.singleton(appointedLog.getFromDish()), Collections.singletonList(teamFilterModel), threshold, null);
+//            } else {
+//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_LOL, null, null, threshold, null);
+//            }
+//        }
         System.out.println("LOL 执行完成");
     }
 
     /**
      * DOTA2
      */
-    @Scheduled(initialDelay = 1000 * 60, fixedDelay = 1000 * 60 * 5)
+    @Scheduled(initialDelay = 1000 * 60 * 2, fixedDelay = 1000 * 60 * 5)
     public void dotaTask() {
-        ALog switchLog = logRepository.getOne(SWITCH_ID);
-        if ("1".equals(switchLog.getFromDish())) {
-            ALog aLog = logRepository.getOne(THRESHOLD_ID);
-            double threshold = Double.parseDouble(aLog.getFromDish());
+        WaterControl waterControl = waterControlRepository.getOne(YL_CONTROL_ID);
+        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
+            double threshold = Double.parseDouble(waterControl.getThreshold());
 
-            ALog appointedLog = logRepository.getOne(APPOINTED_ID);
-            if (!appointedLog.getFromDish().equals("0")) {
-                TeamFilterModel teamFilterModel = new TeamFilterModel();
-                teamFilterModel.setTeamOne(appointedLog.getData());
-                teamFilterModel.setTeamTwo(appointedLog.getMsg());
-
-                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_DOTA2,
-                        Collections.singleton(appointedLog.getFromDish()), Collections.singletonList(teamFilterModel), threshold, null);
-            } else {
-                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_DOTA2, null, null, threshold, null);
-            }
+            eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_DOTA2, null, null, threshold, null);
         }
+
+//        ALog switchLog = logRepository.getOne(SWITCH_ID);
+//        if ("1".equals(switchLog.getFromDish())) {
+//            ALog aLog = logRepository.getOne(THRESHOLD_ID);
+//            double threshold = Double.parseDouble(aLog.getFromDish());
+//
+//            ALog appointedLog = logRepository.getOne(APPOINTED_ID);
+//            if (!appointedLog.getFromDish().equals("0")) {
+//                TeamFilterModel teamFilterModel = new TeamFilterModel();
+//                teamFilterModel.setTeamOne(appointedLog.getData());
+//                teamFilterModel.setTeamTwo(appointedLog.getMsg());
+//
+//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_DOTA2,
+//                        Collections.singleton(appointedLog.getFromDish()), Collections.singletonList(teamFilterModel), threshold, null);
+//            } else {
+//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_DOTA2, null, null, threshold, null);
+//            }
+//        }
 
         System.out.println("DOTA2 执行完成");
     }
@@ -82,23 +121,30 @@ public class CrawlerTask {
      */
     @Scheduled(initialDelay = 1000 * 60 * 3, fixedDelay = 1000 * 60 * 5)
     public void csTask() {
-        ALog switchLog = logRepository.getOne(SWITCH_ID);
-        if ("1".equals(switchLog.getFromDish())) {
-            ALog aLog = logRepository.getOne(THRESHOLD_ID);
-            double threshold = Double.parseDouble(aLog.getFromDish());
+        WaterControl waterControl = waterControlRepository.getOne(YL_CONTROL_ID);
+        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
+            double threshold = Double.parseDouble(waterControl.getThreshold());
 
-            ALog appointedLog = logRepository.getOne(APPOINTED_ID);
-            if (!appointedLog.getFromDish().equals("0")) {
-                TeamFilterModel teamFilterModel = new TeamFilterModel();
-                teamFilterModel.setTeamOne(appointedLog.getData());
-                teamFilterModel.setTeamTwo(appointedLog.getMsg());
-
-                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_CSGO,
-                        Collections.singleton(appointedLog.getFromDish()), Collections.singletonList(teamFilterModel), threshold, null);
-            } else {
-                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_CSGO, null, null, threshold, null);
-            }
+            eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_CSGO, null, null, threshold, null);
         }
+
+//        ALog switchLog = logRepository.getOne(SWITCH_ID);
+//        if ("1".equals(switchLog.getFromDish())) {
+//            ALog aLog = logRepository.getOne(THRESHOLD_ID);
+//            double threshold = Double.parseDouble(aLog.getFromDish());
+//
+//            ALog appointedLog = logRepository.getOne(APPOINTED_ID);
+//            if (!appointedLog.getFromDish().equals("0")) {
+//                TeamFilterModel teamFilterModel = new TeamFilterModel();
+//                teamFilterModel.setTeamOne(appointedLog.getData());
+//                teamFilterModel.setTeamTwo(appointedLog.getMsg());
+//
+//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_CSGO,
+//                        Collections.singleton(appointedLog.getFromDish()), Collections.singletonList(teamFilterModel), threshold, null);
+//            } else {
+//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_CSGO, null, null, threshold, null);
+//            }
+//        }
 
         System.out.println("CSGO 执行完成");
     }
