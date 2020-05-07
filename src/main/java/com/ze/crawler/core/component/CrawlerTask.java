@@ -29,7 +29,7 @@ public class CrawlerTask {
     /**
      * LOL
      */
-    @Scheduled(initialDelay = 1000 * 60, fixedDelay = 1000 * 60 * 5)
+    @Scheduled(initialDelay = 1000 * 60 * 2, fixedDelay = 1000 * 60 * 5)
     public void lolTask() {
         ALog switchLog = logRepository.getOne(SWITCH_ID);
         if ("1".equals(switchLog.getFromDish())) {
@@ -54,7 +54,7 @@ public class CrawlerTask {
     /**
      * DOTA2
      */
-    @Scheduled(initialDelay = 1000 * 60 * 2, fixedDelay = 1000 * 60 * 5)
+    @Scheduled(initialDelay = 1000 * 60, fixedDelay = 1000 * 60 * 5)
     public void dotaTask() {
         ALog switchLog = logRepository.getOne(SWITCH_ID);
         if ("1".equals(switchLog.getFromDish())) {

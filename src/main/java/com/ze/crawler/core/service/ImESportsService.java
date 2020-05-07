@@ -102,7 +102,7 @@ public class ImESportsService implements BaseService {
                     continue;
                 }
                 // 联赛名
-                String leagueName = leagueNames.get(1);
+                String leagueName = leagueNames.get(1).trim();
                 if (!Dictionary.ESPORT_IM_LEAGUE_MAPPING.containsKey(leagueName)) {
                     logService.log(Constant.LOG_TYPE_LEAGUE_NOT_FOUND, Constant.ESPORTS_DISH_IM.toString(), type + ":" + leagueName);
                     continue;
