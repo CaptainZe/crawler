@@ -22,16 +22,11 @@ public class CrawlerTask {
     @Autowired
     private ESportsExecutor eSportsExecutor;
     @Autowired
-    private LogRepository logRepository;
-    @Autowired
     private WaterControlRepository waterControlRepository;
 
     // 水量控制
     public final static String YL_CONTROL_ID = "00000"; // 娱乐
     public final static String BP_CONTROL_ID = "11111"; // 包赔
-    public final static String THRESHOLD_ID = "00000";
-    public final static String SWITCH_ID = "11111";
-    public final static String APPOINTED_ID = "22222";
 
     /**
      * 包赔
@@ -42,12 +37,21 @@ public class CrawlerTask {
         if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
             double threshold = Double.parseDouble(waterControl.getThreshold());
 
+            String type = Constant.ESPORTS_TYPE_LOL;
+            String league = waterControl.getLeague();
+            if (league.startsWith("2")) {
+                type = Constant.ESPORTS_TYPE_DOTA2;
+            } else if (league.startsWith("3")) {
+                type = Constant.ESPORTS_TYPE_CSGO;
+            }
+
             TeamFilterModel teamFilterModel = new TeamFilterModel();
             teamFilterModel.setTeamOne(waterControl.getTeamA());
             teamFilterModel.setTeamTwo(waterControl.getTeamB());
-            eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_LOL,
-                        Collections.singleton(waterControl.getLeague()), Collections.singletonList(teamFilterModel), threshold, null);
+            eSportsExecutor.executor(LangUtils.generateUuid(), type,
+                        Collections.singleton(league), Collections.singletonList(teamFilterModel), threshold, null);
         }
+        System.out.println("包赔 执行完成");
     }
 
     /* 娱乐使用 */
@@ -62,24 +66,6 @@ public class CrawlerTask {
 
             eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_LOL, null, null, threshold, null);
         }
-
-//        ALog switchLog = logRepository.getOne(SWITCH_ID);
-//        if ("1".equals(switchLog.getFromDish())) {
-//            ALog aLog = logRepository.getOne(THRESHOLD_ID);
-//            double threshold = Double.parseDouble(aLog.getFromDish());
-//
-//            ALog appointedLog = logRepository.getOne(APPOINTED_ID);
-//            if (!appointedLog.getFromDish().equals("0")) {
-//                TeamFilterModel teamFilterModel = new TeamFilterModel();
-//                teamFilterModel.setTeamOne(appointedLog.getData());
-//                teamFilterModel.setTeamTwo(appointedLog.getMsg());
-//
-//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_LOL,
-//                        Collections.singleton(appointedLog.getFromDish()), Collections.singletonList(teamFilterModel), threshold, null);
-//            } else {
-//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_LOL, null, null, threshold, null);
-//            }
-//        }
         System.out.println("LOL 执行完成");
     }
 
@@ -94,25 +80,6 @@ public class CrawlerTask {
 
             eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_DOTA2, null, null, threshold, null);
         }
-
-//        ALog switchLog = logRepository.getOne(SWITCH_ID);
-//        if ("1".equals(switchLog.getFromDish())) {
-//            ALog aLog = logRepository.getOne(THRESHOLD_ID);
-//            double threshold = Double.parseDouble(aLog.getFromDish());
-//
-//            ALog appointedLog = logRepository.getOne(APPOINTED_ID);
-//            if (!appointedLog.getFromDish().equals("0")) {
-//                TeamFilterModel teamFilterModel = new TeamFilterModel();
-//                teamFilterModel.setTeamOne(appointedLog.getData());
-//                teamFilterModel.setTeamTwo(appointedLog.getMsg());
-//
-//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_DOTA2,
-//                        Collections.singleton(appointedLog.getFromDish()), Collections.singletonList(teamFilterModel), threshold, null);
-//            } else {
-//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_DOTA2, null, null, threshold, null);
-//            }
-//        }
-
         System.out.println("DOTA2 执行完成");
     }
 
@@ -127,25 +94,6 @@ public class CrawlerTask {
 
             eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_CSGO, null, null, threshold, null);
         }
-
-//        ALog switchLog = logRepository.getOne(SWITCH_ID);
-//        if ("1".equals(switchLog.getFromDish())) {
-//            ALog aLog = logRepository.getOne(THRESHOLD_ID);
-//            double threshold = Double.parseDouble(aLog.getFromDish());
-//
-//            ALog appointedLog = logRepository.getOne(APPOINTED_ID);
-//            if (!appointedLog.getFromDish().equals("0")) {
-//                TeamFilterModel teamFilterModel = new TeamFilterModel();
-//                teamFilterModel.setTeamOne(appointedLog.getData());
-//                teamFilterModel.setTeamTwo(appointedLog.getMsg());
-//
-//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_CSGO,
-//                        Collections.singleton(appointedLog.getFromDish()), Collections.singletonList(teamFilterModel), threshold, null);
-//            } else {
-//                eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_CSGO, null, null, threshold, null);
-//            }
-//        }
-
         System.out.println("CSGO 执行完成");
     }
 }

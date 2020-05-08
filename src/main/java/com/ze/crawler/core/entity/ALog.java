@@ -1,12 +1,9 @@
 package com.ze.crawler.core.entity;
 
-import org.hibernate.annotations.Proxy;
-
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Proxy(lazy = false)
 @Table(name = "t_log", schema = "crawler")
 public class ALog {
     private String id;

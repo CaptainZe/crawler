@@ -63,7 +63,7 @@ public class WeiKongService {
         String url = getUrl(api);
         JSONObject body = new JSONObject();
         body.put("wId", wId);
-        body.put("wcId", WkConstant.WK_ESPORTS_YL.get(wId));
+        body.put("wcId", WkConstant.WK_ESPORTS_BP.get(wId));
         body.put("content", content);
         Map<String, Object> response = HttpClientUtils.post(url, body, Map.class, WkConstant.AUTHORIZATION);
         return JSON.toJSONString(response);
