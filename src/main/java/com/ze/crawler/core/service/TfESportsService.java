@@ -120,10 +120,6 @@ public class TfESportsService implements BaseService {
             TfESportsResultModel tfESportsResultModel = JSON.parseObject(JSON.toJSONString(object), TfESportsResultModel.class);
             // 联赛名
             String leagueName = tfESportsResultModel.getCompetitionName().trim();
-            if (!Dictionary.ESPORT_TF_LEAGUE_MAPPING.containsKey(leagueName)) {
-                logService.log(Constant.LOG_TYPE_LEAGUE_NOT_FOUND, Constant.ESPORTS_DISH_TF.toString(), type + ":" + leagueName);
-                continue;
-            }
             String leagueId = Dictionary.ESPORT_TF_LEAGUE_MAPPING.get(leagueName);
             if (leagueId == null) {
                 continue;
@@ -146,16 +142,14 @@ public class TfESportsService implements BaseService {
             if (homeTeamName==null || guestTeamName==null) {
                 continue;
             }
+
+            homeTeamName = homeTeamName.trim();
+            guestTeamName = guestTeamName.trim();
+
             // 获取主客队信息
             String homeTeamId = Dictionary.ESPORT_TF_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
             String guestTeamId = Dictionary.ESPORT_TF_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
             if (homeTeamId == null || guestTeamId == null) {
-                if (homeTeamId == null) {
-                    logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_TF.toString(), type + ":" + leagueId + "#" + homeTeamName);
-                }
-                if (guestTeamId == null) {
-                    logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_TF.toString(), type + ":" + leagueId + "#" + guestTeamName);
-                }
                 continue;
             }
 

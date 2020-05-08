@@ -103,10 +103,6 @@ public class ImESportsService implements BaseService {
                 }
                 // 联赛名
                 String leagueName = leagueNames.get(1).trim();
-                if (!Dictionary.ESPORT_IM_LEAGUE_MAPPING.containsKey(leagueName)) {
-                    logService.log(Constant.LOG_TYPE_LEAGUE_NOT_FOUND, Constant.ESPORTS_DISH_IM.toString(), type + ":" + leagueName);
-                    continue;
-                }
                 String leagueId = Dictionary.ESPORT_IM_LEAGUE_MAPPING.get(leagueName);
                 if (leagueId == null) {
                     continue;
@@ -127,25 +123,19 @@ public class ImESportsService implements BaseService {
                             continue;
                         }
                         // 主队名
-                        String homeTeamName = homeTeamNames.get(2);
+                        String homeTeamName = homeTeamNames.get(2).trim();
 
                         List<String> guestTeamNames = (List<String>) game.get(6);
                         if (CollectionUtils.isEmpty(guestTeamNames) && guestTeamNames.size() < 2) {
                             continue;
                         }
                         // 客队名
-                        String guestTeamName = guestTeamNames.get(2);
+                        String guestTeamName = guestTeamNames.get(2).trim();
 
                         // 获取主客队信息
                         String homeTeamId = Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
                         String guestTeamId = Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
                         if (homeTeamId == null || guestTeamId == null) {
-                            if (homeTeamId == null) {
-                                logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_IM.toString(), type + ":" + leagueId + "#" + homeTeamName);
-                            }
-                            if (guestTeamId == null) {
-                                logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_IM.toString(), type + ":" + leagueId + "#" + guestTeamName);
-                            }
                             continue;
                         }
 
@@ -240,6 +230,7 @@ public class ImESportsService implements BaseService {
             for (List<Object> dish : allDish) {
                 // [28] 盘口名
                 String dishName = (String) dish.get(28);
+                dishName = dishName.trim();
                 if (ImConstant.SKIP_DISH.equalsIgnoreCase(dishName)) {
                     continue;
                 }

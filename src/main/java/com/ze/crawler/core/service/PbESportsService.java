@@ -135,10 +135,6 @@ public class PbESportsService implements BaseService {
                             }
 
                             // 赛事信息获取
-                            if (!Dictionary.ESPORT_PB_LEAGUE_MAPPING.containsKey(leagueName)) {
-                                logService.log(Constant.LOG_TYPE_LEAGUE_NOT_FOUND, Constant.ESPORTS_DISH_PB.toString(), type + ":" + leagueName);
-                                continue;
-                            }
                             String leagueId = Dictionary.ESPORT_PB_LEAGUE_MAPPING.get(leagueName);
                             if (leagueId == null) {
                                 continue;
@@ -160,8 +156,10 @@ public class PbESportsService implements BaseService {
                                     String startTime = TimeUtils.format(startTimestamp);
                                     // home team name
                                     String homeTeamName = (String) game.get(1);
+                                    homeTeamName = homeTeamName.trim();
                                     // guest team name
                                     String guestTeamName = (String) game.get(2);
+                                    guestTeamName = guestTeamName.trim();
 
                                     if (StringUtils.isEmpty(homeTeamName) || StringUtils.isEmpty(guestTeamName)) {
                                         continue;
@@ -184,13 +182,20 @@ public class PbESportsService implements BaseService {
                                     String homeTeamId = Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(matchHomeTeamName);
                                     String guestTeamId = Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(matchGuestTeamName);
                                     if (homeTeamId == null || guestTeamId == null) {
+                                        // 特殊处理, 有的队伍在击杀数的时候队伍名不一样
+                                        String matchHomeTeamName2 = matchHomeTeamName + "战队";
+                                        homeTeamId = Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(matchHomeTeamName2);
                                         if (homeTeamId == null) {
-                                            logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_PB.toString(), type + ":" + leagueId + "#" + homeTeamName);
+                                            continue;
                                         }
+                                    }
+                                    if (guestTeamId == null) {
+                                        // 特殊处理, 有的队伍在击杀数的时候队伍名不一样
+                                        String matchGuestTeamName2 = matchGuestTeamName + "战队";
+                                        guestTeamId = Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(matchGuestTeamName2);
                                         if (guestTeamId == null) {
-                                            logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_PB.toString(), type + ":" + leagueId + "#" + guestTeamName);
+                                            continue;
                                         }
-                                        continue;
                                     }
 
                                     // 如果存在指定队伍, 进行过滤判断
@@ -444,6 +449,7 @@ public class PbESportsService implements BaseService {
                                         for (Map<String, Object> se : seList) {
                                             // 盘口名
                                             String dishName = (String) se.get("n");
+                                            dishName = dishName.trim();
                                             String dishId = dishMapping.get(dishName);
                                             if (dishId == null) {
                                                 continue;
@@ -924,6 +930,7 @@ public class PbESportsService implements BaseService {
                                             for (Map<String, Object> se : allSeList) {
                                                 // 盘口名
                                                 String dishName = (String) se.get("n");
+                                                dishName = dishName.trim();
                                                 String dishId = dishMapping.get(dishName);
                                                 if (dishId == null) {
                                                     continue;

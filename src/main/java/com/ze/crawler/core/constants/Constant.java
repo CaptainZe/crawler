@@ -28,14 +28,12 @@ public class Constant {
     public static final String ESPORT_MAPPING_FILE_PATH = "D:/Crawler/mapping/esport_mapping.xls";  // 电竞
 
     // 日志类型
-    public final static int LOG_TYPE_LEAGUE_NOT_FOUND = 1;                      // 联赛名未找到
-    public final static int LOG_TYPE_TEAM_NOT_FOUND = 2;                        // 队伍名未找到
     // 电竞
-    public final static int LOG_TYPE_PARSE_ESPORTS_ERROR = 3;                   // 电竞解析错误
-    public final static int LOG_TYPE_ESPORTS_INVOKE_ERROR = 4;                  // 电竞爬虫调用错误
-    public final static int LOG_TYPE_ESPORTS_WATER_CALCULATE_ERROR = 5;         // 电竞水量计算错误
+    public final static int LOG_TYPE_PARSE_ESPORTS_ERROR = 1;                   // 电竞解析错误
+    public final static int LOG_TYPE_ESPORTS_INVOKE_ERROR = 2;                  // 电竞爬虫调用错误
+    public final static int LOG_TYPE_ESPORTS_WATER_CALCULATE_ERROR = 3;         // 电竞水量计算错误
     // 体育
-    public final static int LOG_TYPE_PARSE_SPORTS_ERROR = 6;                   // 体育解析错误
+    public final static int LOG_TYPE_PARSE_SPORTS_ERROR = 4;                   // 体育解析错误
 
     // 各下注盘类型
     public final static String DISH_TYPE_SYP = "输赢盘";

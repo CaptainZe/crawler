@@ -140,10 +140,6 @@ public class RgESportsService implements BaseService {
 
             // 赛事信息获取
             String leagueName = item.getTournamentName().trim();
-            if (!Dictionary.ESPORT_RG_LEAGUE_MAPPING.containsKey(leagueName)) {
-                logService.log(Constant.LOG_TYPE_LEAGUE_NOT_FOUND, Constant.ESPORTS_DISH_RG.toString(), type + ":" + leagueName);
-                continue;
-            }
             String leagueId = Dictionary.ESPORT_RG_LEAGUE_MAPPING.get(leagueName);
             if (leagueId == null) {
                 continue;
@@ -173,17 +169,13 @@ public class RgESportsService implements BaseService {
             if (homeTeamId==null || homeTeamName==null || guestTeamId==null || guestTeamName==null) {
                 continue;
             }
+            homeTeamName = homeTeamName.trim();
+            guestTeamName = guestTeamName.trim();
 
             // 获取主客队信息
             String dishHomeTeamId = Dictionary.ESPORT_RG_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
             String dishGuestTeamId = Dictionary.ESPORT_RG_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
             if (dishHomeTeamId == null || dishGuestTeamId == null) {
-                if (dishHomeTeamId == null) {
-                    logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_RG.toString(), type + ":" + leagueId + "#" + homeTeamName);
-                }
-                if (dishGuestTeamId == null) {
-                    logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.ESPORTS_DISH_RG.toString(), type + ":" + leagueId + "#" + guestTeamName);
-                }
                 continue;
             }
 
@@ -224,7 +216,7 @@ public class RgESportsService implements BaseService {
                         // 存储已处理的oddsId
                         Set<Integer> doneOddsIds = new HashSet<>();
                         for (RgESportsResultItemOddsModel odds : oddsList) {
-                            String groupName = odds.getGroupName();
+                            String groupName = odds.getGroupName().trim();
                             String matchStage = odds.getMatchStage();
                             Integer oddsGroupId = odds.getOddsGroupId();
                             Integer oddsId = odds.getOddsId();

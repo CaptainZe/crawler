@@ -115,11 +115,6 @@ public class PbSportsService implements BaseService {
                             String leagueName = ((String) league.get(1)).trim();
 
                             // 赛事信息获取
-                            if (!Dictionary.SPORT_PB_LEAGUE_MAPPING.containsKey(leagueName)) {
-                                logService.log(Constant.LOG_TYPE_LEAGUE_NOT_FOUND, Constant.SPORTS_DISH_PB.toString(), type + ":" + leagueName);
-                                continue;
-                            }
-
                             String leagueId = Dictionary.SPORT_PB_LEAGUE_MAPPING.get(leagueName);
                             if (leagueId == null) {
                                 continue;
@@ -152,12 +147,6 @@ public class PbSportsService implements BaseService {
                                     String homeTeamId = Dictionary.SPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName);
                                     String guestTeamId = Dictionary.SPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName);
                                     if (homeTeamId == null || guestTeamId == null) {
-                                        if (homeTeamId == null) {
-                                            logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.SPORTS_DISH_PB.toString(), type + ":" + leagueId + "#" + homeTeamName);
-                                        }
-                                        if (guestTeamId == null) {
-                                            logService.log(Constant.LOG_TYPE_TEAM_NOT_FOUND, Constant.SPORTS_DISH_PB.toString(), type + ":" + leagueId + "#" + guestTeamName);
-                                        }
                                         continue;
                                     }
 
