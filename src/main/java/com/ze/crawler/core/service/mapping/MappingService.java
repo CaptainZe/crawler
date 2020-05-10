@@ -12,7 +12,9 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * 映射
@@ -53,16 +55,28 @@ public class MappingService {
                 String imName = getCellValue(row.getCell(5));
 
                 if (!StringUtils.isEmpty(pbName)) {
-                    Dictionary.ESPORT_PB_LEAGUE_MAPPING.put(pbName, id);
+                    List<String> pbNames = splitCellValue(pbName);
+                    for (String name : pbNames) {
+                        Dictionary.ESPORT_PB_LEAGUE_MAPPING.put(name, id);
+                    }
                 }
                 if (!StringUtils.isEmpty(rgName)) {
-                    Dictionary.ESPORT_RG_LEAGUE_MAPPING.put(rgName, id);
+                    List<String> rgNames = splitCellValue(rgName);
+                    for (String name : rgNames) {
+                        Dictionary.ESPORT_RG_LEAGUE_MAPPING.put(name, id);
+                    }
                 }
                 if (!StringUtils.isEmpty(tfName)) {
-                    Dictionary.ESPORT_TF_LEAGUE_MAPPING.put(tfName, id);
+                    List<String> tfNames = splitCellValue(tfName);
+                    for (String name : tfNames) {
+                        Dictionary.ESPORT_TF_LEAGUE_MAPPING.put(name, id);
+                    }
                 }
                 if (!StringUtils.isEmpty(imName)) {
-                    Dictionary.ESPORT_IM_LEAGUE_MAPPING.put(imName, id);
+                    List<String> imNames = splitCellValue(imName);
+                    for (String name : imNames) {
+                        Dictionary.ESPORT_IM_LEAGUE_MAPPING.put(name, id);
+                    }
                 }
             }
 
@@ -101,16 +115,28 @@ public class MappingService {
                 }
 
                 if (!StringUtils.isEmpty(pbName)) {
-                    Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).put(pbName.toUpperCase(), id);
+                    List<String> pbNames = splitCellValue(pbName);
+                    for (String name : pbNames) {
+                        Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                    }
                 }
                 if (!StringUtils.isEmpty(rgName)) {
-                    Dictionary.ESPORT_RG_LEAGUE_TEAM_MAPPING.get(leagueId).put(rgName.toUpperCase(), id);
+                    List<String> rgNames = splitCellValue(rgName);
+                    for (String name : rgNames) {
+                        Dictionary.ESPORT_RG_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                    }
                 }
                 if (!StringUtils.isEmpty(tfName)) {
-                    Dictionary.ESPORT_TF_LEAGUE_TEAM_MAPPING.get(leagueId).put(tfName.toUpperCase(), id);
+                    List<String> tfNames = splitCellValue(tfName);
+                    for (String name : tfNames) {
+                        Dictionary.ESPORT_TF_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                    }
                 }
                 if (!StringUtils.isEmpty(imName)) {
-                    Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).put(imName.toUpperCase(), id);
+                    List<String> imNames = splitCellValue(imName);
+                    for (String name : imNames) {
+                        Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                    }
                 }
             }
 
@@ -208,5 +234,18 @@ public class MappingService {
         }
         cell.setCellType(CellType.STRING);
         return cell.getStringCellValue().trim();
+    }
+
+    /**
+     * 有的映射可能存在多个名字，通过#进行分隔
+     * @param value
+     * @return
+     */
+    private List<String> splitCellValue(String value) {
+//        if (value.contains("#")) {
+//            System.out.println(value);
+//        }
+        String[] array = value.split("#");
+        return Arrays.asList(array);
     }
 }

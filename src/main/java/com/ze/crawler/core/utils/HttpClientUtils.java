@@ -12,11 +12,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.util.StringUtils;
-
-import java.io.UnsupportedEncodingException;
 
 /**
  * 网络请求工具类
@@ -96,13 +93,13 @@ public class HttpClientUtils {
             if (!StringUtils.isEmpty(authorization)) {
                 request.setHeader(Constant.REQUEST_HEADER_AUTHORIZATION, authorization);
             }
-            // 设置超时时间
+
+            // 设置代理 & 设置超时时间
+//            HttpHost proxy = new HttpHost(Constant.PROXY_HOST, Constant.PROXY_PORT);
+//            RequestConfig config = RequestConfig.custom().setSocketTimeout(Constant.SOCKET_TIMEOUT).setProxy(proxy).build();
+//            request.setConfig(config);
             RequestConfig config = RequestConfig.custom().setSocketTimeout(Constant.SOCKET_TIMEOUT).build();
             request.setConfig(config);
-    //        // 设置代理
-    //        HttpHost proxy = new HttpHost("112.85.168.223", 9999);
-    //        RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
-    //        request.setConfig(config);
 
             // 3.执行get请求，相当于在输入地址栏后敲回车键
             response = httpClient.execute(request);
@@ -118,6 +115,7 @@ public class HttpClientUtils {
                 return null;
             }
         } catch (Exception e) {
+            // Connection reset
             return null;
         } finally {
             // 6.关闭

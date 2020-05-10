@@ -42,7 +42,7 @@ public class HelloController {
         teamFilterModel.setTeamOne("10106");
         teamFilterModel.setTeamTwo("10101");
 
-        pbESportsService.crawler("110", Constant.ESPORTS_TYPE_LOL, Collections.singleton("101"), Collections.singletonList(teamFilterModel));
+        imESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
     }
 
     @RequestMapping("/executor")

@@ -4,7 +4,6 @@ import com.ze.crawler.controller.WaterController;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.entity.WaterControl;
 import com.ze.crawler.core.model.TeamFilterModel;
-import com.ze.crawler.core.repository.LogRepository;
 import com.ze.crawler.core.repository.WaterControlRepository;
 import com.ze.crawler.core.service.executor.ESportsExecutor;
 import com.ze.crawler.core.utils.LangUtils;
