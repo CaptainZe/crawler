@@ -114,7 +114,7 @@ public class MappingSupportService {
         // 设置类型
         HSSFRow typeRow = sheet.createRow(startRowIndex);
         setExcelCellValue(typeRow, 0, type, style);
-        startRowIndex++;
+        startRowIndex += 2;
 
         JSONObject body = getBaseBody(null, null);
         Map<String, Object> map = HttpClientUtils.post(ImConstant.IM_BASE_URL, body, Map.class);
@@ -231,7 +231,7 @@ public class MappingSupportService {
         // 设置类型
         HSSFRow typeRow = sheet.createRow(startRowIndex);
         setExcelCellValue(typeRow, 0, type, style);
-        startRowIndex++;
+        startRowIndex += 2;
 
         List<List<Object>> allLeagues = new ArrayList<>();
 
@@ -379,7 +379,7 @@ public class MappingSupportService {
         // 设置类型
         HSSFRow typeRow = sheet.createRow(startRowIndex);
         setExcelCellValue(typeRow, 0, type, style);
-        startRowIndex++;
+        startRowIndex += 2;
 
         List<RgESportsResultItemModel> allResult = new ArrayList<>();
 
@@ -501,7 +501,7 @@ public class MappingSupportService {
         // 设置类型
         HSSFRow typeRow = sheet.createRow(startRowIndex);
         setExcelCellValue(typeRow, 0, type, style);
-        startRowIndex++;
+        startRowIndex += 2;
 
         List list = new ArrayList();
 

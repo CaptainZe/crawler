@@ -3,8 +3,11 @@ package com.ze.crawler.core.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ze.crawler.core.constants.Constant;
+import com.ze.crawler.core.constants.ProxyConstant;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -34,13 +37,13 @@ public class HttpClientUtils {
         if (!StringUtils.isEmpty(authorization)) {
             request.setHeader(Constant.REQUEST_HEADER_AUTHORIZATION, authorization);
         }
-        // 设置超时时间
-        RequestConfig config = RequestConfig.custom().setSocketTimeout(Constant.SOCKET_TIMEOUT).build();
-        request.setConfig(config);
-//        // 设置代理
-//        HttpHost proxy = new HttpHost("112.85.168.223", 9999);
-//        RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
+
+        // 设置代理 & 设置超时时间
+//        HttpHost proxy = new HttpHost(Constant.PROXY_HOST, Constant.PROXY_PORT);
+//        RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).setProxy(proxy).build();
 //        request.setConfig(config);
+        RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).build();
+        request.setConfig(config);
 
         try {
             // 3.执行get请求，相当于在输入地址栏后敲回车键
@@ -75,7 +78,7 @@ public class HttpClientUtils {
     /**
      * 网络请求POST
      */
-    public static <T> T post(String url, JSONObject jsonObject, Class<T> clazz, String authorization) {
+    public static <T> T post(String url, JSONObject jsonObject, Class<T> clazz, String authorization, boolean proxy) {
         // 1.生成httpclient，相当于该打开一个浏览器
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
@@ -95,11 +98,14 @@ public class HttpClientUtils {
             }
 
             // 设置代理 & 设置超时时间
-//            HttpHost proxy = new HttpHost(Constant.PROXY_HOST, Constant.PROXY_PORT);
-//            RequestConfig config = RequestConfig.custom().setSocketTimeout(Constant.SOCKET_TIMEOUT).setProxy(proxy).build();
-//            request.setConfig(config);
-            RequestConfig config = RequestConfig.custom().setSocketTimeout(Constant.SOCKET_TIMEOUT).build();
-            request.setConfig(config);
+            if (proxy) {
+                HttpHost proxyHost = new HttpHost(ProxyConstant.PROXY_HOST, ProxyConstant.PROXY_PORT);
+                RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).setProxy(proxyHost).build();
+                request.setConfig(config);
+            } else {
+                RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).build();
+                request.setConfig(config);
+            }
 
             // 3.执行get请求，相当于在输入地址栏后敲回车键
             response = httpClient.execute(request);
@@ -122,6 +128,20 @@ public class HttpClientUtils {
             org.apache.http.client.utils.HttpClientUtils.closeQuietly(response);
             org.apache.http.client.utils.HttpClientUtils.closeQuietly(httpClient);
         }
+    }
+
+    /**
+     * 网络请求POST
+     */
+    public static <T> T post(String url, JSONObject jsonObject, Class<T> clazz, String authorization) {
+        return post(url, jsonObject, clazz, authorization, false);
+    }
+
+    /**
+     * 网络请求POST
+     */
+    public static <T> T post(String url, JSONObject jsonObject, Class<T> clazz, boolean proxy) {
+        return post(url, jsonObject, clazz, null, proxy);
     }
 
     /**

@@ -19,6 +19,6 @@ public class MappingComponent {
         // 电竞Mapping初始化
         mappingService.esportsMapping();
 
-        log.info("success");
+        log.info("电竞Mapping初始化成功");
     }
 }

@@ -59,3 +59,15 @@ CREATE TABLE `t_water_control` (
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci COMMENT = '临时水量控制表';
 
+DROP TABLE IF EXISTS `t_proxy_ip`;
+CREATE TABLE `t_proxy_ip` (
+  `id` VARCHAR(36) NOT NULL,
+  `ip` VARCHAR(100) NULL,
+  `port` INT NULL,
+  `expire_time` VARCHAR(100) NULL,
+  `city` VARCHAR(100) NULL,
+  `isp` VARCHAR(100) NULL,
+  `create_time` VARCHAR(100) NULL,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE=utf8_general_ci COMMENT = '代理IP记录';
+

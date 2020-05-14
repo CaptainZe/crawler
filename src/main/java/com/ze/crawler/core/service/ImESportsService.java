@@ -5,15 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
 import com.ze.crawler.core.constants.ImConstant;
+import com.ze.crawler.core.constants.ProxyConstant;
 import com.ze.crawler.core.constants.enums.ImSpecialDishEnum;
 import com.ze.crawler.core.entity.ImEsports;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.ImEsportsRepository;
 import com.ze.crawler.core.service.log.LogService;
-import com.ze.crawler.core.utils.FilterUtils;
-import com.ze.crawler.core.utils.HttpClientUtils;
-import com.ze.crawler.core.utils.LangUtils;
-import com.ze.crawler.core.utils.TimeUtils;
+import com.ze.crawler.core.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,10 +44,12 @@ public class ImESportsService implements BaseService {
     public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("IM电竞_" + type + "_" + taskId);
 
+        long startTime = System.currentTimeMillis();
+
         JSONObject body = getBaseBody(null, null);
         int retryCount = 0;
         while (true) {
-            Map<String, Object> map = HttpClientUtils.post(ImConstant.IM_BASE_URL, body, Map.class);
+            Map<String, Object> map = HttpClientUtils.post(ImConstant.IM_BASE_URL, body, Map.class, ProxyConstant.USE_PROXY);
             if (map != null && map.get("d") != null) {
                 List<List<Object>> d = (List<List<Object>>) map.get("d");
                 if (!CollectionUtils.isEmpty(d)) {
@@ -71,6 +71,9 @@ public class ImESportsService implements BaseService {
                 break;
             }
         }
+
+        long endTime = System.currentTimeMillis();
+        log.info("IM电竞_" + type + "_" + taskId + "_[耗时（秒）: " + CommonUtils.getSeconds(endTime - startTime) + "]");
     }
 
     /**
@@ -184,7 +187,7 @@ public class ImESportsService implements BaseService {
                         while (true) {
                             String url = String.format(ImConstant.IM_MORE_URL, matchId);
                             JSONObject body = getBaseBody(sportId, matchId);
-                            Map<String, Object> map = HttpClientUtils.post(url, body, Map.class);
+                            Map<String, Object> map = HttpClientUtils.post(url, body, Map.class, ProxyConstant.USE_PROXY);
                             if (map != null && map.get("d") != null) {
                                 List<List<Object>> moreD = (List<List<Object>>) map.get("d");
                                 if (!CollectionUtils.isEmpty(moreD)) {

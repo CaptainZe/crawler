@@ -8,10 +8,7 @@ import com.ze.crawler.core.entity.RgEsports;
 import com.ze.crawler.core.model.*;
 import com.ze.crawler.core.repository.RgEsportsRepository;
 import com.ze.crawler.core.service.log.LogService;
-import com.ze.crawler.core.utils.FilterUtils;
-import com.ze.crawler.core.utils.HttpClientUtils;
-import com.ze.crawler.core.utils.LangUtils;
-import com.ze.crawler.core.utils.TimeUtils;
+import com.ze.crawler.core.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +38,8 @@ public class RgESportsService implements BaseService {
     @Override
     public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("RG电竞_" + type + "_" + taskId);
+
+        long startTime = System.currentTimeMillis();
 
         // 今日
         for (int page=1; page <= RGConstant.MAX_PAGE; page++) {
@@ -93,6 +92,9 @@ public class RgESportsService implements BaseService {
                 }
             }
         }
+
+        long endTime = System.currentTimeMillis();
+        log.info("RG电竞_" + type + "_" + taskId + "_[耗时（秒）: " + CommonUtils.getSeconds(endTime - startTime) + "]");
     }
 
     /**

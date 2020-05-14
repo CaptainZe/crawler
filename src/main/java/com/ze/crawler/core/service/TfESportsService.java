@@ -8,10 +8,7 @@ import com.ze.crawler.core.entity.TfEsports;
 import com.ze.crawler.core.model.*;
 import com.ze.crawler.core.repository.TfEsportsRepository;
 import com.ze.crawler.core.service.log.LogService;
-import com.ze.crawler.core.utils.FilterUtils;
-import com.ze.crawler.core.utils.HttpClientUtils;
-import com.ze.crawler.core.utils.LangUtils;
-import com.ze.crawler.core.utils.TimeUtils;
+import com.ze.crawler.core.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +42,8 @@ public class TfESportsService implements BaseService {
     @Override
     public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("TF电竞_" + type + "_" + taskId);
+
+        long startTime = System.currentTimeMillis();
 
         Integer gameId = null;
         if (Constant.ESPORTS_TYPE_LOL.equalsIgnoreCase(type)) {
@@ -104,6 +103,9 @@ public class TfESportsService implements BaseService {
                 }
             }
         }
+
+        long endTime = System.currentTimeMillis();
+        log.info("TF电竞_" + type + "_" + taskId + "_[耗时（秒）: " + CommonUtils.getSeconds(endTime - startTime) + "]");
     }
 
     /**

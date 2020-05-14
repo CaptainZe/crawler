@@ -48,4 +48,13 @@ public class CommonUtils {
         BigDecimal bigDecimal = new BigDecimal(d);
         return bigDecimal.setScale(newScale, BigDecimal.ROUND_DOWN).doubleValue();
     }
+
+    /**
+     * 获取秒数
+     * @param ms
+     * @return
+     */
+    public static long getSeconds(long ms) {
+        return ms / 1000;
+    }
 }

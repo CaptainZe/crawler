@@ -10,9 +10,6 @@ public class Constant {
     public final static String REQUEST_HEADER_CONTENT_TYPE_APPLICATION_JSON = "application/json";
     // 浏览器Agent
     public final static String CHROME_BROWSER_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36";
-    // IP代理
-    public final static String PROXY_HOST = "114.99.54.65";
-    public final static int PROXY_PORT = 8118;
 
     // 重试次数
     public final static int RETRY_COUNT = 3;
