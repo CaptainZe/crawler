@@ -1,5 +1,6 @@
 package com.ze.crawler.core.component;
 
+import com.ze.crawler.core.constants.ProxyConstant;
 import com.ze.crawler.core.service.proxy.ProxyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,6 +14,8 @@ public class ProxyTask {
 
     @Scheduled(cron = "0 0 0,6,12,18 * * ?")
     public void autoSwitchoverIp() {
-        proxyService.getProxyIp();
+        if (ProxyConstant.USE_PROXY) {
+            proxyService.getProxyIp();
+        }
     }
 }

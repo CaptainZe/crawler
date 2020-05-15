@@ -38,7 +38,6 @@ public class ProxyService {
 
                     ProxyConstant.PROXY_HOST = proxyData.getIp();
                     ProxyConstant.PROXY_PORT = proxyData.getPort();
-                    ProxyConstant.USE_PROXY = true;
 
                     ProxyIp proxyIp = new ProxyIp();
                     BeanUtils.copyProperties(proxyData, proxyIp);
