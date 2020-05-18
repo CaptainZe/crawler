@@ -67,6 +67,7 @@ CREATE TABLE `t_proxy_ip` (
   `expire_time` VARCHAR(100) NULL,
   `city` VARCHAR(100) NULL,
   `isp` VARCHAR(100) NULL,
+  `scene` VARCHAR(100) NULL,
   `create_time` VARCHAR(100) NULL,
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE=utf8_general_ci COMMENT = '代理IP记录';

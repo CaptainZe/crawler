@@ -28,7 +28,7 @@ public class ProxyService {
     /**
      * 获取代理IP
      */
-    public void getProxyIp() {
+    public void getProxyIp(String scene) {
         int retryCount = 0;
         while (true) {
             ProxyResult result = HttpClientUtils.get(GET_PROXY_IP_URL, ProxyResult.class);
@@ -42,6 +42,7 @@ public class ProxyService {
                     ProxyIp proxyIp = new ProxyIp();
                     BeanUtils.copyProperties(proxyData, proxyIp);
                     proxyIp.setId(LangUtils.generateUuid());
+                    proxyIp.setScene(scene);
                     proxyIp.setCreateTime(TimeUtils.format(new Date().getTime()));
                     proxyIpRepository.save(proxyIp);
                     break;

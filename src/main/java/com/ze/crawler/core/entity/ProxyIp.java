@@ -12,6 +12,7 @@ public class ProxyIp {
     private String expireTime;
     private String city;
     private String isp;
+    private String scene;
     private String createTime;
 
     @Id
@@ -75,6 +76,16 @@ public class ProxyIp {
     }
 
     @Basic
+    @Column(name = "scene")
+    public String getScene() {
+        return scene;
+    }
+
+    public void setScene(String scene) {
+        this.scene = scene;
+    }
+
+    @Basic
     @Column(name = "create_time")
     public String getCreateTime() {
         return createTime;
@@ -95,11 +106,12 @@ public class ProxyIp {
                 Objects.equals(expireTime, proxyIp.expireTime) &&
                 Objects.equals(city, proxyIp.city) &&
                 Objects.equals(isp, proxyIp.isp) &&
+                Objects.equals(scene, proxyIp.scene) &&
                 Objects.equals(createTime, proxyIp.createTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, ip, port, expireTime, city, isp, createTime);
+        return Objects.hash(id, ip, port, expireTime, city, isp, scene, createTime);
     }
 }

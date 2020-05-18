@@ -15,7 +15,7 @@ public class ProxyTask {
     @Scheduled(cron = "0 0 0,6,12,18 * * ?")
     public void autoSwitchoverIp() {
         if (ProxyConstant.USE_PROXY) {
-            proxyService.getProxyIp();
+            proxyService.getProxyIp(ProxyConstant.SCENE_ON_TASK);
         }
     }
 }

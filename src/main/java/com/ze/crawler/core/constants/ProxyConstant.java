@@ -8,4 +8,9 @@ public class ProxyConstant {
 
     // 是否使用代理的开关
     public static boolean USE_PROXY = false;
+
+    // 代理IP生成场景
+    public static String SCENE_ON_OPEN = "ON_OPEN";
+    public static String SCENE_ON_SWITCH = "ON_SWITCH";
+    public static String SCENE_ON_TASK = "ON_TASK";
 }

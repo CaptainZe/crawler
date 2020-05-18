@@ -25,7 +25,7 @@ public class ProxyController {
         if (ENABLE_ON.equals(open)) {
             ProxyConstant.USE_PROXY = true;
 
-            proxyService.getProxyIp();
+            proxyService.getProxyIp(ProxyConstant.SCENE_ON_OPEN);
         } else {
             ProxyConstant.USE_PROXY = false;
         }
@@ -37,7 +37,7 @@ public class ProxyController {
      */
     @RequestMapping("/switch_ip")
     public boolean switchProxyIp() {
-        proxyService.getProxyIp();
+        proxyService.getProxyIp(ProxyConstant.SCENE_ON_SWITCH);
         return true;
     }
 }
