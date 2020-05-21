@@ -41,7 +41,6 @@ public class PbESportsService implements BaseService {
     @Override
     public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("平博电竞_" + type + "_" + taskId);
-
         long startTime = System.currentTimeMillis();
 
         int retryCount = 0;
@@ -131,8 +130,12 @@ public class PbESportsService implements BaseService {
                                 if (!leagueName.startsWith(PBConstant.LEAGUE_PREFIX_CSGO)) {
                                     continue;
                                 }
+                            } else if (type.equalsIgnoreCase(Constant.ESPORTS_TYPE_KPL)) {
+                                if (!leagueName.startsWith(PBConstant.LEAGUE_PREFIX_KPL)) {
+                                    continue;
+                                }
                             } else {
-                                // 其余赛事, 比如王者荣耀, 暂不需要
+                                // 其余赛事, 暂不需要
                                 continue;
                             }
 
@@ -227,7 +230,7 @@ public class PbESportsService implements BaseService {
                                         } else {
                                             dealLoLOrDotaKill(meParam, initPbEsports);
                                         }
-                                    } else if (type.equalsIgnoreCase(Constant.ESPORTS_TYPE_CSGO)) {
+                                    } else if (type.equalsIgnoreCase(Constant.ESPORTS_TYPE_CSGO) || type.equalsIgnoreCase(Constant.ESPORTS_TYPE_KPL)) {
                                         // 具体赔率等信息. (KEY: 0表示全场 1表示地图1 2表示地图2 3表示地图3 4表示地图4 5表示地图5)
                                         Map<String, List<Object>> dishMap = (Map<String, List<Object>>) game.get(8);
                                         dealLoLOrDotaOrCsGoNormal(meParam, initPbEsports, dishMap);

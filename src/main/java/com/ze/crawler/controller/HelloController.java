@@ -2,12 +2,8 @@ package com.ze.crawler.controller;
 
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.model.TeamFilterModel;
-import com.ze.crawler.core.service.ImESportsService;
-import com.ze.crawler.core.service.PbESportsService;
-import com.ze.crawler.core.service.RgESportsService;
-import com.ze.crawler.core.service.TfESportsService;
+import com.ze.crawler.core.service.*;
 import com.ze.crawler.core.service.executor.ESportsExecutor;
-import com.ze.crawler.core.service.wk.WeiKongService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,8 +24,13 @@ public class HelloController {
     private ImESportsService imESportsService;
     @Autowired
     private ESportsExecutor eSportsExecutor;
+
     @Autowired
-    private WeiKongService weiKongService;
+    private PbSportsService pbSportsService;
+    @Autowired
+    private ImSportsService imSportsService;
+    @Autowired
+    private YbbSportsService ybbSportsService;
 
     @RequestMapping("/index")
     public String index() {
@@ -42,7 +43,17 @@ public class HelloController {
         teamFilterModel.setTeamOne("10106");
         teamFilterModel.setTeamTwo("10101");
 
-        imESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
+        pbESportsService.crawler("110", Constant.ESPORTS_TYPE_KPL,null, null);
+        rgESportsService.crawler("110", Constant.ESPORTS_TYPE_KPL,null, null);
+        tfESportsService.crawler("110", Constant.ESPORTS_TYPE_KPL,null, null);
+        imESportsService.crawler("110", Constant.ESPORTS_TYPE_KPL,null, null);
+    }
+
+    @RequestMapping("/sports")
+    public void sports() {
+        pbSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
+        imSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
+        ybbSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
     }
 
     @RequestMapping("/executor")

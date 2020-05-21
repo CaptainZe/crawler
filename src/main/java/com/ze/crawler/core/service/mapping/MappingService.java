@@ -19,11 +19,212 @@ import java.util.List;
 /**
  * 映射
  */
+@SuppressWarnings("all")
 @Service
 public class MappingService {
 
     // 完成返回值
     private static final String DONE = "done";
+
+    /**
+     * 解析并缓存体育映射表
+     */
+    public String sportsMapping() {
+        File excelFile = new File(Constant.SPORT_MAPPING_FILE_PATH);
+        try (FileInputStream fis = new FileInputStream(excelFile)) {
+            // 打开工作表
+            HSSFWorkbook workbook = new HSSFWorkbook(fis);
+
+            // 1. sheet[0] -- 联赛映射表
+            HSSFSheet leagueMappingSheet = workbook.getSheetAt(0);
+            for (int rowIndex=1; rowIndex <= leagueMappingSheet.getLastRowNum(); rowIndex++) {
+                // 列顺序: 类型、ID、平博体育、188体育(yabo)、沙巴体育、IM体育、BTI体育
+                HSSFRow row = leagueMappingSheet.getRow(rowIndex);
+                if (row == null) {
+                    continue;
+                }
+                if (row.getCell(0) == null) {
+                    // 分隔线
+                    continue;
+                }
+
+                // 各列信息
+                String id = getCellValue(row.getCell(1));
+                String pbName = getCellValue(row.getCell(2));
+                String ybName = getCellValue(row.getCell(3));
+                String sbName = getCellValue(row.getCell(4));
+                String imName = getCellValue(row.getCell(5));
+                String btiName = getCellValue(row.getCell(6));
+
+                if (!StringUtils.isEmpty(pbName)) {
+                    List<String> pbNames = splitCellValue(pbName);
+                    for (String name : pbNames) {
+                        Dictionary.SPORT_PB_LEAGUE_MAPPING.put(name, id);
+                    }
+                }
+                if (!StringUtils.isEmpty(ybName)) {
+                    List<String> ybNames = splitCellValue(ybName);
+                    for (String name : ybNames) {
+                        Dictionary.SPORT_YB_LEAGUE_MAPPING.put(name, id);
+                    }
+                }
+                if (!StringUtils.isEmpty(sbName)) {
+                    List<String> sbNames = splitCellValue(sbName);
+                    for (String name : sbNames) {
+                        Dictionary.SPORT_SB_LEAGUE_MAPPING.put(name, id);
+                    }
+                }
+                if (!StringUtils.isEmpty(imName)) {
+                    List<String> imNames = splitCellValue(imName);
+                    for (String name : imNames) {
+                        Dictionary.SPORT_IM_LEAGUE_MAPPING.put(name, id);
+                    }
+                }
+                if (!StringUtils.isEmpty(btiName)) {
+                    List<String> btiNames = splitCellValue(btiName);
+                    for (String name : btiNames) {
+                        Dictionary.SPORT_BTI_LEAGUE_MAPPING.put(name, id);
+                    }
+                }
+            }
+
+            // 2. sheet[1] -- 队伍映射表
+            HSSFSheet teamMappingSheet = workbook.getSheetAt(1);
+            for (int rowIndex=1; rowIndex <= teamMappingSheet.getLastRowNum(); rowIndex++) {
+                // 列顺序: 联赛ID、ID、平博体育、188体育(yabo)、沙巴体育、IM体育、BTI体育
+                HSSFRow row = teamMappingSheet.getRow(rowIndex);
+                if (row == null) {
+                    continue;
+                }
+                if (row.getCell(0) == null) {
+                    // 分隔线
+                    continue;
+                }
+
+                // 各列信息
+                String leagueId = getCellValue(row.getCell(0));
+                String id = getCellValue(row.getCell(1));
+                String pbName = getCellValue(row.getCell(2));
+                String ybName = getCellValue(row.getCell(3));
+                String sbName = getCellValue(row.getCell(4));
+                String imName = getCellValue(row.getCell(5));
+                String btiName = getCellValue(row.getCell(6));
+
+                if (!Dictionary.SPORT_PB_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
+                    Dictionary.SPORT_PB_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
+                }
+                if (!Dictionary.SPORT_YB_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
+                    Dictionary.SPORT_YB_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
+                }
+                if (!Dictionary.SPORT_SB_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
+                    Dictionary.SPORT_SB_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
+                }
+                if (!Dictionary.SPORT_IM_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
+                    Dictionary.SPORT_IM_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
+                }
+                if (!Dictionary.SPORT_BTI_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
+                    Dictionary.SPORT_BTI_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
+                }
+
+                if (!StringUtils.isEmpty(pbName)) {
+                    List<String> pbNames = splitCellValue(pbName);
+                    for (String name : pbNames) {
+                        Dictionary.SPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                    }
+                }
+                if (!StringUtils.isEmpty(ybName)) {
+                    List<String> ybNames = splitCellValue(ybName);
+                    for (String name : ybNames) {
+                        Dictionary.SPORT_YB_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                    }
+                }
+                if (!StringUtils.isEmpty(sbName)) {
+                    List<String> sbNames = splitCellValue(sbName);
+                    for (String name : sbNames) {
+                        Dictionary.SPORT_SB_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                    }
+                }
+                if (!StringUtils.isEmpty(imName)) {
+                    List<String> imNames = splitCellValue(imName);
+                    for (String name : imNames) {
+                        Dictionary.SPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                    }
+                }
+                if (!StringUtils.isEmpty(btiName)) {
+                    List<String> btiNames = splitCellValue(btiName);
+                    for (String name : btiNames) {
+                        Dictionary.SPORT_BTI_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                    }
+                }
+            }
+
+            // 3. sheet[2] -- 盘口映射表
+            HSSFSheet dishMappingSheet = workbook.getSheetAt(2);
+            for (int rowIndex=1; rowIndex <= dishMappingSheet.getLastRowNum(); rowIndex++) {
+                // 列顺序: 赛事类型、盘口类型、ID、平博体育、188体育(yabo)、沙巴体育、IM体育、BTI体育
+                HSSFRow row = dishMappingSheet.getRow(rowIndex);
+                if (row == null) {
+                    continue;
+                }
+                if (row.getCell(0) == null) {
+                    // 分隔线
+                    continue;
+                }
+
+                String leagueType = getCellValue(row.getCell(0));
+                String dishType = getCellValue(row.getCell(1));
+                String id = getCellValue(row.getCell(2));
+                String pbName = getCellValue(row.getCell(3));
+                String ybName = getCellValue(row.getCell(4));
+                String sbName = getCellValue(row.getCell(5));
+                String imName = getCellValue(row.getCell(6));
+                String btiName = getCellValue(row.getCell(7));
+
+                if (Constant.SPORTS_TYPE_SOCCER.equalsIgnoreCase(leagueType)) {
+                    // 足球
+                    if (!StringUtils.isEmpty(pbName)) {
+                        Dictionary.SPORT_SOCCER_PB_DISH_MAPPING.put(pbName, id);
+                    }
+                    if (!StringUtils.isEmpty(ybName)) {
+                        Dictionary.SPORT_SOCCER_YB_DISH_MAPPING.put(ybName, id);
+                    }
+                    if (!StringUtils.isEmpty(sbName)) {
+                        Dictionary.SPORT_SOCCER_SB_DISH_MAPPING.put(sbName, id);
+                    }
+                    if (!StringUtils.isEmpty(imName)) {
+                        Dictionary.SPORT_SOCCER_IM_DISH_MAPPING.put(imName, id);
+                    }
+                    if (!StringUtils.isEmpty(btiName)) {
+                        Dictionary.SPORT_SOCCER_BTI_DISH_MAPPING.put(btiName, id);
+                    }
+                } else if (Constant.SPORTS_TYPE_BASKETBALL.equalsIgnoreCase(leagueType)) {
+                    // 足球
+                    if (!StringUtils.isEmpty(pbName)) {
+                        Dictionary.SPORT_BASKETBALL_PB_DISH_MAPPING.put(pbName, id);
+                    }
+                    if (!StringUtils.isEmpty(ybName)) {
+                        Dictionary.SPORT_BASKETBALL_YB_DISH_MAPPING.put(ybName, id);
+                    }
+                    if (!StringUtils.isEmpty(sbName)) {
+                        Dictionary.SPORT_BASKETBALL_SB_DISH_MAPPING.put(sbName, id);
+                    }
+                    if (!StringUtils.isEmpty(imName)) {
+                        Dictionary.SPORT_BASKETBALL_IM_DISH_MAPPING.put(imName, id);
+                    }
+                    if (!StringUtils.isEmpty(btiName)) {
+                        Dictionary.SPORT_BASKETBALL_BTI_DISH_MAPPING.put(btiName, id);
+                    }
+                }
+
+                // 盘口类型映射
+                Dictionary.SPORT_DISH_TYPE_MAPPING.put(id, dishType);
+            }
+
+            return DONE;
+        } catch (Exception e) {
+            return e.getLocalizedMessage();
+        }
+    }
 
     /**
      * 解析并缓存电竞映射表
@@ -213,6 +414,23 @@ public class MappingService {
                     if (!StringUtils.isEmpty(imDisplayName)) {
                         Dictionary.ESPORT_CSGO_IM_DISH_DISPLAY_MAPPING.put(imName, imDisplayName);
                     }
+                } else if (Constant.ESPORTS_TYPE_KPL.equalsIgnoreCase(leagueType)) {
+                    // 王者荣耀
+                    if (!StringUtils.isEmpty(pbName)) {
+                        Dictionary.ESPORT_KPL_PB_DISH_MAPPING.put(pbName, id);
+                    }
+                    if (!StringUtils.isEmpty(rgName)) {
+                        Dictionary.ESPORT_KPL_RG_DISH_MAPPING.put(rgName, id);
+                    }
+                    if (!StringUtils.isEmpty(tfName)) {
+                        Dictionary.ESPORT_KPL_TF_DISH_MAPPING.put(tfName, id);
+                    }
+                    if (!StringUtils.isEmpty(imName)) {
+                        Dictionary.ESPORT_KPL_IM_DISH_MAPPING.put(imName, id);
+                    }
+                    if (!StringUtils.isEmpty(imDisplayName)) {
+                        Dictionary.ESPORT_KPL_IM_DISH_DISPLAY_MAPPING.put(imName, imDisplayName);
+                    }
                 }
 
                 // 盘口类型映射
@@ -242,9 +460,6 @@ public class MappingService {
      * @return
      */
     private List<String> splitCellValue(String value) {
-//        if (value.contains("#")) {
-//            System.out.println(value);
-//        }
         String[] array = value.split("#");
         return Arrays.asList(array);
     }

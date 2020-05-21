@@ -8,10 +8,7 @@ import com.ze.crawler.core.entity.PbSports;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.PbSportsRepository;
 import com.ze.crawler.core.service.log.LogService;
-import com.ze.crawler.core.utils.FilterUtils;
-import com.ze.crawler.core.utils.HttpClientUtils;
-import com.ze.crawler.core.utils.LangUtils;
-import com.ze.crawler.core.utils.TimeUtils;
+import com.ze.crawler.core.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 /**
- * 平博盘口 - 体育（足篮）
+ * 平博盘口 - 体育
  */
 @SuppressWarnings("all")
 @Slf4j
@@ -37,6 +34,7 @@ public class PbSportsService implements BaseService {
     @Override
     public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("平博体育_" + type + "_" + taskId);
+        long startTime = System.currentTimeMillis();
 
         String sp = null;
         if (type.equalsIgnoreCase(Constant.SPORTS_TYPE_BASKETBALL)) {
@@ -51,11 +49,11 @@ public class PbSportsService implements BaseService {
         int retryCount = 0;
         while (true) {
             // 今天
-            String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, sp, TimeUtils.getDate(), System.currentTimeMillis());
+            String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, sp, "", System.currentTimeMillis());
             Map<String, Object> map = HttpClientUtils.get(url, Map.class);
             if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
                 try {
-
+                    parseSports(taskId, type, map, appointedLeagues, appointedTeams);
                 } catch (Exception e) {
                     Map<String, String> data = new HashMap<>();
                     data.put("url", url);
@@ -79,6 +77,7 @@ public class PbSportsService implements BaseService {
             Map<String, Object> map = HttpClientUtils.get(url, Map.class);
             if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
                 try {
+                    parseSports(taskId, type, map, appointedLeagues, appointedTeams);
                 } catch (Exception e) {
                     Map<String, String> data = new HashMap<>();
                     data.put("url", url);
@@ -94,12 +93,15 @@ public class PbSportsService implements BaseService {
                 break;
             }
         }
+
+        long endTime = System.currentTimeMillis();
+        log.info("平博体育_" + type + "_" + taskId + "_[耗时（秒）: " + CommonUtils.getSeconds(endTime - startTime) + "]");
     }
 
     /**
      * 体育解析
      */
-    private void parseEsports(String taskId, String type, Map<String, Object> map, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
+    private void parseSports(String taskId, String type, Map<String, Object> map, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         if (map != null) {
             List<Object> n = (List<Object>) map.get("n");
             if (!CollectionUtils.isEmpty(n)) {
@@ -322,8 +324,8 @@ public class PbSportsService implements BaseService {
                     data.put("result", JSON.toJSONString(moreMap));
                     data.put("retry_count", String.valueOf(retryCount));
                     logService.log(Constant.LOG_TYPE_PARSE_SPORTS_ERROR, Constant.SPORTS_DISH_PB.toString(), JSON.toJSONString(data), e);
-                    break;
                 }
+                break;
             }
 
             retryCount++;

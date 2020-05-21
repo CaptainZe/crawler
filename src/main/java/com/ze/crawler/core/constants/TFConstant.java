@@ -21,6 +21,7 @@ public class TFConstant {
     public final static Integer GAME_ID_CSGO = 1;   // CS:GO
     public final static Integer GAME_ID_DOTA2 = 2;  // DOTA 2
     public final static Integer GAME_ID_LOL = 3;    // LOL
+    public final static Integer GAME_ID_KPL = 14;   // 王者荣耀
 
     /**
      * 一些常量
@@ -33,6 +34,7 @@ public class TFConstant {
 
     public static final String ROUND_BO3 = "BO3";
     public static final String ROUND_BO5 = "BO5";
+    public static final String ROUND_BO7 = "BO7";
 
     // 表示正常, 非滚球
     public final static String IN_PLAY_FALSE = "false";

@@ -43,7 +43,6 @@ public class ImESportsService implements BaseService {
     @Override
     public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("IM电竞_" + type + "_" + taskId);
-
         long startTime = System.currentTimeMillis();
 
         JSONObject body = getBaseBody(null, null);
@@ -90,7 +89,10 @@ public class ImESportsService implements BaseService {
             sportId = ImConstant.SPORT_ID_DOTA2;
         } else if (Constant.ESPORTS_TYPE_CSGO.equalsIgnoreCase(type)) {
             sportId = ImConstant.SPORT_ID_CSGO;
+        } else if (Constant.ESPORTS_TYPE_KPL.equalsIgnoreCase(type)) {
+            sportId = ImConstant.SPORT_ID_KPL;
         }
+
         if (sportId != null) {
             for (List<Object> league : d) {
                 // [8]
@@ -347,7 +349,7 @@ public class ImESportsService implements BaseService {
      * 处理地图数据
      */
     private boolean doMap(Integer gameNo, String round) {
-        if (ImConstant.GAME_ROUND_BO5.equalsIgnoreCase(round)) {
+        if (ImConstant.GAME_ROUND_BO5.equalsIgnoreCase(round) || ImConstant.GAME_ROUND_BO7.equalsIgnoreCase(round)) {
             // bo5
             if (gameNo > 3) {
                 return false;

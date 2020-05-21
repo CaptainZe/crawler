@@ -42,6 +42,8 @@ public class CrawlerTask {
                 type = Constant.ESPORTS_TYPE_DOTA2;
             } else if (league.startsWith("3")) {
                 type = Constant.ESPORTS_TYPE_CSGO;
+            } else if (league.startsWith("4")) {
+                type = Constant.ESPORTS_TYPE_KPL;
             }
 
             TeamFilterModel teamFilterModel = new TeamFilterModel();
@@ -94,5 +96,19 @@ public class CrawlerTask {
             eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_CSGO, null, null, threshold, null);
         }
         System.out.println("CSGO 执行完成");
+    }
+
+    /**
+     * 王者荣耀
+     */
+    @Scheduled(initialDelay = 1000 * 60 * 4, fixedDelay = 1000 * 60 * 5)
+    public void kplTask() {
+        WaterControl waterControl = waterControlRepository.getOne(YL_CONTROL_ID);
+        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
+            double threshold = Double.parseDouble(waterControl.getThreshold());
+
+            eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_KPL, null, null, threshold, null);
+        }
+        System.out.println("王者荣耀 执行完成");
     }
 }

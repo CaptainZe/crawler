@@ -26,6 +26,7 @@ public class RGConstant {
     public static final String GAME_NAME_LOL = "英雄联盟";   // 70
     public static final String GAME_NAME_DOTA2 = "DOTA2";   // 151
     public static final String GAME_NAME_CSGO = "CSGO";     // 140
+    public static final String GAME_NAME_KPL = "王者荣耀";     // 74
 
     public static final String MATCH_STAGE_FINAL = "final"; // 全场
     public static final String MATCH_STAGE_R1 = "r1"; // 第一局

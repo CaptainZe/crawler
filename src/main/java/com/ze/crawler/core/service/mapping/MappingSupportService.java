@@ -58,6 +58,8 @@ public class MappingSupportService {
             rowIndex = imESport(imSheet, Constant.ESPORTS_TYPE_DOTA2, rowIndex, style);
             // CSGO
             rowIndex = imESport(imSheet, Constant.ESPORTS_TYPE_CSGO, rowIndex, style);
+            // 王者荣耀
+            rowIndex = imESport(imSheet, Constant.ESPORTS_TYPE_KPL, rowIndex, style);
 
             // 平博电竞
             rowIndex = 1;
@@ -68,6 +70,8 @@ public class MappingSupportService {
             rowIndex = pbESport(pbSheet, Constant.ESPORTS_TYPE_DOTA2, rowIndex, style);
             // CSGO
             rowIndex = pbESport(pbSheet, Constant.ESPORTS_TYPE_CSGO, rowIndex, style);
+            // 王者荣耀
+            rowIndex = pbESport(pbSheet, Constant.ESPORTS_TYPE_KPL, rowIndex, style);
 
             // RG电竞
             rowIndex = 1;
@@ -78,6 +82,8 @@ public class MappingSupportService {
             rowIndex = rgESport(rgSheet, Constant.ESPORTS_TYPE_DOTA2, rowIndex, style);
             // CSGO
             rowIndex = rgESport(rgSheet, Constant.ESPORTS_TYPE_CSGO, rowIndex, style);
+            // 王者荣耀
+            rowIndex = rgESport(rgSheet, Constant.ESPORTS_TYPE_KPL, rowIndex, style);
 
             // TF电竞
             rowIndex = 1;
@@ -88,6 +94,8 @@ public class MappingSupportService {
             rowIndex = tfESport(tfSheet, Constant.ESPORTS_TYPE_DOTA2, rowIndex, style);
             // CSGO
             rowIndex = tfESport(tfSheet, Constant.ESPORTS_TYPE_CSGO, rowIndex, style);
+            // 王者荣耀
+            rowIndex = tfESport(tfSheet, Constant.ESPORTS_TYPE_KPL, rowIndex, style);
 
             out = new FileOutputStream(ESPORT_MAPPING_SUPPORT_FILE_PATH);
             workbook.write(out);
@@ -128,6 +136,8 @@ public class MappingSupportService {
                     sportId = ImConstant.SPORT_ID_DOTA2;
                 } else if (Constant.ESPORTS_TYPE_CSGO.equalsIgnoreCase(type)) {
                     sportId = ImConstant.SPORT_ID_CSGO;
+                } else if (Constant.ESPORTS_TYPE_KPL.equalsIgnoreCase(type)) {
+                    sportId = ImConstant.SPORT_ID_KPL;
                 }
 
                 if (sportId != null) {
@@ -291,8 +301,12 @@ public class MappingSupportService {
                     if (!leagueName.startsWith(PBConstant.LEAGUE_PREFIX_CSGO)) {
                         continue;
                     }
+                } else if (type.equalsIgnoreCase(Constant.ESPORTS_TYPE_KPL)) {
+                    if (!leagueName.startsWith(PBConstant.LEAGUE_PREFIX_KPL)) {
+                        continue;
+                    }
                 } else {
-                    // 其余赛事, 比如王者荣耀, 暂不需要
+                    // 其余赛事, 暂不需要
                     continue;
                 }
 
@@ -418,8 +432,12 @@ public class MappingSupportService {
                     if (!gameName.equals(RGConstant.GAME_NAME_CSGO)) {
                         continue;
                     }
+                } else if (type.equalsIgnoreCase(Constant.ESPORTS_TYPE_KPL)) {
+                    if (!gameName.equals(RGConstant.GAME_NAME_KPL)) {
+                        continue;
+                    }
                 } else {
-                    // 其余赛事, 比如王者荣耀, 暂不需要
+                    // 其余赛事, 暂不需要
                     continue;
                 }
 
@@ -512,6 +530,8 @@ public class MappingSupportService {
             gameId = TFConstant.GAME_ID_DOTA2;
         } else if (Constant.ESPORTS_TYPE_CSGO.equalsIgnoreCase(type)) {
             gameId = TFConstant.GAME_ID_CSGO;
+        } else if (Constant.ESPORTS_TYPE_KPL.equalsIgnoreCase(type)) {
+            gameId = TFConstant.GAME_ID_KPL;
         }
 
         if (gameId != null) {

@@ -10,6 +10,10 @@ import java.util.TimeZone;
  */
 public class TimeUtils {
 
+    public final static String TIME_FORMAT_1 = "yyyy-MM-dd";
+    public final static String TIME_FORMAT_2 = "yyyy-MM-dd HH:mm:ss";
+    public final static String TIME_FORMAT_3 = "yyyy/MM/dd";
+
     /**
      * 获取日期 - 如果超过12点获取第二天日期
      * @return
@@ -22,7 +26,7 @@ public class TimeUtils {
             calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) + 1);
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT_1);
         return sdf.format(calendar.getTime());
     }
 
@@ -40,7 +44,7 @@ public class TimeUtils {
         calendar.set(Calendar.SECOND, 59);
 
         // 2020-04-06 00:00:00
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT_2);
         return sdf.format(calendar.getTime());
     }
 
@@ -49,12 +53,19 @@ public class TimeUtils {
      * @return
      */
     public static String getNextDay() {
+        return getNextDay(TIME_FORMAT_1);
+    }
+
+    /**
+     * 获取第二天日期
+     * @return
+     */
+    public static String getNextDay(String format) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) + 1);
 
-        // 2020-04-06
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(calendar.getTime());
     }
 
@@ -65,7 +76,7 @@ public class TimeUtils {
      */
     public static String format(Long timestamp) {
         Date date = new Date(timestamp);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT_2);
         return sdf.format(date);
     }
 }

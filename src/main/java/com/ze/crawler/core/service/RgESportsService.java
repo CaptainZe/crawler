@@ -38,7 +38,6 @@ public class RgESportsService implements BaseService {
     @Override
     public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("RG电竞_" + type + "_" + taskId);
-
         long startTime = System.currentTimeMillis();
 
         // 今日
@@ -125,8 +124,12 @@ public class RgESportsService implements BaseService {
                 if (!gameName.equals(RGConstant.GAME_NAME_CSGO)) {
                     continue;
                 }
+            } else if (type.equalsIgnoreCase(Constant.ESPORTS_TYPE_KPL)) {
+                if (!gameName.equals(RGConstant.GAME_NAME_KPL)) {
+                    continue;
+                }
             } else {
-                // 其余赛事, 比如王者荣耀, 暂不需要
+                // 其余赛事 暂不需要
                 continue;
             }
 

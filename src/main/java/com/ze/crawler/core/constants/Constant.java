@@ -19,6 +19,7 @@ public class Constant {
     public final static int EXECUTOR_TIMEOUT = 600;
     // 换行符
     public final static String NEW_LINE = System.getProperty("line.separator");
+
     // VS
     public final static String VS = " VS ";
     // 盘口名通配符
@@ -27,6 +28,7 @@ public class Constant {
 
     // 映射解析路径
     public static final String ESPORT_MAPPING_FILE_PATH = "D:/Crawler/mapping/esport_mapping.xls";  // 电竞
+    public static final String SPORT_MAPPING_FILE_PATH = "D:/Crawler/mapping/sport_mapping.xls";    // 体育
 
     // 日志类型
     // 电竞
@@ -48,6 +50,7 @@ public class Constant {
     public final static String ESPORTS_TYPE_LOL = "LOL";
     public final static String ESPORTS_TYPE_DOTA2 = "DOTA2";
     public final static String ESPORTS_TYPE_CSGO = "CSGO";
+    public final static String ESPORTS_TYPE_KPL = "王者荣耀";
     // 电竞 - 盘口类型
     public final static Integer ESPORTS_DISH_PB = 1;
     public final static Integer ESPORTS_DISH_RG = 2;
@@ -59,4 +62,8 @@ public class Constant {
     public final static String SPORTS_TYPE_BASKETBALL = "BASKETBALL";
     // 体育 - 盘口类型
     public final static Integer SPORTS_DISH_PB = 5;
+    public final static Integer SPORTS_DISH_IM = 6;
+    public final static Integer SPORTS_DISH_YB = 7;
+    public final static Integer SPORTS_DISH_SB = 8;
+    public final static Integer SPORTS_DISH_BTI = 9;
 }

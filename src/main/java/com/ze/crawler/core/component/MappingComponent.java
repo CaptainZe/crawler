@@ -18,7 +18,10 @@ public class MappingComponent {
     void initMapping() {
         // 电竞Mapping初始化
         mappingService.esportsMapping();
-
         log.info("电竞Mapping初始化成功");
+
+        // 体育Mapping初始化
+        mappingService.sportsMapping();
+        log.info("体育Mapping初始化成功");
     }
 }

@@ -42,7 +42,6 @@ public class TfESportsService implements BaseService {
     @Override
     public void crawler(String taskId, String type, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         log.info("TF电竞_" + type + "_" + taskId);
-
         long startTime = System.currentTimeMillis();
 
         Integer gameId = null;
@@ -52,6 +51,8 @@ public class TfESportsService implements BaseService {
             gameId = TFConstant.GAME_ID_DOTA2;
         } else if (Constant.ESPORTS_TYPE_CSGO.equalsIgnoreCase(type)) {
             gameId = TFConstant.GAME_ID_CSGO;
+        } else if (Constant.ESPORTS_TYPE_KPL.equalsIgnoreCase(type)) {
+            gameId = TFConstant.GAME_ID_KPL;
         }
 
         if (gameId != null) {
@@ -392,8 +393,8 @@ public class TfESportsService implements BaseService {
      * 过滤场次
      */
     private boolean doMap(String tabName, String round) {
-        if (TFConstant.ROUND_BO5.equals(round)) {
-            // bo5
+        if (TFConstant.ROUND_BO5.equals(round) || TFConstant.ROUND_BO7.equals(round)) {
+            // bo5 or bo7
             if (tabName.equals(TFConstant.TAB_NAME_MAP4) || tabName.equals(TFConstant.TAB_NAME_MAP5)) {
                 return false;
             }

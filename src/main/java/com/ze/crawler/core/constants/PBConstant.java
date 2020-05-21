@@ -29,10 +29,12 @@ public class PBConstant {
      * 一些常量
      */
     public static final String TEAM_NAME_KILL_SUFFIX = "（击杀数）";
+
     public static final String LEAGUE_PREFIX_LOL = "英雄联盟";
     public static final String LEAGUE_PREFIX_LOL_EN = "League of Legends";
     public static final String LEAGUE_PREFIX_DOTA2 = "Dota 2";
     public static final String LEAGUE_PREFIX_CSGO = "CS:GO";
+    public static final String LEAGUE_PREFIX_KPL = "王者荣耀";
 
     // 盘口的一些描述信息
     public static final String EXTRA_DISH_NAME_DP = "大盘";
