@@ -3,6 +3,7 @@ package com.ze.crawler.core.service;
 import com.alibaba.fastjson.JSON;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
+import com.ze.crawler.core.constants.ProxyConstant;
 import com.ze.crawler.core.constants.RGConstant;
 import com.ze.crawler.core.entity.RgEsports;
 import com.ze.crawler.core.model.*;
@@ -45,7 +46,7 @@ public class RgESportsService implements BaseService {
             int retryCount = 0;
             while (true) {
                 String url = String.format(RGConstant.RG_BASE_URL, page, RGConstant.MATCH_TYPE_TODAY);
-                RgESportsResultModel rgESportsResultModel = HttpClientUtils.get(url, RgESportsResultModel.class);
+                RgESportsResultModel rgESportsResultModel = HttpClientUtils.get(url, RgESportsResultModel.class, ProxyConstant.USE_PROXY);
                 if (rgESportsResultModel != null && !CollectionUtils.isEmpty(rgESportsResultModel.getResult())) {
                     try {
                         parseEsports(taskId, type, rgESportsResultModel.getResult(), false, appointedLeagues, appointedTeams);
@@ -71,7 +72,7 @@ public class RgESportsService implements BaseService {
             int retryCount = 0;
             while (true) {
                 String url = String.format(RGConstant.RG_BASE_URL, page, RGConstant.MATCH_TYPE_ZP);
-                RgESportsResultModel rgESportsResultModel = HttpClientUtils.get(url, RgESportsResultModel.class);
+                RgESportsResultModel rgESportsResultModel = HttpClientUtils.get(url, RgESportsResultModel.class, ProxyConstant.USE_PROXY);
                 if (rgESportsResultModel != null && !CollectionUtils.isEmpty(rgESportsResultModel.getResult())) {
                     try {
                         parseEsports(taskId, type, rgESportsResultModel.getResult(), true, appointedLeagues, appointedTeams);
@@ -196,7 +197,7 @@ public class RgESportsService implements BaseService {
             int retryCount = 0;
             while (true) {
                 String url = String.format(RGConstant.RG_MORE_URL, item.getId());
-                RgESportsOddsResultModel rgESportsOddsResultModel = HttpClientUtils.get(url, RgESportsOddsResultModel.class);
+                RgESportsOddsResultModel rgESportsOddsResultModel = HttpClientUtils.get(url, RgESportsOddsResultModel.class, ProxyConstant.USE_PROXY);
                 if (rgESportsOddsResultModel != null && rgESportsOddsResultModel.getResult() != null) {
                     // 局数
                     String round = rgESportsOddsResultModel.getResult().getRound();

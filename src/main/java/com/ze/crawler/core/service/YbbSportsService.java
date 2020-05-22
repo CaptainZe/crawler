@@ -3,7 +3,7 @@ package com.ze.crawler.core.service;
 import com.alibaba.fastjson.JSON;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
-import com.ze.crawler.core.constants.YbbConstant;
+import com.ze.crawler.core.constants.YBBConstant;
 import com.ze.crawler.core.entity.YbbSports;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.YbbSportsRepository;
@@ -42,7 +42,7 @@ public class YbbSportsService implements BaseService {
         // 今日
         int retryCount = 0;
         while (true) {
-            String url = String.format(YbbConstant.YBB_BASE_URL, System.currentTimeMillis());
+            String url = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
             Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(true), Map.class);
             if (map != null && map.get("mod") != null) {
                 try {
@@ -66,7 +66,7 @@ public class YbbSportsService implements BaseService {
         // 明日
         retryCount = 0;
         while (true) {
-            String url = String.format(YbbConstant.YBB_BASE_URL, System.currentTimeMillis());
+            String url = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
             Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(false), Map.class);
             if (map != null && map.get("mod") != null) {
                 try {
@@ -180,16 +180,16 @@ public class YbbSportsService implements BaseService {
                                     if (!CollectionUtils.isEmpty(oddsInfo)) {
                                         for (String oddsType : oddsInfo.keySet()) {
                                             List<YbbSports> tempList = new ArrayList<>();
-                                            if (YbbConstant.ODDS_TYPE_RFP.equalsIgnoreCase(oddsType)
-                                                    || YbbConstant.ODDS_TYPE_RFP_1ST.equalsIgnoreCase(oddsType)) {
+                                            if (YBBConstant.ODDS_TYPE_RFP.equalsIgnoreCase(oddsType)
+                                                    || YBBConstant.ODDS_TYPE_RFP_1ST.equalsIgnoreCase(oddsType)) {
                                                 // 让分盘
                                                 List<String> odds = oddsInfo.get(oddsType);
                                                 if (CollectionUtils.isEmpty(odds)) {
                                                     continue;
                                                 }
                                                 tempList = dishHandler4Rfp(initYbbSports, oddsType, odds, dishMapping);
-                                            } else if (YbbConstant.ODDS_TYPE_DXP.equalsIgnoreCase(oddsType)
-                                                    || YbbConstant.ODDS_TYPE_DXP_1ST.equalsIgnoreCase(oddsType)) {
+                                            } else if (YBBConstant.ODDS_TYPE_DXP.equalsIgnoreCase(oddsType)
+                                                    || YBBConstant.ODDS_TYPE_DXP_1ST.equalsIgnoreCase(oddsType)) {
                                                 // 大小盘
                                                 List<String> odds = oddsInfo.get(oddsType);
                                                 if (CollectionUtils.isEmpty(odds)) {
@@ -223,10 +223,10 @@ public class YbbSportsService implements BaseService {
         List<YbbSports> ybbSportsList = new ArrayList<>();
 
         String dishName = null;
-        if (YbbConstant.ODDS_TYPE_RFP.equalsIgnoreCase(oddsType)) {
-            dishName = YbbConstant.CUSTOM_DISH_NAME_FULL_RFP;
-        } else if (YbbConstant.ODDS_TYPE_RFP_1ST.equalsIgnoreCase(oddsType)) {
-            dishName = YbbConstant.CUSTOM_DISH_NAME_FIRST_HALF_RFP;
+        if (YBBConstant.ODDS_TYPE_RFP.equalsIgnoreCase(oddsType)) {
+            dishName = YBBConstant.CUSTOM_DISH_NAME_FULL_RFP;
+        } else if (YBBConstant.ODDS_TYPE_RFP_1ST.equalsIgnoreCase(oddsType)) {
+            dishName = YBBConstant.CUSTOM_DISH_NAME_FIRST_HALF_RFP;
         }
 
         if (dishName != null) {
@@ -275,10 +275,10 @@ public class YbbSportsService implements BaseService {
         List<YbbSports> ybbSportsList = new ArrayList<>();
 
         String dishName = null;
-        if (YbbConstant.ODDS_TYPE_DXP.equalsIgnoreCase(oddsType)) {
-            dishName = YbbConstant.CUSTOM_DISH_NAME_FULL_DXP;
-        } else if (YbbConstant.ODDS_TYPE_DXP_1ST.equalsIgnoreCase(oddsType)) {
-            dishName = YbbConstant.CUSTOM_DISH_NAME_FIRST_HALF_DXP;
+        if (YBBConstant.ODDS_TYPE_DXP.equalsIgnoreCase(oddsType)) {
+            dishName = YBBConstant.CUSTOM_DISH_NAME_FULL_DXP;
+        } else if (YBBConstant.ODDS_TYPE_DXP_1ST.equalsIgnoreCase(oddsType)) {
+            dishName = YBBConstant.CUSTOM_DISH_NAME_FIRST_HALF_DXP;
         }
 
         if (dishName != null) {
@@ -309,8 +309,8 @@ public class YbbSportsService implements BaseService {
                     ybbSports.setHomeTeamOdds(homeTeamOdds);
                     ybbSports.setGuestTeamOdds(guestTeamOdds);
                     ybbSports.setHomeTeamItem(homeTeamItem.toString());
-                    ybbSports.setHomeExtraDishName(YbbConstant.EXTRA_DISH_NAME_GREATER_THAN);
-                    ybbSports.setGuestExtraDishName(YbbConstant.EXTRA_DISH_NAME_LESS_THAN);
+                    ybbSports.setHomeExtraDishName(YBBConstant.EXTRA_DISH_NAME_GREATER_THAN);
+                    ybbSports.setGuestExtraDishName(YBBConstant.EXTRA_DISH_NAME_LESS_THAN);
                     ybbSportsList.add(ybbSports);
                 }
             }

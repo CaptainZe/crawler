@@ -11,6 +11,8 @@ import com.ze.crawler.core.repository.TfEsportsRepository;
 import com.ze.crawler.core.service.*;
 import com.ze.crawler.core.service.log.LogService;
 import com.ze.crawler.core.service.water.WaterCalculator;
+import com.ze.crawler.core.utils.CommonUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 电竞爬虫执行器
  */
+@Slf4j
 @Service
 public class ESportsExecutor {
     @Autowired
@@ -76,6 +79,8 @@ public class ESportsExecutor {
         }
 
         try {
+            long startTime = System.currentTimeMillis();
+
             // 执行完成, 进行水量计算
             List<PbEsports> pbEsportsList = pbEsportsRepository.findByTaskId(taskId);
             List<RgEsports> rgEsportsList = rgEsportsRepository.findByTaskId(taskId);
@@ -108,6 +113,9 @@ public class ESportsExecutor {
 
             // 报水
             waterCalculator.calculateWater(esportsMapOrder, threshold, main, appointedLeagues == null ? WkConstant.ESPORTS_YL : WkConstant.ESPORTS_BP);
+
+            long endTime = System.currentTimeMillis();
+            log.info("报水_" + type + "_" + taskId + "_[耗时（秒）: " + CommonUtils.getSeconds(endTime - startTime) + "]");
         } catch (Exception e) {
             logService.log(Constant.LOG_TYPE_ESPORTS_WATER_CALCULATE_ERROR, "esports", taskId + "_" + type, e);
         }

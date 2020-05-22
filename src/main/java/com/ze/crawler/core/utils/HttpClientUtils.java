@@ -29,11 +29,12 @@ import java.util.Set;
 /**
  * 网络请求工具类
  */
+@SuppressWarnings("all")
 public class HttpClientUtils {
     /**
      * 网络请求GET
      */
-    public static <T> T get(String url, Class<T> clazz, String authorization) {
+    public static <T> T get(String url, Class<T> clazz, String authorization, boolean proxy) {
         // 1.生成httpclient，相当于该打开一个浏览器
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
@@ -47,11 +48,14 @@ public class HttpClientUtils {
         }
 
         // 设置代理 & 设置超时时间
-//        HttpHost proxy = new HttpHost(Constant.PROXY_HOST, Constant.PROXY_PORT);
-//        RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).setProxy(proxy).build();
-//        request.setConfig(config);
-        RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).build();
-        request.setConfig(config);
+        if (proxy) {
+            HttpHost proxyHost = new HttpHost(ProxyConstant.PROXY_HOST, ProxyConstant.PROXY_PORT);
+            RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).setProxy(proxyHost).build();
+            request.setConfig(config);
+        } else {
+            RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).build();
+            request.setConfig(config);
+        }
 
         try {
             // 3.执行get请求，相当于在输入地址栏后敲回车键
@@ -79,8 +83,22 @@ public class HttpClientUtils {
     /**
      * 网络请求GET
      */
+    public static <T> T get(String url, Class<T> clazz, String authorization) {
+        return get(url, clazz, null, false);
+    }
+
+    /**
+     * 网络请求GET
+     */
     public static <T> T get(String url, Class<T> clazz) {
-        return get(url, clazz, null);
+        return get(url, clazz, null, false);
+    }
+
+    /**
+     * 网络请求GET
+     */
+    public static <T> T get(String url, Class<T> clazz, boolean proxy) {
+        return get(url, clazz, null, proxy);
     }
 
     /**

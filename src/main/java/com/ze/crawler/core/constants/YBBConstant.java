@@ -3,7 +3,7 @@ package com.ze.crawler.core.constants;
 /**
  * 188盘口常量
  */
-public class YbbConstant {
+public class YBBConstant {
 
     // 基础URL (%s替换替换顺序: ts)
     public final static String YBB_BASE_URL = "https://landing-sb.188sbk.com/zh-cn/Service/CentralService?GetData&ts=%s";
