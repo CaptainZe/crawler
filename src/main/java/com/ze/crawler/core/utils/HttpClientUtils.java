@@ -84,7 +84,7 @@ public class HttpClientUtils {
      * 网络请求GET
      */
     public static <T> T get(String url, Class<T> clazz, String authorization) {
-        return get(url, clazz, null, false);
+        return get(url, clazz, authorization, false);
     }
 
     /**

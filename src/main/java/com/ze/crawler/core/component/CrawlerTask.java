@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
+import java.util.*;
 
 /**
  * 临时爬虫任务
@@ -46,11 +46,20 @@ public class CrawlerTask {
                 type = Constant.ESPORTS_TYPE_KPL;
             }
 
+            List<String> leagueList = Arrays.asList(league.split(","));
+            Set<String> leagues = new HashSet<>(leagueList);
+
             TeamFilterModel teamFilterModel = new TeamFilterModel();
             teamFilterModel.setTeamOne(waterControl.getTeamA());
             teamFilterModel.setTeamTwo(waterControl.getTeamB());
-            eSportsExecutor.executor(LangUtils.generateUuid(), type,
-                        Collections.singleton(league), Collections.singletonList(teamFilterModel), threshold, null);
+
+            if ("0".equals(waterControl.getTeamA()) || "0".equals(waterControl.getTeamB())) {
+                eSportsExecutor.executor(LangUtils.generateUuid(), type,
+                        leagues, null, threshold, Constant.ESPORTS_DISH_PB);
+            } else {
+                eSportsExecutor.executor(LangUtils.generateUuid(), type,
+                        leagues, Collections.singletonList(teamFilterModel), threshold, null);
+            }
         }
         System.out.println("包赔 执行完成");
     }
