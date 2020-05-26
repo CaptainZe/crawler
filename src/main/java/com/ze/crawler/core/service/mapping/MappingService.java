@@ -254,6 +254,7 @@ public class MappingService {
                 String rgName = getCellValue(row.getCell(3));
                 String tfName = getCellValue(row.getCell(4));
                 String imName = getCellValue(row.getCell(5));
+                String fyName = getCellValue(row.getCell(6));
 
                 if (!StringUtils.isEmpty(pbName)) {
                     List<String> pbNames = splitCellValue(pbName);
@@ -279,6 +280,12 @@ public class MappingService {
                         Dictionary.ESPORT_IM_LEAGUE_MAPPING.put(name, id);
                     }
                 }
+                if (!StringUtils.isEmpty(fyName)) {
+                    List<String> fyNames = splitCellValue(fyName);
+                    for (String name : fyNames) {
+                        Dictionary.ESPORT_FY_LEAGUE_MAPPING.put(name, id);
+                    }
+                }
             }
 
             // 2. sheet[1] -- 队伍映射表
@@ -301,6 +308,7 @@ public class MappingService {
                 String rgName = getCellValue(row.getCell(3));
                 String tfName = getCellValue(row.getCell(4));
                 String imName = getCellValue(row.getCell(5));
+                String fyName = getCellValue(row.getCell(6));
 
                 if (!Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
                     Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
@@ -313,6 +321,9 @@ public class MappingService {
                 }
                 if (!Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
                     Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
+                }
+                if (!Dictionary.ESPORT_FY_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
+                    Dictionary.ESPORT_FY_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
                 }
 
                 if (!StringUtils.isEmpty(pbName)) {
@@ -339,6 +350,12 @@ public class MappingService {
                         Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
                     }
                 }
+                if (!StringUtils.isEmpty(fyName)) {
+                    List<String> fyNames = splitCellValue(fyName);
+                    for (String name : fyNames) {
+                        Dictionary.ESPORT_FY_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                    }
+                }
             }
 
             // 3. sheet[2] -- 盘口映射表
@@ -362,6 +379,7 @@ public class MappingService {
                 String tfName = getCellValue(row.getCell(5));
                 String imName = getCellValue(row.getCell(6));
                 String imDisplayName = getCellValue(row.getCell(7));
+                String fyName = getCellValue(row.getCell(8));
                 
                 if (Constant.ESPORTS_TYPE_LOL.equalsIgnoreCase(leagueType)) {
                     // LOL
@@ -380,6 +398,9 @@ public class MappingService {
                     if (!StringUtils.isEmpty(imDisplayName)) {
                         Dictionary.ESPORT_LOL_IM_DISH_DISPLAY_MAPPING.put(imName, imDisplayName);
                     }
+                    if (!StringUtils.isEmpty(fyName)) {
+                        Dictionary.ESPORT_LOL_FY_DISH_MAPPING.put(fyName, id);
+                    }
                 } else if (Constant.ESPORTS_TYPE_DOTA2.equalsIgnoreCase(leagueType)) {
                     // DOTA2
                     if (!StringUtils.isEmpty(pbName)) {
@@ -396,6 +417,9 @@ public class MappingService {
                     }
                     if (!StringUtils.isEmpty(imDisplayName)) {
                         Dictionary.ESPORT_DOTA2_IM_DISH_DISPLAY_MAPPING.put(imName, imDisplayName);
+                    }
+                    if (!StringUtils.isEmpty(fyName)) {
+                        Dictionary.ESPORT_DOTA2_FY_DISH_MAPPING.put(fyName, id);
                     }
                 } else if (Constant.ESPORTS_TYPE_CSGO.equalsIgnoreCase(leagueType)) {
                     // CSGO
@@ -414,6 +438,9 @@ public class MappingService {
                     if (!StringUtils.isEmpty(imDisplayName)) {
                         Dictionary.ESPORT_CSGO_IM_DISH_DISPLAY_MAPPING.put(imName, imDisplayName);
                     }
+                    if (!StringUtils.isEmpty(fyName)) {
+                        Dictionary.ESPORT_CSGO_FY_DISH_MAPPING.put(fyName, id);
+                    }
                 } else if (Constant.ESPORTS_TYPE_KPL.equalsIgnoreCase(leagueType)) {
                     // 王者荣耀
                     if (!StringUtils.isEmpty(pbName)) {
@@ -430,6 +457,9 @@ public class MappingService {
                     }
                     if (!StringUtils.isEmpty(imDisplayName)) {
                         Dictionary.ESPORT_KPL_IM_DISH_DISPLAY_MAPPING.put(imName, imDisplayName);
+                    }
+                    if (!StringUtils.isEmpty(fyName)) {
+                        Dictionary.ESPORT_KPL_FY_DISH_MAPPING.put(fyName, id);
                     }
                 }
 

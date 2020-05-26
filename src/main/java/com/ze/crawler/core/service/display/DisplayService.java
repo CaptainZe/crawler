@@ -129,6 +129,8 @@ public class DisplayService {
             return "TF电竞";
         } else if (Constant.ESPORTS_DISH_IM.equals(dish)) {
             return "IM电竞";
+        } else if (Constant.ESPORTS_DISH_FY.equals(dish)) {
+            return "泛亚电竞";
         }
         return null;
     }

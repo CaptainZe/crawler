@@ -4,10 +4,7 @@ import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.WKConstant;
 import com.ze.crawler.core.entity.*;
 import com.ze.crawler.core.model.TeamFilterModel;
-import com.ze.crawler.core.repository.ImEsportsRepository;
-import com.ze.crawler.core.repository.PbEsportsRepository;
-import com.ze.crawler.core.repository.RgEsportsRepository;
-import com.ze.crawler.core.repository.TfEsportsRepository;
+import com.ze.crawler.core.repository.*;
 import com.ze.crawler.core.service.*;
 import com.ze.crawler.core.service.log.LogService;
 import com.ze.crawler.core.service.water.WaterCalculator;
@@ -39,6 +36,8 @@ public class ESportsExecutor {
     @Autowired
     private ImESportsService imESportsService;
     @Autowired
+    private FyESportsService fyESportsService;
+    @Autowired
     private PbEsportsRepository pbEsportsRepository;
     @Autowired
     private RgEsportsRepository rgEsportsRepository;
@@ -46,6 +45,8 @@ public class ESportsExecutor {
     private TfEsportsRepository tfEsportsRepository;
     @Autowired
     private ImEsportsRepository imEsportsRepository;
+    @Autowired
+    private FyEsportsRepository fyEsportsRepository;
     @Autowired
     private WaterCalculator waterCalculator;
 
@@ -66,10 +67,12 @@ public class ESportsExecutor {
         CrawlerThread rg = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, rgESportsService);
         CrawlerThread tf = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, tfESportsService);
         CrawlerThread im = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, imESportsService);
+        CrawlerThread fy = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, fyESportsService);
         threads.add(pb);
         threads.add(rg);
         threads.add(tf);
         threads.add(im);
+        threads.add(fy);
 
         try {
             // 执行
@@ -86,11 +89,13 @@ public class ESportsExecutor {
             List<RgEsports> rgEsportsList = rgEsportsRepository.findByTaskId(taskId);
             List<TfEsports> tfEsportsList = tfEsportsRepository.findByTaskId(taskId);
             List<ImEsports> imEsportsList = imEsportsRepository.findByTaskId(taskId);
+            List<FyEsports> fyEsportsList = fyEsportsRepository.findByTaskId(taskId);
             Map<Integer, List<? extends Sports>> esportsMap = new LinkedHashMap<>();
             esportsMap.put(Constant.ESPORTS_DISH_PB, pbEsportsList);
             esportsMap.put(Constant.ESPORTS_DISH_RG, rgEsportsList);
             esportsMap.put(Constant.ESPORTS_DISH_TF, tfEsportsList);
             esportsMap.put(Constant.ESPORTS_DISH_IM, imEsportsList);
+            esportsMap.put(Constant.ESPORTS_DISH_FY, fyEsportsList);
 
             Map<Integer, List<? extends Sports>> esportsMapOrder = new LinkedHashMap<>();
             if (main != null) {
@@ -103,6 +108,8 @@ public class ESportsExecutor {
                     esportsMapOrder.put(Constant.ESPORTS_DISH_TF, esportsMap.get(Constant.ESPORTS_DISH_TF));
                 } else if (main.equals(Constant.ESPORTS_DISH_IM)) {
                     esportsMapOrder.put(Constant.ESPORTS_DISH_IM, esportsMap.get(Constant.ESPORTS_DISH_IM));
+                } else if (main.equals(Constant.ESPORTS_DISH_FY)) {
+                    esportsMapOrder.put(Constant.ESPORTS_DISH_FY, esportsMap.get(Constant.ESPORTS_DISH_FY));
                 }
                 for (Integer key : esportsMap.keySet()) {
                     esportsMapOrder.put(key, esportsMap.get(key));

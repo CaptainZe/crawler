@@ -21,8 +21,25 @@ public class FYConstant {
     // 状态
     public static final String MATCH_STATUS_BEGIN = "Begin";
 
+    // 赔率index
+    public static final int INDEX_FIRST = 0;
+    public static final int INDEX_SECOND = 1;
+
     // Round
     public static final String ROUND_BO3 = "BO3";
     public static final String ROUND_BO5 = "BO5";
     public static final String ROUND_BO7 = "BO7";
+
+    // 地图数
+    public static final String ROUND_MAP3 = "Map3";
+    public static final String ROUND_MAP4 = "Map4";
+    public static final String ROUND_MAP5 = "Map5";
+
+    // 盘口的一些描述信息
+    public static final String EXTRA_DISH_NAME_GREATER_THAN = "大";
+    public static final String EXTRA_DISH_NAME_LESS_THAN = "小";
+    public static final String EXTRA_DISH_NAME_ODD = "单";
+    public static final String EXTRA_DISH_NAME_EVEN = "双";
+    public static final String EXTRA_DISH_NAME_YES = "是";
+    public static final String EXTRA_DISH_NAME_NO = "否";
 }

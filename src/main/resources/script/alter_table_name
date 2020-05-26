@@ -4,6 +4,7 @@ ALTER TABLE `t_esports_pb` RENAME TO  `t_esports_pb_20200509`;
 ALTER TABLE `t_esports_rg` RENAME TO  `t_esports_rg_20200509`;
 ALTER TABLE `t_esports_tf` RENAME TO  `t_esports_tf_20200509`;
 ALTER TABLE `t_esports_im` RENAME TO  `t_esports_im_20200509`;
+ALTER TABLE `t_esports_fy` RENAME TO  `t_esports_fy_20200509`;
 
 # 体育
 ALTER TABLE `t_sports_pb` RENAME TO  `t_sports_pb`;

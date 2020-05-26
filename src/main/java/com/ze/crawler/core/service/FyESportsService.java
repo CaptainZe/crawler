@@ -5,22 +5,20 @@ import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
 import com.ze.crawler.core.constants.FYConstant;
 import com.ze.crawler.core.constants.ProxyConstant;
+import com.ze.crawler.core.entity.FyEsports;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.FyEsportsRepository;
 import com.ze.crawler.core.service.log.LogService;
-import com.ze.crawler.core.utils.CommonUtils;
-import com.ze.crawler.core.utils.FilterUtils;
-import com.ze.crawler.core.utils.HttpClientUtils;
+import com.ze.crawler.core.utils.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 泛亚电竞盘口
@@ -74,6 +72,9 @@ public class FyESportsService implements BaseService {
      * 解析电竞
      */
     private void parseEsports(String taskId, String type, List<Map<String, Object>> matchList, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
+        // 第二天最后时刻
+        String nextDayLastTime = TimeUtils.getNextDayLastTime();
+
         if (!CollectionUtils.isEmpty(matchList)) {
             // 遍历
             for (Map<String, Object> match : matchList) {
@@ -108,8 +109,18 @@ public class FyESportsService implements BaseService {
                     continue;
                 }
 
+                // 比赛开始时间
+                String startTime = (String) match.get("StartAt");
+                if (nextDayLastTime.compareTo(startTime) < 0) {
+                    continue;
+                }
+
                 // 联赛名
                 String leagueName = (String) match.get("LeagueName");
+                if (StringUtils.isEmpty(leagueName)) {
+                    continue;
+                }
+                leagueName = leagueName.trim();
                 String leagueId = Dictionary.ESPORT_FY_LEAGUE_MAPPING.get(leagueName);
                 if (leagueId == null) {
                     continue;
@@ -144,9 +155,196 @@ public class FyESportsService implements BaseService {
 
                 // 比赛ID
                 Integer matchId = (Integer) match.get("ID");
-                //
+                // 轮数
+                String round = (String) match.get("Type");
+
+                // 初始化一个, 避免重复赋值
+                FyEsports initFyEsports = new FyEsports();
+                initFyEsports.setTaskId(taskId);
+                initFyEsports.setType(type);
+                initFyEsports.setLeagueId(leagueId);
+                initFyEsports.setLeagueName(leagueName);
+                initFyEsports.setHomeTeamId(homeTeamId);
+                initFyEsports.setHomeTeamName(homeTeamName);
+                initFyEsports.setGuestTeamId(guestTeamId);
+                initFyEsports.setGuestTeamName(guestTeamName);
+                initFyEsports.setStartTime(startTime);
+
+                // 获取对应盘口字典表
+                Map<String, String> dishMapping = Dictionary.getEsportDishMappingByTypeAndDishType(type, Constant.ESPORTS_DISH_FY);
+
+                List<FyEsports> fyEsportsList = new ArrayList<>();
+                // 获取赔率信息
+                Map<String, String> headers = getRequestHeaders(FYConstant.PATH_MATCH_INFO);
+                Map<String, Object> body = getRequestParams(matchId);
+                Map<String, Object> dishMap = HttpClientUtils.postFrom(FYConstant.FY_BASE_URL, body, headers, Map.class, ProxyConstant.USE_PROXY);
+                if (!CollectionUtils.isEmpty(dishMap)) {
+                    Map<String, Object> info = (Map<String, Object>) dishMap.get("info");
+                    if (!CollectionUtils.isEmpty(info)) {
+                        // 赔率数值
+                        Map<String, Map<String, Object>> oddsItems = (Map<String, Map<String, Object>>) info.get("Items");
+                        // 比赛信息
+                        Map<String, Object> matchInfo = (Map<String, Object>) info.get("Match");
+                        // 盘口信息
+                        List<Map<String, Object>> bets = (List<Map<String, Object>>) matchInfo.get("Bets");
+                        if (!CollectionUtils.isEmpty(bets)) {
+                            for (Map<String, Object> bet : bets) {
+                                // 地图名
+                                String mapName = (String) bet.get("Round");
+                                if (!doMap(mapName, round)) {
+                                    continue;
+                                }
+
+                                /*
+                                    对应的具体赔率
+                                    1、输赢盘： 0是主队 1是客队
+                                    2、大小盘： 0是大  2是小
+                                    3、让分盘： 0是主队 1是客队
+                                    4、单双盘： 0是单 1是双
+                                    5、是否盘： 0是是 1是否
+                                 */
+                                List<Map<String, Object>> items = (List<Map<String, Object>>) bet.get("Items");
+                                if (CollectionUtils.isEmpty(items) || items.size() < 2) {
+                                    continue;
+                                }
+
+                                String handicap = (String) bet.get("Handicap");
+                                String name = (String) bet.get("Name");
+                                // 盘口名
+                                String dishName = getDishName(handicap, name);
+                                String dishId = dishMapping.get(dishName);
+                                if (dishId != null) {
+                                    String dishType = Dictionary.ESPORT_DISH_TYPE_MAPPING.get(dishId);
+                                    if (dishType == null) {
+                                        continue;
+                                    }
+
+                                    FyEsports fyEsports = new FyEsports();
+                                    BeanUtils.copyProperties(initFyEsports, fyEsports);
+                                    fyEsports.setId(LangUtils.generateUuid());
+                                    fyEsports.setDishId(dishId);
+                                    fyEsports.setDishName(dishName);
+
+                                    String odds1 = getOdds(items, oddsItems, FYConstant.INDEX_FIRST);
+                                    String odds2 = getOdds(items, oddsItems, FYConstant.INDEX_SECOND);
+                                    if (StringUtils.isEmpty(odds1) || StringUtils.isEmpty(odds1)) {
+                                        continue;
+                                    }
+
+                                    if (Constant.DISH_TYPE_SYP.equals(dishType)) {
+                                        // 输赢盘
+                                        fyEsports.setHomeTeamOdds(odds1);
+                                        fyEsports.setGuestTeamOdds(odds2);
+                                    } else if (Constant.DISH_TYPE_RFP.equals(dishType)) {
+                                        // 让分盘
+                                        String homeTeamItem = handicap;
+                                        if (handicap.startsWith("+")) {
+                                            homeTeamItem = homeTeamItem.replace("+", "");
+                                        }
+                                        String guestTeamItem = handicap;
+                                        if (handicap.startsWith("+")) {
+                                            guestTeamItem = guestTeamItem.replace("+", "-");
+                                        } else {
+                                            guestTeamItem = guestTeamItem.replace("-", "");
+                                        }
+
+                                        fyEsports.setHomeTeamOdds(odds1);
+                                        fyEsports.setGuestTeamOdds(odds2);
+                                        fyEsports.setHomeTeamItem(homeTeamItem);
+                                        fyEsports.setGuestTeamItem(guestTeamItem);
+                                    } else if (Constant.DISH_TYPE_DXP.equals(dishType) || Constant.DISH_TYPE_DXP_IGNORE.equals(dishType)) {
+                                        // 大小盘
+                                        String homeTeamItem = handicap;
+                                        if (handicap.contains(":")) {
+                                            // 比赛时长大小特殊处理
+                                            homeTeamItem = homeTeamItem.replace(":00", ".0");
+                                        }
+
+                                        fyEsports.setHomeTeamOdds(odds1);
+                                        fyEsports.setGuestTeamOdds(odds2);
+                                        fyEsports.setHomeTeamItem(homeTeamItem);
+                                        fyEsports.setHomeExtraDishName(FYConstant.EXTRA_DISH_NAME_GREATER_THAN);
+                                        fyEsports.setGuestExtraDishName(FYConstant.EXTRA_DISH_NAME_LESS_THAN);
+                                    } else if (Constant.DISH_TYPE_DSP.equals(dishType)) {
+                                        // 单双盘
+                                        fyEsports.setHomeTeamOdds(odds1);
+                                        fyEsports.setGuestTeamOdds(odds2);
+                                        fyEsports.setHomeExtraDishName(FYConstant.EXTRA_DISH_NAME_ODD);
+                                        fyEsports.setGuestExtraDishName(FYConstant.EXTRA_DISH_NAME_EVEN);
+                                    } else if (Constant.DISH_TYPE_SFP.equals(dishType)) {
+                                        // 是否盘
+                                        fyEsports.setHomeTeamOdds(odds2);
+                                        fyEsports.setGuestTeamOdds(odds1);
+                                        fyEsports.setHomeExtraDishName(FYConstant.EXTRA_DISH_NAME_NO);
+                                        fyEsports.setGuestExtraDishName(FYConstant.EXTRA_DISH_NAME_YES);
+                                    }
+
+                                    fyEsportsList.add(fyEsports);
+                                }
+                            }
+                        }
+                    }
+                }
+                // 保存
+                saveFyEsports(fyEsportsList);
             }
         }
+    }
+
+    /**
+     * 获取对应赔率
+     */
+    private String getOdds(List<Map<String, Object>> items, Map<String, Map<String, Object>> oddsItems, int index) {
+        Map<String, Object> item = items.get(index);
+        Integer oddsId = (Integer) item.get("ID");
+
+        if (oddsItems.containsKey(oddsId.toString())) {
+            Map<String, Object> oddsItem = oddsItems.get(oddsId.toString());
+            BigDecimal odds = (BigDecimal) oddsItem.get("Odds");
+            double o = CommonUtils.setScale(odds.doubleValue(), 3);
+            return BigDecimal.valueOf(o).toString();
+        }
+        return null;
+    }
+
+    /**
+     * 构造盘口名
+     */
+    private String getDishName(String handicap, String name) {
+        String dishName = name;
+        if (!StringUtils.isEmpty(handicap)) {
+            dishName = dishName.replace(handicap, "");
+            dishName.trim();
+        }
+        return dishName;
+    }
+
+    /**
+     * 过滤场次
+     */
+    private boolean doMap(String mapName, String round) {
+        if (FYConstant.ROUND_BO5.equals(round) || FYConstant.ROUND_BO7.equals(round)) {
+            // bo5 or bo7
+            if (mapName.equals(FYConstant.ROUND_MAP4) || mapName.equals(FYConstant.ROUND_MAP5)) {
+                return false;
+            }
+        } else if (FYConstant.ROUND_BO3.equals(round)) {
+            // bo3
+            if (mapName.equals(FYConstant.ROUND_MAP3)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 请求Body
+     */
+    private Map<String, Object> getRequestParams(Integer matchId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("matchId", matchId);
+        return params;
     }
 
     /**
@@ -164,5 +362,16 @@ public class FyESportsService implements BaseService {
         headers.put("x-forwarded-host", "jingjib.aabv.top");
 
         return headers;
+    }
+
+    /**
+     * 保存
+     * @param fyEsports
+     */
+    private void saveFyEsports(List<FyEsports> fyEsports) {
+        if (!CollectionUtils.isEmpty(fyEsports)) {
+            fyEsportsRepository.saveAll(fyEsports);
+            fyEsportsRepository.flush();
+        }
     }
 }
