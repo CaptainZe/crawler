@@ -314,7 +314,7 @@ public class FyESportsService implements BaseService {
         String dishName = name;
         if (!StringUtils.isEmpty(handicap)) {
             dishName = dishName.replace(handicap, "");
-            dishName.trim();
+            dishName = dishName.trim();
         }
         return dishName;
     }

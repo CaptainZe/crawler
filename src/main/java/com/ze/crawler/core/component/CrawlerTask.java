@@ -9,13 +9,14 @@ import com.ze.crawler.core.service.executor.ESportsExecutor;
 import com.ze.crawler.core.utils.LangUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 /**
  * 临时爬虫任务
  */
-//@Component
+@Component
 public class CrawlerTask {
     @Autowired
     private ESportsExecutor eSportsExecutor;

@@ -45,7 +45,10 @@ public class HelloController {
         teamFilterModel.setTeamOne("10106");
         teamFilterModel.setTeamTwo("10101");
 
-//        pbESportsService.cro("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
+        pbESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
+        rgESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
+        tfESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
+        imESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
         fyESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
     }
 
