@@ -3,6 +3,7 @@ package com.ze.crawler.core.service;
 import com.alibaba.fastjson.JSON;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
+import com.ze.crawler.core.constants.ProxyConstant;
 import com.ze.crawler.core.constants.YBBConstant;
 import com.ze.crawler.core.entity.YbbSports;
 import com.ze.crawler.core.model.TeamFilterModel;
@@ -43,7 +44,7 @@ public class YbbSportsService implements BaseService {
         int retryCount = 0;
         while (true) {
             String url = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
-            Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(true), Map.class);
+            Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(true), Map.class, ProxyConstant.USE_PROXY);
             if (map != null && map.get("mod") != null) {
                 try {
                     parseSports(taskId, type, map, appointedLeagues, appointedTeams);
@@ -67,7 +68,7 @@ public class YbbSportsService implements BaseService {
         retryCount = 0;
         while (true) {
             String url = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
-            Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(false), Map.class);
+            Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(false), Map.class, ProxyConstant.USE_PROXY);
             if (map != null && map.get("mod") != null) {
                 try {
                     parseSports(taskId, type, map, appointedLeagues, appointedTeams);

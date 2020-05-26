@@ -3,7 +3,7 @@ package com.ze.crawler.core.constants;
 /**
  * IM盘口常量
  */
-public class ImConstant {
+public class IMConstant {
 
     // 基础URL
     public final static String IM_BASE_URL = "https://imes-vkg.roshan88.com/Sportsbook/GetMatch";

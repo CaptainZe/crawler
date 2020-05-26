@@ -2,7 +2,7 @@ package com.ze.crawler.core.service.wk;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.ze.crawler.core.constants.WkConstant;
+import com.ze.crawler.core.constants.WKConstant;
 import com.ze.crawler.core.entity.Wk;
 import com.ze.crawler.core.repository.WkRepository;
 import com.ze.crawler.core.utils.HttpClientUtils;
@@ -42,7 +42,7 @@ public class WeiKongService {
         if (!StringUtils.isEmpty(at)) {
             body.put("at", at);
         }
-        HttpClientUtils.post(url, body, Map.class, WkConstant.AUTHORIZATION);
+        HttpClientUtils.post(url, body, Map.class, WKConstant.AUTHORIZATION);
     }
 
     /**
@@ -63,9 +63,9 @@ public class WeiKongService {
         String url = getUrl(api);
         JSONObject body = new JSONObject();
         body.put("wId", wId);
-        body.put("wcId", WkConstant.WK_ESPORTS_BP.get(wId));
+        body.put("wcId", WKConstant.WK_ESPORTS_BP.get(wId));
         body.put("content", content);
-        Map<String, Object> response = HttpClientUtils.post(url, body, Map.class, WkConstant.AUTHORIZATION);
+        Map<String, Object> response = HttpClientUtils.post(url, body, Map.class, WKConstant.AUTHORIZATION);
         return JSON.toJSONString(response);
     }
 
@@ -76,9 +76,9 @@ public class WeiKongService {
     public String reLoginAll() {
         // 1. 开发者账号退出微控平台（目的：使所有已登录的微信号下线）
         String logoutApi = "/member/logout";
-        Map<String, Object> r1 = HttpClientUtils.post(getUrl(logoutApi), new JSONObject(), Map.class, WkConstant.AUTHORIZATION);
+        Map<String, Object> r1 = HttpClientUtils.post(getUrl(logoutApi), new JSONObject(), Map.class, WKConstant.AUTHORIZATION);
         if (r1.get("message").equals("失败")) {
-            return WkConstant.TRY_AGAIN;
+            return WKConstant.TRY_AGAIN;
         }
 
         // 2. 登录开发者账号
@@ -88,7 +88,7 @@ public class WeiKongService {
         loginBody.put("password", "123456");
         Map<String, Object> r2 = HttpClientUtils.post(getUrl(loginApi), loginBody, Map.class);
         if (r2.get("message").equals("失败")) {
-            return WkConstant.TRY_AGAIN;
+            return WKConstant.TRY_AGAIN;
         }
 
         // 3. 二次登录
@@ -99,9 +99,9 @@ public class WeiKongService {
                 JSONObject secondLoginBody = new JSONObject();
                 secondLoginBody.put("wcId", wk.getWcId());
                 secondLoginBody.put("type", 2);
-                Map<String, Object> response = HttpClientUtils.post(getUrl(secondLoginApi), secondLoginBody, Map.class, WkConstant.AUTHORIZATION);
+                Map<String, Object> response = HttpClientUtils.post(getUrl(secondLoginApi), secondLoginBody, Map.class, WKConstant.AUTHORIZATION);
                 if (response.get("message").equals("失败")) {
-                    return WkConstant.TRY_AGAIN;
+                    return WKConstant.TRY_AGAIN;
                 }
                 if (response.get("message").equals("二次登录失败，请重新扫码登录")) {
                     return "二次登录失败，请重新扫码登录";
@@ -125,13 +125,13 @@ public class WeiKongService {
      * 刷新&初始化
      */
     private void initAndRefreshWkInfo() {
-        WkConstant.WK_ESPORTS_YL.clear();
-        WkConstant.WK_ESPORTS_BP.clear();
+        WKConstant.WK_ESPORTS_YL.clear();
+        WKConstant.WK_ESPORTS_BP.clear();
         List<Wk> wkList = wkRepository.findAll();
         if (!CollectionUtils.isEmpty(wkList)) {
             for (Wk wk : wkList) {
-                WkConstant.WK_ESPORTS_YL.put(wk.getwId(), wk.getRoomA());
-                WkConstant.WK_ESPORTS_BP.put(wk.getwId(), wk.getRoomB());
+                WKConstant.WK_ESPORTS_YL.put(wk.getwId(), wk.getRoomA());
+                WKConstant.WK_ESPORTS_BP.put(wk.getwId(), wk.getRoomB());
             }
         }
     }
@@ -142,10 +142,10 @@ public class WeiKongService {
     private JSONObject getRandomAccount(Integer sendType) {
         JSONObject jsonObject = new JSONObject();
 
-        Map<String, String> wkInfo = WkConstant.WK_ESPORTS_YL;
+        Map<String, String> wkInfo = WKConstant.WK_ESPORTS_YL;
         // fixme 扩展点
-        if (sendType.equals(WkConstant.ESPORTS_BP)) {
-            wkInfo = WkConstant.WK_ESPORTS_BP;
+        if (sendType.equals(WKConstant.ESPORTS_BP)) {
+            wkInfo = WKConstant.WK_ESPORTS_BP;
         }
 
         Random random = new Random();
@@ -171,6 +171,6 @@ public class WeiKongService {
      * 获取URL
      */
     private static String getUrl(String api) {
-        return WkConstant.DOMAIN + api;
+        return WKConstant.DOMAIN + api;
     }
 }

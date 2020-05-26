@@ -125,19 +125,19 @@ public class MappingSupportService {
         startRowIndex += 2;
 
         JSONObject body = getBaseBody(null, null);
-        Map<String, Object> map = HttpClientUtils.post(ImConstant.IM_BASE_URL, body, Map.class);
+        Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL, body, Map.class);
         if (map != null && map.get("d") != null) {
             List<List<Object>> d = (List<List<Object>>) map.get("d");
             if (!CollectionUtils.isEmpty(d)) {
                 Integer sportId = null;
                 if (Constant.ESPORTS_TYPE_LOL.equalsIgnoreCase(type)) {
-                    sportId = ImConstant.SPORT_ID_LOL;
+                    sportId = IMConstant.SPORT_ID_LOL;
                 } else if (Constant.ESPORTS_TYPE_DOTA2.equalsIgnoreCase(type)) {
-                    sportId = ImConstant.SPORT_ID_DOTA2;
+                    sportId = IMConstant.SPORT_ID_DOTA2;
                 } else if (Constant.ESPORTS_TYPE_CSGO.equalsIgnoreCase(type)) {
-                    sportId = ImConstant.SPORT_ID_CSGO;
+                    sportId = IMConstant.SPORT_ID_CSGO;
                 } else if (Constant.ESPORTS_TYPE_KPL.equalsIgnoreCase(type)) {
-                    sportId = ImConstant.SPORT_ID_KPL;
+                    sportId = IMConstant.SPORT_ID_KPL;
                 }
 
                 if (sportId != null) {

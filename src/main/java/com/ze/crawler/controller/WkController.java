@@ -1,6 +1,6 @@
 package com.ze.crawler.controller;
 
-import com.ze.crawler.core.constants.WkConstant;
+import com.ze.crawler.core.constants.WKConstant;
 import com.ze.crawler.core.service.wk.WeiKongService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +21,7 @@ public class WkController {
     @RequestMapping("/check")
     public Map<String, String> check() {
         Map<String, String> map = new HashMap<>();
-        for (String wid : WkConstant.WK_ESPORTS_BP.keySet()) {
+        for (String wid : WKConstant.WK_ESPORTS_BP.keySet()) {
             String s = weiKongService.sendTextByWid(wid, wid + ":OK");
             map.put(wid, s);
         }

@@ -1,7 +1,7 @@
 package com.ze.crawler.core.service.executor;
 
 import com.ze.crawler.core.constants.Constant;
-import com.ze.crawler.core.constants.WkConstant;
+import com.ze.crawler.core.constants.WKConstant;
 import com.ze.crawler.core.entity.*;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.ImEsportsRepository;
@@ -112,7 +112,7 @@ public class ESportsExecutor {
             }
 
             // 报水
-            waterCalculator.calculateWater(esportsMapOrder, threshold, main, appointedLeagues == null ? WkConstant.ESPORTS_YL : WkConstant.ESPORTS_BP);
+            waterCalculator.calculateWater(esportsMapOrder, threshold, main, appointedLeagues == null ? WKConstant.ESPORTS_YL : WKConstant.ESPORTS_BP);
 
             long endTime = System.currentTimeMillis();
             log.info("报水_" + type + "_" + taskId + "_[耗时（秒）: " + CommonUtils.getSeconds(endTime - startTime) + "]");

@@ -19,12 +19,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 网络请求工具类
@@ -180,31 +180,42 @@ public class HttpClientUtils {
     /**
      * 网络请求POST - From方式请求
      */
-    public static <T> T postFrom(String url, Map<String, Object> params, Class<T> clazz) {
+    public static <T> T postFrom(String url, Map<String, Object> params, Map<String, String> headers, Class<T> clazz, boolean proxy) {
         // 1.生成httpclient，相当于该打开一个浏览器
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
         try {
             // 2.创建post请求，相当于在浏览器地址栏输入 网址
             HttpPost request = new HttpPost(url);
+
             // 设置请求body
-            List<NameValuePair> paramList = new ArrayList<>();
-            if(params != null && params.size() > 0){
-                Set<String> keySet = params.keySet();
-                for(String key : keySet) {
+            if (!CollectionUtils.isEmpty(params)) {
+                List<NameValuePair> paramList = new ArrayList<>();
+                for(String key : params.keySet()) {
                     paramList.add(new BasicNameValuePair(key, params.get(key).toString()));
                 }
+                request.setEntity(new UrlEncodedFormEntity(paramList, "UTF-8"));
             }
-            request.setEntity(new UrlEncodedFormEntity(paramList, "UTF-8"));
+
             // 设置请求头，将爬虫伪装成浏览器
             request.setHeader(Constant.REQUEST_HEADER_USER_AGENT, Constant.CHROME_BROWSER_USER_AGENT);
 
+            // 设置自定义请求头
+            if (!CollectionUtils.isEmpty(headers)) {
+                for (String key : headers.keySet()) {
+                    request.setHeader(key, headers.get(key));
+                }
+            }
+
             // 设置代理 & 设置超时时间
-//            HttpHost proxyHost = new HttpHost(ProxyConstant.PROXY_HOST, ProxyConstant.PROXY_PORT);
-//            RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).setProxy(proxyHost).build();
-//            request.setConfig(config);
-            RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).build();
-            request.setConfig(config);
+            if (proxy) {
+                HttpHost proxyHost = new HttpHost(ProxyConstant.PROXY_HOST, ProxyConstant.PROXY_PORT);
+                RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).setProxy(proxyHost).build();
+                request.setConfig(config);
+            } else {
+                RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).setSocketTimeout(Constant.SOCKET_TIMEOUT).build();
+                request.setConfig(config);
+            }
 
             // 3.执行get请求，相当于在输入地址栏后敲回车键
             response = httpClient.execute(request);
@@ -227,5 +238,12 @@ public class HttpClientUtils {
             org.apache.http.client.utils.HttpClientUtils.closeQuietly(response);
             org.apache.http.client.utils.HttpClientUtils.closeQuietly(httpClient);
         }
+    }
+
+    /**
+     * 网络请求POST - From方式请求
+     */
+    public static <T> T postFrom(String url, Map<String, Object> params, Class<T> clazz, boolean proxy) {
+        return postFrom(url, params, null, clazz, proxy);
     }
 }

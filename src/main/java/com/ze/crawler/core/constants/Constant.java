@@ -52,18 +52,19 @@ public class Constant {
     public final static String ESPORTS_TYPE_CSGO = "CSGO";
     public final static String ESPORTS_TYPE_KPL = "王者荣耀";
     // 电竞 - 盘口类型
-    public final static Integer ESPORTS_DISH_PB = 1;
-    public final static Integer ESPORTS_DISH_RG = 2;
-    public final static Integer ESPORTS_DISH_TF = 3;
-    public final static Integer ESPORTS_DISH_IM = 4;
+    public final static Integer ESPORTS_DISH_PB = 11;
+    public final static Integer ESPORTS_DISH_RG = 12;
+    public final static Integer ESPORTS_DISH_TF = 13;
+    public final static Integer ESPORTS_DISH_IM = 14;
+    public final static Integer ESPORTS_DISH_FY = 15;
 
     // 体育 - 类型
     public final static String SPORTS_TYPE_SOCCER = "SOCCER";
     public final static String SPORTS_TYPE_BASKETBALL = "BASKETBALL";
     // 体育 - 盘口类型
-    public final static Integer SPORTS_DISH_PB = 5;
-    public final static Integer SPORTS_DISH_IM = 6;
-    public final static Integer SPORTS_DISH_YB = 7;
-    public final static Integer SPORTS_DISH_SB = 8;
-    public final static Integer SPORTS_DISH_BTI = 9;
+    public final static Integer SPORTS_DISH_PB = 21;
+    public final static Integer SPORTS_DISH_IM = 22;
+    public final static Integer SPORTS_DISH_YB = 23;
+    public final static Integer SPORTS_DISH_SB = 24;
+    public final static Integer SPORTS_DISH_BTI = 25;
 }

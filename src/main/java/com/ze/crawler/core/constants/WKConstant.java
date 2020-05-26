@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * 微控常量
  */
-public class WkConstant {
+public class WKConstant {
     // 微控域名
     public final static String DOMAIN = "http://xingshenapi.com/";
     // Authorization 登录一次永不失效

@@ -92,3 +92,26 @@ CREATE TABLE `t_esports_im` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='IM电竞盘口数据';
 
+DROP TABLE IF EXISTS `t_esports_fy`;
+CREATE TABLE `t_esports_fy` (
+  `id` varchar(36) NOT NULL,
+  `task_id` varchar(36) NOT NULL COMMENT '任务ID，表示一次爬虫任务',
+  `type` varchar(36) DEFAULT NULL COMMENT '类型: LOL,DOTA2,CSGO',
+  `dish_id` varchar(36) DEFAULT NULL COMMENT '盘口ID-来自字典表',
+  `dish_name` varchar(200) DEFAULT NULL COMMENT '盘口名（比如输赢盘、让分盘、大小盘）',
+  `league_id` varchar(36) DEFAULT NULL COMMENT '联赛ID-来自字典表',
+  `league_name` varchar(200) DEFAULT NULL COMMENT '联赛名',
+  `home_team_id` varchar(36) DEFAULT NULL COMMENT '主队ID-来自字典表',
+  `home_team_name` varchar(200) DEFAULT NULL COMMENT '主队名',
+  `guest_team_id` varchar(36) DEFAULT NULL COMMENT '客队ID-来自字典表',
+  `guest_team_name` varchar(200) DEFAULT NULL COMMENT '客队名',
+  `start_time` varchar(100) DEFAULT NULL COMMENT '开赛时间',
+  `home_team_odds` varchar(36) DEFAULT NULL COMMENT '主队赔率(大小盘的时候表示大; 是否盘的时候表示否; 主客队的时候表示大)',
+  `guest_team_odds` varchar(36) DEFAULT NULL COMMENT '客队赔率(大小盘的时候表示小; 是否盘的时候表示是; 主客队的时候表示小)',
+  `home_team_item` varchar(36) DEFAULT NULL COMMENT '让分盘时:为主队让分;大小盘时:为大小数;',
+  `guest_team_item` varchar(45) DEFAULT NULL COMMENT '让分盘时:为客队让分;',
+  `home_extra_dish_name` varchar(100) DEFAULT NULL COMMENT '更多盘的时候,存储额外显示.(比如：不是、单、大盘)',
+  `guest_extra_dish_name` varchar(100) DEFAULT NULL COMMENT '更多盘的时候,存储额外显示.(比如：是、双、小盘)',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='泛亚电竞盘口数据';
+

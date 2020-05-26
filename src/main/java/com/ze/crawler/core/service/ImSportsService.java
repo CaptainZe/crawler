@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
-import com.ze.crawler.core.constants.ImConstant;
+import com.ze.crawler.core.constants.IMConstant;
 import com.ze.crawler.core.constants.ProxyConstant;
 import com.ze.crawler.core.entity.ImSports;
 import com.ze.crawler.core.model.TeamFilterModel;
@@ -42,17 +42,17 @@ public class ImSportsService implements BaseService {
 
         Integer sportId = null;
         if (Constant.SPORTS_TYPE_SOCCER.equalsIgnoreCase(type)) {
-            sportId = ImConstant.SPORT_ID_SOCCER;
+            sportId = IMConstant.SPORT_ID_SOCCER;
         } else if (Constant.SPORTS_TYPE_BASKETBALL.equalsIgnoreCase(type)) {
-            sportId = ImConstant.SPORT_ID_BASKETBALL;
+            sportId = IMConstant.SPORT_ID_BASKETBALL;
         }
 
         if (sportId != null) {
             // 今日
             int retryCount = 0;
             while (true) {
-                JSONObject todayBody = getBaseBody(sportId, ImConstant.MARKET_TODAY, null, null);
-                Map<String, Object> map = HttpClientUtils.post(ImConstant.IM_SPORT_BASE_URL, todayBody, Map.class, ProxyConstant.USE_PROXY);
+                JSONObject todayBody = getBaseBody(sportId, IMConstant.MARKET_TODAY, null, null);
+                Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, todayBody, Map.class, ProxyConstant.USE_PROXY);
                 if (map != null && map.get("sel") != null) {
                     List<Map<String, Object>> sels = (List<Map<String, Object>>) map.get("sel");
                     if (!CollectionUtils.isEmpty(sels)) {
@@ -60,7 +60,7 @@ public class ImSportsService implements BaseService {
                             parseSports(taskId, type, sels, appointedLeagues, appointedTeams);
                         } catch (Exception e) {
                             Map<String, String> data = new HashMap<>();
-                            data.put("url", ImConstant.IM_BASE_URL);
+                            data.put("url", IMConstant.IM_BASE_URL);
                             data.put("result", JSON.toJSONString(map));
                             data.put("retry_count", String.valueOf(retryCount));
                             logService.log(Constant.LOG_TYPE_PARSE_SPORTS_ERROR, Constant.SPORTS_DISH_IM.toString(), JSON.toJSONString(data), e);
@@ -79,8 +79,8 @@ public class ImSportsService implements BaseService {
             retryCount = 0;
             while (true) {
                 String zpDate = TimeUtils.getNextDay(TimeUtils.TIME_FORMAT_3);
-                JSONObject todayBody = getBaseBody(sportId, ImConstant.MARKET_ZP, zpDate, zpDate);
-                Map<String, Object> map = HttpClientUtils.post(ImConstant.IM_SPORT_BASE_URL, todayBody, Map.class, ProxyConstant.USE_PROXY);
+                JSONObject todayBody = getBaseBody(sportId, IMConstant.MARKET_ZP, zpDate, zpDate);
+                Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, todayBody, Map.class, ProxyConstant.USE_PROXY);
                 if (map != null && map.get("sel") != null) {
                     List<Map<String, Object>> sels = (List<Map<String, Object>>) map.get("sel");
                     if (!CollectionUtils.isEmpty(sels)) {
@@ -88,7 +88,7 @@ public class ImSportsService implements BaseService {
                             parseSports(taskId, type, sels, appointedLeagues, appointedTeams);
                         } catch (Exception e) {
                             Map<String, String> data = new HashMap<>();
-                            data.put("url", ImConstant.IM_BASE_URL);
+                            data.put("url", IMConstant.IM_BASE_URL);
                             data.put("result", JSON.toJSONString(map));
                             data.put("retry_count", String.valueOf(retryCount));
                             logService.log(Constant.LOG_TYPE_PARSE_SPORTS_ERROR, Constant.SPORTS_DISH_IM.toString(), JSON.toJSONString(data), e);
@@ -180,13 +180,13 @@ public class ImSportsService implements BaseService {
                         List<Map<String, Object>> ws = (List<Map<String, Object>>) ml.get("ws");
                         if (bti != null && pi != null && !CollectionUtils.isEmpty(ws)) {
                             ImSports imSports = null;
-                            if (ImConstant.BTI_RFP.equals(bti)) {
+                            if (IMConstant.BTI_RFP.equals(bti)) {
                                 // 让分盘
                                 imSports = dishHandler4Rfp(initImSports, pi, ws, dishMapping);
-                            } else if (ImConstant.BTI_DXP.equals(bti)) {
+                            } else if (IMConstant.BTI_DXP.equals(bti)) {
                                 // 大小盘
                                 imSports = dishHandler4Dxp(initImSports, pi, ws, dishMapping);
-                            } else if (ImConstant.BTI_SYP.equals(bti) && Constant.SPORTS_TYPE_BASKETBALL.equalsIgnoreCase(type)) {
+                            } else if (IMConstant.BTI_SYP.equals(bti) && Constant.SPORTS_TYPE_BASKETBALL.equalsIgnoreCase(type)) {
                                 // 输赢盘 - 只有篮球需要
                                 imSports = dishHandler4Syp(initImSports, pi, ws, dishMapping);
                             }
@@ -208,10 +208,10 @@ public class ImSportsService implements BaseService {
      */
     private ImSports dishHandler4Rfp(ImSports initImSports, Integer pi, List<Map<String, Object>> ws, Map<String, String> dishMapping) {
         String dishName = null;
-        if (pi.equals(ImConstant.PI_FULL)) {
-            dishName = ImConstant.CUSTOM_DISH_NAME_FULL_RFP;
-        } else if (pi.equals(ImConstant.PI_FIRST_HALF)) {
-            dishName = ImConstant.CUSTOM_DISH_NAME_FIRST_HALF_RFP;
+        if (pi.equals(IMConstant.PI_FULL)) {
+            dishName = IMConstant.CUSTOM_DISH_NAME_FULL_RFP;
+        } else if (pi.equals(IMConstant.PI_FIRST_HALF)) {
+            dishName = IMConstant.CUSTOM_DISH_NAME_FIRST_HALF_RFP;
         }
         if (dishName != null) {
             String dishId = dishMapping.get(dishName);
@@ -251,10 +251,10 @@ public class ImSportsService implements BaseService {
      */
     private ImSports dishHandler4Dxp(ImSports initImSports, Integer pi, List<Map<String, Object>> ws, Map<String, String> dishMapping) {
         String dishName = null;
-        if (pi.equals(ImConstant.PI_FULL)) {
-            dishName = ImConstant.CUSTOM_DISH_NAME_FULL_DXP;
-        } else if (pi.equals(ImConstant.PI_FIRST_HALF)) {
-            dishName = ImConstant.CUSTOM_DISH_NAME_FIRST_HALF_DXP;
+        if (pi.equals(IMConstant.PI_FULL)) {
+            dishName = IMConstant.CUSTOM_DISH_NAME_FULL_DXP;
+        } else if (pi.equals(IMConstant.PI_FIRST_HALF)) {
+            dishName = IMConstant.CUSTOM_DISH_NAME_FIRST_HALF_DXP;
         }
         if (dishName != null) {
             String dishId = dishMapping.get(dishName);
@@ -274,11 +274,11 @@ public class ImSportsService implements BaseService {
                         // 主队赔率
                         imSports.setHomeTeamOdds(o.toString());
                         imSports.setHomeTeamItem(hdp.toString());
-                        imSports.setHomeExtraDishName(ImConstant.EXTRA_DISH_NAME_GREATER_THAN);
+                        imSports.setHomeExtraDishName(IMConstant.EXTRA_DISH_NAME_GREATER_THAN);
                     } else {
                         // 客队赔率
                         imSports.setGuestTeamOdds(o.toString());
-                        imSports.setGuestExtraDishName(ImConstant.EXTRA_DISH_NAME_LESS_THAN);
+                        imSports.setGuestExtraDishName(IMConstant.EXTRA_DISH_NAME_LESS_THAN);
                     }
 
                     i++;
@@ -295,10 +295,10 @@ public class ImSportsService implements BaseService {
      */
     private ImSports dishHandler4Syp(ImSports initImSports, Integer pi, List<Map<String, Object>> ws, Map<String, String> dishMapping) {
         String dishName = null;
-        if (pi.equals(ImConstant.PI_FULL)) {
-            dishName = ImConstant.CUSTOM_DISH_NAME_FULL_SYP;
-        } else if (pi.equals(ImConstant.PI_FIRST_HALF)) {
-            dishName = ImConstant.CUSTOM_DISH_NAME_FIRST_HALF_SYP;
+        if (pi.equals(IMConstant.PI_FULL)) {
+            dishName = IMConstant.CUSTOM_DISH_NAME_FULL_SYP;
+        } else if (pi.equals(IMConstant.PI_FIRST_HALF)) {
+            dishName = IMConstant.CUSTOM_DISH_NAME_FIRST_HALF_SYP;
         }
         if (dishName != null) {
             String dishId = dishMapping.get(dishName);

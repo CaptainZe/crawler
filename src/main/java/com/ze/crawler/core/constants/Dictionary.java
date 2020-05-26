@@ -15,32 +15,38 @@ public class Dictionary {
     public static final Map<String, String> ESPORT_RG_LEAGUE_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_TF_LEAGUE_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_IM_LEAGUE_MAPPING = new LinkedHashMap<>();
+    public static final Map<String, String> ESPORT_FY_LEAGUE_MAPPING = new LinkedHashMap<>();
     // 电竞 - 队伍字典表   key: leagueId; value: (key: teamName; value: teamId)
     public static final Map<String, Map<String, String>> ESPORT_PB_LEAGUE_TEAM_MAPPING = new LinkedHashMap<>();
     public static final Map<String, Map<String, String>> ESPORT_RG_LEAGUE_TEAM_MAPPING = new LinkedHashMap<>();
     public static final Map<String, Map<String, String>> ESPORT_TF_LEAGUE_TEAM_MAPPING = new LinkedHashMap<>();
     public static final Map<String, Map<String, String>> ESPORT_IM_LEAGUE_TEAM_MAPPING = new LinkedHashMap<>();
+    public static final Map<String, Map<String, String>> ESPORT_FY_LEAGUE_TEAM_MAPPING = new LinkedHashMap<>();
     // 电竞 - 盘口字典表   key: dishName; value: dishId
     public static final Map<String, String> ESPORT_LOL_PB_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_LOL_RG_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_LOL_TF_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_LOL_IM_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_LOL_IM_DISH_DISPLAY_MAPPING = new LinkedHashMap<>();
+    public static final Map<String, String> ESPORT_LOL_FY_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_DOTA2_PB_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_DOTA2_RG_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_DOTA2_TF_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_DOTA2_IM_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_DOTA2_IM_DISH_DISPLAY_MAPPING = new LinkedHashMap<>();
+    public static final Map<String, String> ESPORT_DOTA2_FY_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_CSGO_PB_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_CSGO_RG_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_CSGO_TF_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_CSGO_IM_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_CSGO_IM_DISH_DISPLAY_MAPPING = new LinkedHashMap<>();
+    public static final Map<String, String> ESPORT_CSGO_FY_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_KPL_PB_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_KPL_RG_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_KPL_TF_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_KPL_IM_DISH_MAPPING = new LinkedHashMap<>();
     public static final Map<String, String> ESPORT_KPL_IM_DISH_DISPLAY_MAPPING = new LinkedHashMap<>();
+    public static final Map<String, String> ESPORT_KPL_FY_DISH_MAPPING = new LinkedHashMap<>();
     // 电竞 - 盘口类型对应  key: dishId; value: dishType
     public static final Map<String, String> ESPORT_DISH_TYPE_MAPPING = new LinkedHashMap<>();
 
@@ -126,6 +132,8 @@ public class Dictionary {
                 return ESPORT_LOL_TF_DISH_MAPPING;
             } else if (Constant.ESPORTS_DISH_IM.equals(dishType)) {
                 return ESPORT_LOL_IM_DISH_MAPPING;
+            } else if (Constant.ESPORTS_DISH_FY.equals(dishType)) {
+                return ESPORT_LOL_FY_DISH_MAPPING;
             }
         } else if (type.equalsIgnoreCase(Constant.ESPORTS_TYPE_DOTA2)) {
             if (Constant.ESPORTS_DISH_PB.equals(dishType)) {
@@ -136,6 +144,8 @@ public class Dictionary {
                 return ESPORT_DOTA2_TF_DISH_MAPPING;
             } else if (Constant.ESPORTS_DISH_IM.equals(dishType)) {
                 return ESPORT_DOTA2_IM_DISH_MAPPING;
+            } else if (Constant.ESPORTS_DISH_FY.equals(dishType)) {
+                return ESPORT_DOTA2_FY_DISH_MAPPING;
             }
         } else if (type.equalsIgnoreCase(Constant.ESPORTS_TYPE_CSGO)) {
             if (Constant.ESPORTS_DISH_PB.equals(dishType)) {
@@ -146,6 +156,8 @@ public class Dictionary {
                 return ESPORT_CSGO_TF_DISH_MAPPING;
             } else if (Constant.ESPORTS_DISH_IM.equals(dishType)) {
                 return ESPORT_CSGO_IM_DISH_MAPPING;
+            } else if (Constant.ESPORTS_DISH_FY.equals(dishType)) {
+                return ESPORT_CSGO_FY_DISH_MAPPING;
             }
         } else if (type.equalsIgnoreCase(Constant.ESPORTS_TYPE_KPL)) {
             if (Constant.ESPORTS_DISH_PB.equals(dishType)) {
@@ -156,6 +168,8 @@ public class Dictionary {
                 return ESPORT_KPL_TF_DISH_MAPPING;
             } else if (Constant.ESPORTS_DISH_IM.equals(dishType)) {
                 return ESPORT_KPL_IM_DISH_MAPPING;
+            } else if (Constant.ESPORTS_DISH_FY.equals(dishType)) {
+                return ESPORT_KPL_FY_DISH_MAPPING;
             }
         }
 

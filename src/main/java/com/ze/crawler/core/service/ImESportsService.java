@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
-import com.ze.crawler.core.constants.ImConstant;
+import com.ze.crawler.core.constants.IMConstant;
 import com.ze.crawler.core.constants.ProxyConstant;
 import com.ze.crawler.core.constants.enums.ImSpecialDishEnum;
 import com.ze.crawler.core.entity.ImEsports;
@@ -48,7 +48,7 @@ public class ImESportsService implements BaseService {
         JSONObject body = getBaseBody(null, null);
         int retryCount = 0;
         while (true) {
-            Map<String, Object> map = HttpClientUtils.post(ImConstant.IM_BASE_URL, body, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL, body, Map.class, ProxyConstant.USE_PROXY);
             if (map != null && map.get("d") != null) {
                 List<List<Object>> d = (List<List<Object>>) map.get("d");
                 if (!CollectionUtils.isEmpty(d)) {
@@ -56,7 +56,7 @@ public class ImESportsService implements BaseService {
                         parseEsports(taskId, type, d, appointedLeagues, appointedTeams);
                     } catch (Exception e) {
                         Map<String, String> data = new HashMap<>();
-                        data.put("url", ImConstant.IM_BASE_URL);
+                        data.put("url", IMConstant.IM_BASE_URL);
                         data.put("result", JSON.toJSONString(map));
                         data.put("retry_count", String.valueOf(retryCount));
                         logService.log(Constant.LOG_TYPE_PARSE_ESPORTS_ERROR, Constant.ESPORTS_DISH_IM.toString(), JSON.toJSONString(data), e);
@@ -84,13 +84,13 @@ public class ImESportsService implements BaseService {
     private void parseEsports(String taskId, String type, List<List<Object>> d, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         Integer sportId = null;
         if (Constant.ESPORTS_TYPE_LOL.equalsIgnoreCase(type)) {
-            sportId = ImConstant.SPORT_ID_LOL;
+            sportId = IMConstant.SPORT_ID_LOL;
         } else if (Constant.ESPORTS_TYPE_DOTA2.equalsIgnoreCase(type)) {
-            sportId = ImConstant.SPORT_ID_DOTA2;
+            sportId = IMConstant.SPORT_ID_DOTA2;
         } else if (Constant.ESPORTS_TYPE_CSGO.equalsIgnoreCase(type)) {
-            sportId = ImConstant.SPORT_ID_CSGO;
+            sportId = IMConstant.SPORT_ID_CSGO;
         } else if (Constant.ESPORTS_TYPE_KPL.equalsIgnoreCase(type)) {
-            sportId = ImConstant.SPORT_ID_KPL;
+            sportId = IMConstant.SPORT_ID_KPL;
         }
 
         if (sportId != null) {
@@ -151,7 +151,7 @@ public class ImESportsService implements BaseService {
 
                         // [35]滚球标志
                         Integer gameStatus = (Integer) game.get(35);
-                        if (!ImConstant.GAME_STATUS.equals(gameStatus)) {
+                        if (!IMConstant.GAME_STATUS.equals(gameStatus)) {
                             continue;
                         }
 
@@ -187,7 +187,7 @@ public class ImESportsService implements BaseService {
                         // 获取详细盘口
                         int retryCount = 0;
                         while (true) {
-                            String url = String.format(ImConstant.IM_MORE_URL, matchId);
+                            String url = String.format(IMConstant.IM_MORE_URL, matchId);
                             JSONObject body = getBaseBody(sportId, matchId);
                             Map<String, Object> map = HttpClientUtils.post(url, body, Map.class, ProxyConstant.USE_PROXY);
                             if (map != null && map.get("d") != null) {
@@ -236,7 +236,7 @@ public class ImESportsService implements BaseService {
                 // [28] 盘口名
                 String dishName = (String) dish.get(28);
                 dishName = dishName.trim();
-                if (ImConstant.SKIP_DISH.equalsIgnoreCase(dishName)) {
+                if (IMConstant.SKIP_DISH.equalsIgnoreCase(dishName)) {
                     continue;
                 }
                 ImSpecialDishEnum imSpecialDishEnum = ImSpecialDishEnum.getImSpecialDishByOriginalValue(dishName);
@@ -319,19 +319,19 @@ public class ImESportsService implements BaseService {
 
                             imEsports.setHomeTeamOdds(homeTeamOdds);
                             imEsports.setHomeTeamItem(dxItem);
-                            imEsports.setHomeExtraDishName(ImConstant.EXTRA_DISH_NAME_GREATER_THAN);
+                            imEsports.setHomeExtraDishName(IMConstant.EXTRA_DISH_NAME_GREATER_THAN);
 
                             imEsports.setGuestTeamOdds(guestTeamOdds);
-                            imEsports.setGuestExtraDishName(ImConstant.EXTRA_DISH_NAME_LESS_THAN);
+                            imEsports.setGuestExtraDishName(IMConstant.EXTRA_DISH_NAME_LESS_THAN);
 
                             imEsportsList.add(imEsports);
                         } else if (Constant.DISH_TYPE_DSP.equals(dishType)) {
                             // 单双盘
                             imEsports.setHomeTeamOdds(homeTeamOdds);
-                            imEsports.setHomeExtraDishName(ImConstant.EXTRA_DISH_NAME_ODD);
+                            imEsports.setHomeExtraDishName(IMConstant.EXTRA_DISH_NAME_ODD);
 
                             imEsports.setGuestTeamOdds(guestTeamOdds);
-                            imEsports.setGuestExtraDishName(ImConstant.EXTRA_DISH_NAME_EVEN);
+                            imEsports.setGuestExtraDishName(IMConstant.EXTRA_DISH_NAME_EVEN);
                             imEsportsList.add(imEsports);
                         } else if (Constant.DISH_TYPE_SFP.equals(dishType)) {
                             // 是否盘
@@ -349,12 +349,12 @@ public class ImESportsService implements BaseService {
      * 处理地图数据
      */
     private boolean doMap(Integer gameNo, String round) {
-        if (ImConstant.GAME_ROUND_BO5.equalsIgnoreCase(round) || ImConstant.GAME_ROUND_BO7.equalsIgnoreCase(round)) {
+        if (IMConstant.GAME_ROUND_BO5.equalsIgnoreCase(round) || IMConstant.GAME_ROUND_BO7.equalsIgnoreCase(round)) {
             // bo5
             if (gameNo > 3) {
                 return false;
             }
-        } else if (ImConstant.GAME_ROUND_BO3.equalsIgnoreCase(round)) {
+        } else if (IMConstant.GAME_ROUND_BO3.equalsIgnoreCase(round)) {
             // bo3
             if (gameNo > 2) {
                 return false;
