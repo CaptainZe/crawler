@@ -21,4 +21,6 @@ public class WKConstant {
     // 发送类型
     public final static Integer ESPORTS_YL = 1;
     public final static Integer ESPORTS_BP = 2;
+
+    public final static String ENABLE_TRUE = "true";
 }

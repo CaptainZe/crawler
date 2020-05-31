@@ -10,6 +10,7 @@ import com.ze.crawler.core.utils.LangUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -36,29 +37,53 @@ public class CrawlerTask {
         if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
             double threshold = Double.parseDouble(waterControl.getThreshold());
 
-            String type = Constant.ESPORTS_TYPE_LOL;
-            String league = waterControl.getLeague();
-            if (league.startsWith("2")) {
-                type = Constant.ESPORTS_TYPE_DOTA2;
-            } else if (league.startsWith("3")) {
-                type = Constant.ESPORTS_TYPE_CSGO;
-            } else if (league.startsWith("4")) {
-                type = Constant.ESPORTS_TYPE_KPL;
-            }
-
-            List<String> leagueList = Arrays.asList(league.split(","));
-            Set<String> leagues = new HashSet<>(leagueList);
-
-            TeamFilterModel teamFilterModel = new TeamFilterModel();
-            teamFilterModel.setTeamOne(waterControl.getTeamA());
-            teamFilterModel.setTeamTwo(waterControl.getTeamB());
-
             if ("0".equals(waterControl.getTeamA()) || "0".equals(waterControl.getTeamB())) {
-                eSportsExecutor.executor(LangUtils.generateUuid(), type,
-                        leagues, null, threshold, Constant.ESPORTS_DISH_PB);
+                String league = waterControl.getLeague();
+                List<String> leagueList = Arrays.asList(league.split(","));
+                if (!CollectionUtils.isEmpty(leagueList)) {
+                    Map<String, Set<String>> map = new HashMap<>();
+                    map.put(Constant.ESPORTS_TYPE_LOL, new HashSet<>());
+                    map.put(Constant.ESPORTS_TYPE_DOTA2, new HashSet<>());
+                    map.put(Constant.ESPORTS_TYPE_CSGO, new HashSet<>());
+                    map.put(Constant.ESPORTS_TYPE_KPL, new HashSet<>());
+
+                    for (String l : leagueList) {
+                        if (l.startsWith("2")) {
+                            map.get(Constant.ESPORTS_TYPE_DOTA2).add(l);
+                        } else if (l.startsWith("3")) {
+                            map.get(Constant.ESPORTS_TYPE_CSGO).add(l);
+                        } else if (l.startsWith("4")) {
+                            map.get(Constant.ESPORTS_TYPE_KPL).add(l);
+                        } else if (l.startsWith("1")) {
+                            map.get(Constant.ESPORTS_TYPE_LOL).add(l);
+                        }
+                    }
+
+                    for (String type : map.keySet()) {
+                        if (!CollectionUtils.isEmpty(map.get(type))) {
+                            eSportsExecutor.executor(LangUtils.generateUuid(), type,
+                                    map.get(type), null, threshold, Constant.ESPORTS_DISH_PB);
+                        }
+                    }
+                }
             } else {
+                String type = Constant.ESPORTS_TYPE_LOL;
+                String league = waterControl.getLeague();
+                if (league.startsWith("2")) {
+                    type = Constant.ESPORTS_TYPE_DOTA2;
+                } else if (league.startsWith("3")) {
+                    type = Constant.ESPORTS_TYPE_CSGO;
+                } else if (league.startsWith("4")) {
+                    type = Constant.ESPORTS_TYPE_KPL;
+                }
+
+                TeamFilterModel teamFilterModel = new TeamFilterModel();
+                teamFilterModel.setTeamOne(waterControl.getTeamA());
+                teamFilterModel.setTeamTwo(waterControl.getTeamB());
+
+
                 eSportsExecutor.executor(LangUtils.generateUuid(), type,
-                        leagues, Collections.singletonList(teamFilterModel), threshold, null);
+                        Collections.singleton(league), Collections.singletonList(teamFilterModel), threshold, null);
             }
         }
         System.out.println("包赔 执行完成");

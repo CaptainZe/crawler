@@ -11,6 +11,7 @@ public class Wk {
     private String roomA;
     private String roomB;
     private String loginTime;
+    private String enable;
 
     @Id
     @Column(name = "wc_id")
@@ -62,6 +63,16 @@ public class Wk {
         this.loginTime = loginTime;
     }
 
+    @Basic
+    @Column(name = "enable")
+    public String getEnable() {
+        return enable;
+    }
+
+    public void setEnable(String enable) {
+        this.enable = enable;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -71,11 +82,12 @@ public class Wk {
                 Objects.equals(wId, wk.wId) &&
                 Objects.equals(roomA, wk.roomA) &&
                 Objects.equals(roomB, wk.roomB) &&
-                Objects.equals(loginTime, wk.loginTime);
+                Objects.equals(loginTime, wk.loginTime) &&
+                Objects.equals(enable, wk.enable);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(wcId, wId, roomA, roomB, loginTime);
+        return Objects.hash(wcId, wId, roomA, roomB, loginTime, enable);
     }
 }

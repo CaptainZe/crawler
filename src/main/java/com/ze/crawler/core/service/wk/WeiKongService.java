@@ -13,7 +13,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * 微控
@@ -96,22 +99,24 @@ public class WeiKongService {
         List<Wk> list = wkRepository.findAll();
         if (!CollectionUtils.isEmpty(list)) {
             for (Wk wk : list) {
-                JSONObject secondLoginBody = new JSONObject();
-                secondLoginBody.put("wcId", wk.getWcId());
-                secondLoginBody.put("type", 2);
-                Map<String, Object> response = HttpClientUtils.post(getUrl(secondLoginApi), secondLoginBody, Map.class, WKConstant.AUTHORIZATION);
-                if (response.get("message").equals("失败")) {
-                    return WKConstant.TRY_AGAIN;
-                }
-                if (response.get("message").equals("二次登录失败，请重新扫码登录")) {
-                    return "二次登录失败，请重新扫码登录";
-                }
+                if (WKConstant.ENABLE_TRUE.equalsIgnoreCase(wk.getEnable())) {
+                    JSONObject secondLoginBody = new JSONObject();
+                    secondLoginBody.put("wcId", wk.getWcId());
+                    secondLoginBody.put("type", 2);
+                    Map<String, Object> response = HttpClientUtils.post(getUrl(secondLoginApi), secondLoginBody, Map.class, WKConstant.AUTHORIZATION);
+                    if (response.get("message").equals("失败")) {
+                        return WKConstant.TRY_AGAIN;
+                    }
+                    if (response.get("message").equals("二次登录失败，请重新扫码登录")) {
+                        return "二次登录失败，请重新扫码登录";
+                    }
 
-                Map<String, Object> data = (Map<String, Object>) response.get("data");
-                String wId = (String) data.get("wId");
-                wk.setwId(wId);
-                wk.setLoginTime(TimeUtils.format(new Date().getTime()));
-                wkRepository.save(wk);
+                    Map<String, Object> data = (Map<String, Object>) response.get("data");
+                    String wId = (String) data.get("wId");
+                    wk.setwId(wId);
+                    wk.setLoginTime(TimeUtils.format(new Date().getTime()));
+                    wkRepository.save(wk);
+                }
             }
         }
 
@@ -130,8 +135,10 @@ public class WeiKongService {
         List<Wk> wkList = wkRepository.findAll();
         if (!CollectionUtils.isEmpty(wkList)) {
             for (Wk wk : wkList) {
-                WKConstant.WK_ESPORTS_YL.put(wk.getwId(), wk.getRoomA());
-                WKConstant.WK_ESPORTS_BP.put(wk.getwId(), wk.getRoomB());
+                if (WKConstant.ENABLE_TRUE.equalsIgnoreCase(wk.getEnable())) {
+                    WKConstant.WK_ESPORTS_YL.put(wk.getwId(), wk.getRoomA());
+                    WKConstant.WK_ESPORTS_BP.put(wk.getwId(), wk.getRoomB());
+                }
             }
         }
     }
