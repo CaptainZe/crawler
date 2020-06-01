@@ -12,6 +12,9 @@ ADD INDEX `INDEX_TASKID` (`task_id` ASC) VISIBLE;
 ALTER TABLE `t_esports_im`
 ADD INDEX `INDEX_TASKID` (`task_id` ASC) VISIBLE;
 
+ALTER TABLE `t_esports_fy`
+ADD INDEX `INDEX_TASKID` (`task_id` ASC) VISIBLE;
+
 # 体育
 ALTER TABLE `t_sports_pb`
 ADD INDEX `INDEX_TASKID` (`task_id` ASC) VISIBLE;
