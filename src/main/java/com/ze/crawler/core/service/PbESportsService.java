@@ -103,6 +103,12 @@ public class PbESportsService implements BaseService {
      * @param map
      */
     private void parseEsports(String taskId, String type, Map<String, Object> map, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
+        Map<String, String> leagueMapping = Dictionary.ESPORT_PB_LEAGUE_MAPPING.get(type);
+        Map<String, String> teamMapping = Dictionary.ESPORT_PB_TEAM_MAPPING.get(type);
+        if (leagueMapping == null || teamMapping == null) {
+            return;
+        }
+
         if (map != null) {
             List<Object> n = (List<Object>) map.get("n");
             if (!CollectionUtils.isEmpty(n)) {
@@ -141,7 +147,7 @@ public class PbESportsService implements BaseService {
                             }
 
                             // 赛事信息获取
-                            String leagueId = Dictionary.ESPORT_PB_LEAGUE_MAPPING.get(leagueName);
+                            String leagueId = leagueMapping.get(leagueName);
                             if (leagueId == null) {
                                 continue;
                             }
@@ -185,23 +191,10 @@ public class PbESportsService implements BaseService {
                                     }
 
                                     // 获取主客队信息
-                                    String homeTeamId = Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(matchHomeTeamName);
-                                    String guestTeamId = Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(matchGuestTeamName);
+                                    String homeTeamId = teamMapping.get(matchHomeTeamName);
+                                    String guestTeamId = teamMapping.get(matchGuestTeamName);
                                     if (homeTeamId == null || guestTeamId == null) {
-                                        // 特殊处理, 有的队伍在击杀数的时候队伍名不一样
-                                        String matchHomeTeamName2 = matchHomeTeamName + "战队";
-                                        homeTeamId = Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(matchHomeTeamName2);
-                                        if (homeTeamId == null) {
-                                            continue;
-                                        }
-                                    }
-                                    if (guestTeamId == null) {
-                                        // 特殊处理, 有的队伍在击杀数的时候队伍名不一样
-                                        String matchGuestTeamName2 = matchGuestTeamName + "战队";
-                                        guestTeamId = Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(matchGuestTeamName2);
-                                        if (guestTeamId == null) {
-                                            continue;
-                                        }
+                                        continue;
                                     }
 
                                     // 如果存在指定队伍, 进行过滤判断

@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -235,6 +236,9 @@ public class MappingService {
             // 打开工作表
             HSSFWorkbook workbook = new HSSFWorkbook(fis);
 
+            // 初始化电竞相关映射
+            initEsportMapping();
+
             // 1. sheet[0] -- 联赛映射表
             HSSFSheet leagueMappingSheet = workbook.getSheetAt(0);
             for (int rowIndex=1; rowIndex <= leagueMappingSheet.getLastRowNum(); rowIndex++) {
@@ -249,41 +253,42 @@ public class MappingService {
                 }
 
                 // 各列信息
+                String type = getCellValue(row.getCell(0));
                 String id = getCellValue(row.getCell(1));
                 String pbName = getCellValue(row.getCell(2));
                 String rgName = getCellValue(row.getCell(3));
                 String tfName = getCellValue(row.getCell(4));
                 String imName = getCellValue(row.getCell(5));
                 String fyName = getCellValue(row.getCell(6));
-
+                
                 if (!StringUtils.isEmpty(pbName)) {
                     List<String> pbNames = splitCellValue(pbName);
                     for (String name : pbNames) {
-                        Dictionary.ESPORT_PB_LEAGUE_MAPPING.put(name, id);
+                        Dictionary.ESPORT_PB_LEAGUE_MAPPING.get(type).put(name, id);
                     }
                 }
                 if (!StringUtils.isEmpty(rgName)) {
                     List<String> rgNames = splitCellValue(rgName);
                     for (String name : rgNames) {
-                        Dictionary.ESPORT_RG_LEAGUE_MAPPING.put(name, id);
+                        Dictionary.ESPORT_RG_LEAGUE_MAPPING.get(type).put(name, id);
                     }
                 }
                 if (!StringUtils.isEmpty(tfName)) {
                     List<String> tfNames = splitCellValue(tfName);
                     for (String name : tfNames) {
-                        Dictionary.ESPORT_TF_LEAGUE_MAPPING.put(name, id);
+                        Dictionary.ESPORT_TF_LEAGUE_MAPPING.get(type).put(name, id);
                     }
                 }
                 if (!StringUtils.isEmpty(imName)) {
                     List<String> imNames = splitCellValue(imName);
                     for (String name : imNames) {
-                        Dictionary.ESPORT_IM_LEAGUE_MAPPING.put(name, id);
+                        Dictionary.ESPORT_IM_LEAGUE_MAPPING.get(type).put(name, id);
                     }
                 }
                 if (!StringUtils.isEmpty(fyName)) {
                     List<String> fyNames = splitCellValue(fyName);
                     for (String name : fyNames) {
-                        Dictionary.ESPORT_FY_LEAGUE_MAPPING.put(name, id);
+                        Dictionary.ESPORT_FY_LEAGUE_MAPPING.get(type).put(name, id);
                     }
                 }
             }
@@ -291,7 +296,7 @@ public class MappingService {
             // 2. sheet[1] -- 队伍映射表
             HSSFSheet teamMappingSheet = workbook.getSheetAt(1);
             for (int rowIndex=1; rowIndex <= teamMappingSheet.getLastRowNum(); rowIndex++) {
-                // 列顺序: 联赛ID、ID、平博电竞、RG电竞、TF电竞、IM电竞
+                // 列顺序: 赛事类型、ID、平博电竞、RG电竞、TF电竞、IM电竞
                 HSSFRow row = teamMappingSheet.getRow(rowIndex);
                 if (row == null) {
                     continue;
@@ -302,7 +307,7 @@ public class MappingService {
                 }
 
                 // 各列信息
-                String leagueId = getCellValue(row.getCell(0));
+                String type = getCellValue(row.getCell(0));
                 String id = getCellValue(row.getCell(1));
                 String pbName = getCellValue(row.getCell(2));
                 String rgName = getCellValue(row.getCell(3));
@@ -310,50 +315,34 @@ public class MappingService {
                 String imName = getCellValue(row.getCell(5));
                 String fyName = getCellValue(row.getCell(6));
 
-                if (!Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
-                    Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
-                }
-                if (!Dictionary.ESPORT_RG_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
-                    Dictionary.ESPORT_RG_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
-                }
-                if (!Dictionary.ESPORT_TF_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
-                    Dictionary.ESPORT_TF_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
-                }
-                if (!Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
-                    Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
-                }
-                if (!Dictionary.ESPORT_FY_LEAGUE_TEAM_MAPPING.containsKey(leagueId)) {
-                    Dictionary.ESPORT_FY_LEAGUE_TEAM_MAPPING.put(leagueId, new LinkedHashMap<>());
-                }
-
                 if (!StringUtils.isEmpty(pbName)) {
                     List<String> pbNames = splitCellValue(pbName);
                     for (String name : pbNames) {
-                        Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                        Dictionary.ESPORT_PB_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
                     }
                 }
                 if (!StringUtils.isEmpty(rgName)) {
                     List<String> rgNames = splitCellValue(rgName);
                     for (String name : rgNames) {
-                        Dictionary.ESPORT_RG_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                        Dictionary.ESPORT_RG_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
                     }
                 }
                 if (!StringUtils.isEmpty(tfName)) {
                     List<String> tfNames = splitCellValue(tfName);
                     for (String name : tfNames) {
-                        Dictionary.ESPORT_TF_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                        Dictionary.ESPORT_TF_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
                     }
                 }
                 if (!StringUtils.isEmpty(imName)) {
                     List<String> imNames = splitCellValue(imName);
                     for (String name : imNames) {
-                        Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                        Dictionary.ESPORT_IM_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
                     }
                 }
                 if (!StringUtils.isEmpty(fyName)) {
                     List<String> fyNames = splitCellValue(fyName);
                     for (String name : fyNames) {
-                        Dictionary.ESPORT_FY_LEAGUE_TEAM_MAPPING.get(leagueId).put(name.toUpperCase(), id);
+                        Dictionary.ESPORT_FY_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
                     }
                 }
             }
@@ -380,87 +369,24 @@ public class MappingService {
                 String imName = getCellValue(row.getCell(6));
                 String imDisplayName = getCellValue(row.getCell(7));
                 String fyName = getCellValue(row.getCell(8));
-                
-                if (Constant.ESPORTS_TYPE_LOL.equalsIgnoreCase(leagueType)) {
-                    // LOL
-                    if (!StringUtils.isEmpty(pbName)) {
-                        Dictionary.ESPORT_LOL_PB_DISH_MAPPING.put(pbName, id);
-                    }
-                    if (!StringUtils.isEmpty(rgName)) {
-                        Dictionary.ESPORT_LOL_RG_DISH_MAPPING.put(rgName, id);
-                    }
-                    if (!StringUtils.isEmpty(tfName)) {
-                        Dictionary.ESPORT_LOL_TF_DISH_MAPPING.put(tfName, id);
-                    }
-                    if (!StringUtils.isEmpty(imName)) {
-                        Dictionary.ESPORT_LOL_IM_DISH_MAPPING.put(imName, id);
-                    }
-                    if (!StringUtils.isEmpty(imDisplayName)) {
-                        Dictionary.ESPORT_LOL_IM_DISH_DISPLAY_MAPPING.put(imName, imDisplayName);
-                    }
-                    if (!StringUtils.isEmpty(fyName)) {
-                        Dictionary.ESPORT_LOL_FY_DISH_MAPPING.put(fyName, id);
-                    }
-                } else if (Constant.ESPORTS_TYPE_DOTA2.equalsIgnoreCase(leagueType)) {
-                    // DOTA2
-                    if (!StringUtils.isEmpty(pbName)) {
-                        Dictionary.ESPORT_DOTA2_PB_DISH_MAPPING.put(pbName, id);
-                    }
-                    if (!StringUtils.isEmpty(rgName)) {
-                        Dictionary.ESPORT_DOTA2_RG_DISH_MAPPING.put(rgName, id);
-                    }
-                    if (!StringUtils.isEmpty(tfName)) {
-                        Dictionary.ESPORT_DOTA2_TF_DISH_MAPPING.put(tfName, id);
-                    }
-                    if (!StringUtils.isEmpty(imName)) {
-                        Dictionary.ESPORT_DOTA2_IM_DISH_MAPPING.put(imName, id);
-                    }
-                    if (!StringUtils.isEmpty(imDisplayName)) {
-                        Dictionary.ESPORT_DOTA2_IM_DISH_DISPLAY_MAPPING.put(imName, imDisplayName);
-                    }
-                    if (!StringUtils.isEmpty(fyName)) {
-                        Dictionary.ESPORT_DOTA2_FY_DISH_MAPPING.put(fyName, id);
-                    }
-                } else if (Constant.ESPORTS_TYPE_CSGO.equalsIgnoreCase(leagueType)) {
-                    // CSGO
-                    if (!StringUtils.isEmpty(pbName)) {
-                        Dictionary.ESPORT_CSGO_PB_DISH_MAPPING.put(pbName, id);
-                    }
-                    if (!StringUtils.isEmpty(rgName)) {
-                        Dictionary.ESPORT_CSGO_RG_DISH_MAPPING.put(rgName, id);
-                    }
-                    if (!StringUtils.isEmpty(tfName)) {
-                        Dictionary.ESPORT_CSGO_TF_DISH_MAPPING.put(tfName, id);
-                    }
-                    if (!StringUtils.isEmpty(imName)) {
-                        Dictionary.ESPORT_CSGO_IM_DISH_MAPPING.put(imName, id);
-                    }
-                    if (!StringUtils.isEmpty(imDisplayName)) {
-                        Dictionary.ESPORT_CSGO_IM_DISH_DISPLAY_MAPPING.put(imName, imDisplayName);
-                    }
-                    if (!StringUtils.isEmpty(fyName)) {
-                        Dictionary.ESPORT_CSGO_FY_DISH_MAPPING.put(fyName, id);
-                    }
-                } else if (Constant.ESPORTS_TYPE_KPL.equalsIgnoreCase(leagueType)) {
-                    // 王者荣耀
-                    if (!StringUtils.isEmpty(pbName)) {
-                        Dictionary.ESPORT_KPL_PB_DISH_MAPPING.put(pbName, id);
-                    }
-                    if (!StringUtils.isEmpty(rgName)) {
-                        Dictionary.ESPORT_KPL_RG_DISH_MAPPING.put(rgName, id);
-                    }
-                    if (!StringUtils.isEmpty(tfName)) {
-                        Dictionary.ESPORT_KPL_TF_DISH_MAPPING.put(tfName, id);
-                    }
-                    if (!StringUtils.isEmpty(imName)) {
-                        Dictionary.ESPORT_KPL_IM_DISH_MAPPING.put(imName, id);
-                    }
-                    if (!StringUtils.isEmpty(imDisplayName)) {
-                        Dictionary.ESPORT_KPL_IM_DISH_DISPLAY_MAPPING.put(imName, imDisplayName);
-                    }
-                    if (!StringUtils.isEmpty(fyName)) {
-                        Dictionary.ESPORT_KPL_FY_DISH_MAPPING.put(fyName, id);
-                    }
+
+                if (!StringUtils.isEmpty(pbName)) {
+                    Dictionary.ESPORT_PB_DISH_MAPPING.get(leagueType).put(pbName, id);
+                }
+                if (!StringUtils.isEmpty(rgName)) {
+                    Dictionary.ESPORT_RG_DISH_MAPPING.get(leagueType).put(rgName, id);
+                }
+                if (!StringUtils.isEmpty(tfName)) {
+                    Dictionary.ESPORT_TF_DISH_MAPPING.get(leagueType).put(tfName, id);
+                }
+                if (!StringUtils.isEmpty(imName)) {
+                    Dictionary.ESPORT_IM_DISH_MAPPING.get(leagueType).put(imName, id);
+                }
+                if (!StringUtils.isEmpty(imDisplayName)) {
+                    Dictionary.ESPORT_IM_DISH_DISPLAY_MAPPING.get(leagueType).put(imName, imDisplayName);
+                }
+                if (!StringUtils.isEmpty(fyName)) {
+                    Dictionary.ESPORT_FY_DISH_MAPPING.get(leagueType).put(fyName, id);
                 }
 
                 // 盘口类型映射
@@ -473,6 +399,94 @@ public class MappingService {
         }
     }
 
+    /**
+     * 初始化电竞相关映射
+     */
+    private void initEsportMapping() {
+        // 联赛
+        Dictionary.ESPORT_PB_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_PB_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_PB_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_PB_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_RG_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_RG_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_RG_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_RG_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_TF_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_TF_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_TF_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_TF_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_IM_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_IM_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_IM_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_IM_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_FY_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_FY_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_FY_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_FY_LEAGUE_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+        
+        // 队伍
+        Dictionary.ESPORT_PB_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_PB_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_PB_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_PB_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_RG_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_RG_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_RG_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_RG_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_TF_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_TF_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_TF_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_TF_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_IM_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_IM_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_IM_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_IM_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_FY_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_FY_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_FY_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_FY_TEAM_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+        
+        // 盘口
+        Dictionary.ESPORT_PB_DISH_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_PB_DISH_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_PB_DISH_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_PB_DISH_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_RG_DISH_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_RG_DISH_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_RG_DISH_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_RG_DISH_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_TF_DISH_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_TF_DISH_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_TF_DISH_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_TF_DISH_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_IM_DISH_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_IM_DISH_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_IM_DISH_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_IM_DISH_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_IM_DISH_DISPLAY_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_IM_DISH_DISPLAY_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_IM_DISH_DISPLAY_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_IM_DISH_DISPLAY_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+
+        Dictionary.ESPORT_FY_DISH_MAPPING.put(Constant.ESPORTS_TYPE_LOL, new HashMap<>());
+        Dictionary.ESPORT_FY_DISH_MAPPING.put(Constant.ESPORTS_TYPE_DOTA2, new HashMap<>());
+        Dictionary.ESPORT_FY_DISH_MAPPING.put(Constant.ESPORTS_TYPE_CSGO, new HashMap<>());
+        Dictionary.ESPORT_FY_DISH_MAPPING.put(Constant.ESPORTS_TYPE_KPL, new HashMap<>());
+    }
+    
     /**
      * 获取单元格的值
      */

@@ -47,21 +47,9 @@ public class MappingSupportService {
             style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);  //填充单元格
             style.setFillForegroundColor(HSSFColor.RED.index);    //填红色
 
-            // IM电竞
-            int rowIndex = 1;
-            HSSFSheet imSheet = workbook.getSheetAt(0);
-            // LOL
-            rowIndex = imESport(imSheet, Constant.ESPORTS_TYPE_LOL, rowIndex, style);
-            // DOTA2
-            rowIndex = imESport(imSheet, Constant.ESPORTS_TYPE_DOTA2, rowIndex, style);
-            // CSGO
-            rowIndex = imESport(imSheet, Constant.ESPORTS_TYPE_CSGO, rowIndex, style);
-            // 王者荣耀
-            rowIndex = imESport(imSheet, Constant.ESPORTS_TYPE_KPL, rowIndex, style);
-
             // 平博电竞
-            rowIndex = 1;
-            HSSFSheet pbSheet = workbook.getSheetAt(1);
+            int rowIndex = 1;
+            HSSFSheet pbSheet = workbook.getSheetAt(0);
             // LOL
             rowIndex = pbESport(pbSheet, Constant.ESPORTS_TYPE_LOL, rowIndex, style);
             // DOTA2
@@ -73,7 +61,7 @@ public class MappingSupportService {
 
             // RG电竞
             rowIndex = 1;
-            HSSFSheet rgSheet = workbook.getSheetAt(2);
+            HSSFSheet rgSheet = workbook.getSheetAt(1);
             // LOL
             rowIndex = rgESport(rgSheet, Constant.ESPORTS_TYPE_LOL, rowIndex, style);
             // DOTA2
@@ -85,7 +73,7 @@ public class MappingSupportService {
 
             // TF电竞
             rowIndex = 1;
-            HSSFSheet tfSheet = workbook.getSheetAt(3);
+            HSSFSheet tfSheet = workbook.getSheetAt(2);
             // LOL
             rowIndex = tfESport(tfSheet, Constant.ESPORTS_TYPE_LOL, rowIndex, style);
             // DOTA2
@@ -94,6 +82,18 @@ public class MappingSupportService {
             rowIndex = tfESport(tfSheet, Constant.ESPORTS_TYPE_CSGO, rowIndex, style);
             // 王者荣耀
             rowIndex = tfESport(tfSheet, Constant.ESPORTS_TYPE_KPL, rowIndex, style);
+
+            // IM电竞
+            rowIndex = 1;
+            HSSFSheet imSheet = workbook.getSheetAt(3);
+            // LOL
+            rowIndex = imESport(imSheet, Constant.ESPORTS_TYPE_LOL, rowIndex, style);
+            // DOTA2
+            rowIndex = imESport(imSheet, Constant.ESPORTS_TYPE_DOTA2, rowIndex, style);
+            // CSGO
+            rowIndex = imESport(imSheet, Constant.ESPORTS_TYPE_CSGO, rowIndex, style);
+            // 王者荣耀
+            rowIndex = imESport(imSheet, Constant.ESPORTS_TYPE_KPL, rowIndex, style);
 
             // 泛亚电竞
             rowIndex = 1;
@@ -134,6 +134,9 @@ public class MappingSupportService {
         setExcelCellValue(typeRow, 0, type, style);
         startRowIndex += 2;
 
+        Map<String, String> leagueMapping = Dictionary.ESPORT_IM_LEAGUE_MAPPING.get(type);
+        Map<String, String> teamMapping = Dictionary.ESPORT_IM_TEAM_MAPPING.get(type);
+
         JSONObject body = getBaseBody(null, null);
         Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL, body, Map.class);
         if (map != null && map.get("d") != null) {
@@ -166,7 +169,7 @@ public class MappingSupportService {
 
                         // 联赛名
                         String leagueName = leagueNames.get(1).trim();
-                        String leagueId = Dictionary.ESPORT_IM_LEAGUE_MAPPING.get(leagueName);
+                        String leagueId = leagueMapping.get(leagueName);
 
                         // [10]比赛列表
                         List<List<Object>> games = (List<List<Object>>) league.get(10);
@@ -192,41 +195,46 @@ public class MappingSupportService {
                                 if (leagueId == null) {
                                     // 联赛未录入
                                     HSSFRow homeRow = sheet.createRow(startRowIndex);
-                                    setExcelCellValue(homeRow, 0, leagueName, style);
-                                    setExcelCellValue(homeRow, 1, homeTeamName, style);
+                                    setExcelCellValue(homeRow, 1, leagueName, style);
+                                    setExcelCellValue(homeRow, 2, homeTeamName, style);
                                     startRowIndex++;
 
                                     HSSFRow guestRow = sheet.createRow(startRowIndex);
-                                    setExcelCellValue(guestRow, 0, leagueName, style);
-                                    setExcelCellValue(guestRow, 1, guestTeamName, style);
+                                    setExcelCellValue(guestRow, 1, leagueName, style);
+                                    setExcelCellValue(guestRow, 2, guestTeamName, style);
                                     startRowIndex++;
                                 } else {
                                     // 联赛已录入
-                                    String homeTeamId = Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
-                                    String guestTeamId = Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
+                                    String homeTeamId = teamMapping.get(homeTeamName.toUpperCase());
+                                    String guestTeamId = teamMapping.get(guestTeamName.toUpperCase());
 
-                                    String leagueCellValue = leagueName + "(" + leagueId + ")";
                                     if (homeTeamId == null) {
                                         HSSFRow homeRow = sheet.createRow(startRowIndex);
-                                        setExcelCellValue(homeRow, 0, leagueCellValue, null);
-                                        setExcelCellValue(homeRow, 1, homeTeamName, style);
+                                        setExcelCellValue(homeRow, 0, leagueId, null);
+                                        setExcelCellValue(homeRow, 1, leagueName, null);
+                                        setExcelCellValue(homeRow, 2, homeTeamName, style);
                                         startRowIndex++;
                                     } else {
                                         HSSFRow homeRow = sheet.createRow(startRowIndex);
-                                        setExcelCellValue(homeRow, 0, leagueCellValue, null);
-                                        setExcelCellValue(homeRow, 1, homeTeamName, null);
+                                        setExcelCellValue(homeRow, 0, leagueId, null);
+                                        setExcelCellValue(homeRow, 1, leagueName, null);
+                                        setExcelCellValue(homeRow, 2, homeTeamName, null);
+                                        setExcelCellValue(homeRow, 3, homeTeamId, null);
                                         startRowIndex++;
                                     }
 
                                     if (guestTeamId == null) {
                                         HSSFRow guestRow = sheet.createRow(startRowIndex);
-                                        setExcelCellValue(guestRow, 0, leagueCellValue, null);
-                                        setExcelCellValue(guestRow, 1, guestTeamName, style);
+                                        setExcelCellValue(guestRow, 0, leagueId, null);
+                                        setExcelCellValue(guestRow, 1, leagueName, null);
+                                        setExcelCellValue(guestRow, 2, guestTeamName, style);
                                         startRowIndex++;
                                     } else {
                                         HSSFRow guestRow = sheet.createRow(startRowIndex);
-                                        setExcelCellValue(guestRow, 0, leagueCellValue, null);
-                                        setExcelCellValue(guestRow, 1, guestTeamName, null);
+                                        setExcelCellValue(guestRow, 0, leagueId, null);
+                                        setExcelCellValue(guestRow, 1, leagueName, null);
+                                        setExcelCellValue(guestRow, 2, guestTeamName, null);
+                                        setExcelCellValue(guestRow, 3, guestTeamId, null);
                                         startRowIndex++;
                                     }
                                 }
@@ -253,8 +261,10 @@ public class MappingSupportService {
         setExcelCellValue(typeRow, 0, type, style);
         startRowIndex += 2;
 
-        List<List<Object>> allLeagues = new ArrayList<>();
+        Map<String, String> leagueMapping = Dictionary.ESPORT_PB_LEAGUE_MAPPING.get(type);
+        Map<String, String> teamMapping = Dictionary.ESPORT_PB_TEAM_MAPPING.get(type);
 
+        List<List<Object>> allLeagues = new ArrayList<>();
         // 今天
         String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, PBConstant.SP_ESPORTS, TimeUtils.getDate(), System.currentTimeMillis());
         Map<String, Object> map = HttpClientUtils.get(url, Map.class);
@@ -320,7 +330,7 @@ public class MappingSupportService {
                     continue;
                 }
 
-                String leagueId = Dictionary.ESPORT_PB_LEAGUE_MAPPING.get(leagueName);
+                String leagueId = leagueMapping.get(leagueName);
 
                 // 具体比赛列表
                 List<List<Object>> games = (List<List<Object>>) league.get(2);
@@ -346,41 +356,46 @@ public class MappingSupportService {
                         if (leagueId == null) {
                             // 联赛未录入
                             HSSFRow homeRow = sheet.createRow(startRowIndex);
-                            setExcelCellValue(homeRow, 0, leagueName, style);
-                            setExcelCellValue(homeRow, 1, matchHomeTeamName, style);
+                            setExcelCellValue(homeRow, 1, leagueName, style);
+                            setExcelCellValue(homeRow, 2, matchHomeTeamName, style);
                             startRowIndex++;
 
                             HSSFRow guestRow = sheet.createRow(startRowIndex);
-                            setExcelCellValue(guestRow, 0, leagueName, style);
-                            setExcelCellValue(guestRow, 1, matchGuestTeamName, style);
+                            setExcelCellValue(guestRow, 1, leagueName, style);
+                            setExcelCellValue(guestRow, 2, matchGuestTeamName, style);
                             startRowIndex++;
                         } else {
                             // 联赛已录入
-                            String homeTeamId = Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(matchHomeTeamName.toUpperCase());
-                            String guestTeamId = Dictionary.ESPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(matchGuestTeamName.toUpperCase());
+                            String homeTeamId = teamMapping.get(matchHomeTeamName.toUpperCase());
+                            String guestTeamId = teamMapping.get(matchGuestTeamName.toUpperCase());
 
-                            String leagueCellValue = leagueName + "(" + leagueId + ")";
                             if (homeTeamId == null) {
                                 HSSFRow homeRow = sheet.createRow(startRowIndex);
-                                setExcelCellValue(homeRow, 0, leagueCellValue, null);
-                                setExcelCellValue(homeRow, 1, matchHomeTeamName, style);
+                                setExcelCellValue(homeRow, 0, leagueId, null);
+                                setExcelCellValue(homeRow, 1, leagueName, null);
+                                setExcelCellValue(homeRow, 2, matchHomeTeamName, style);
                                 startRowIndex++;
                             } else {
                                 HSSFRow homeRow = sheet.createRow(startRowIndex);
-                                setExcelCellValue(homeRow, 0, leagueCellValue, null);
-                                setExcelCellValue(homeRow, 1, matchHomeTeamName, null);
+                                setExcelCellValue(homeRow, 0, leagueId, null);
+                                setExcelCellValue(homeRow, 1, leagueName, null);
+                                setExcelCellValue(homeRow, 2, matchHomeTeamName, null);
+                                setExcelCellValue(homeRow, 3, homeTeamId, null);
                                 startRowIndex++;
                             }
 
                             if (guestTeamId == null) {
                                 HSSFRow guestRow = sheet.createRow(startRowIndex);
-                                setExcelCellValue(guestRow, 0, leagueCellValue, null);
-                                setExcelCellValue(guestRow, 1, matchGuestTeamName, style);
+                                setExcelCellValue(guestRow, 0, leagueId, null);
+                                setExcelCellValue(guestRow, 1, leagueName, null);
+                                setExcelCellValue(guestRow, 2, matchGuestTeamName, style);
                                 startRowIndex++;
                             } else {
                                 HSSFRow guestRow = sheet.createRow(startRowIndex);
-                                setExcelCellValue(guestRow, 0, leagueCellValue, null);
-                                setExcelCellValue(guestRow, 1, matchGuestTeamName, null);
+                                setExcelCellValue(guestRow, 0, leagueId, null);
+                                setExcelCellValue(guestRow, 1, leagueName, null);
+                                setExcelCellValue(guestRow, 2, matchGuestTeamName, null);
+                                setExcelCellValue(guestRow, 3, guestTeamId, null);
                                 startRowIndex++;
                             }
                         }
@@ -405,8 +420,10 @@ public class MappingSupportService {
         setExcelCellValue(typeRow, 0, type, style);
         startRowIndex += 2;
 
-        List<RgESportsResultItemModel> allResult = new ArrayList<>();
+        Map<String, String> leagueMapping = Dictionary.ESPORT_RG_LEAGUE_MAPPING.get(type);
+        Map<String, String> teamMapping = Dictionary.ESPORT_RG_TEAM_MAPPING.get(type);
 
+        List<RgESportsResultItemModel> allResult = new ArrayList<>();
         // 今日
         for (int page = 1; page <= RGConstant.MAX_PAGE; page++) {
             String url = String.format(RGConstant.RG_BASE_URL, page, RGConstant.MATCH_TYPE_TODAY);
@@ -453,7 +470,7 @@ public class MappingSupportService {
 
                 // 赛事信息获取
                 String leagueName = item.getTournamentName().trim();
-                String leagueId = Dictionary.ESPORT_RG_LEAGUE_MAPPING.get(leagueName);
+                String leagueId = leagueMapping.get(leagueName);
 
                 // 队伍信息
                 String homeTeamName = null;
@@ -476,41 +493,46 @@ public class MappingSupportService {
                 if (leagueId == null) {
                     // 联赛未录入
                     HSSFRow homeRow = sheet.createRow(startRowIndex);
-                    setExcelCellValue(homeRow, 0, leagueName, style);
-                    setExcelCellValue(homeRow, 1, homeTeamName, style);
+                    setExcelCellValue(homeRow, 1, leagueName, style);
+                    setExcelCellValue(homeRow, 2, homeTeamName, style);
                     startRowIndex++;
 
                     HSSFRow guestRow = sheet.createRow(startRowIndex);
-                    setExcelCellValue(guestRow, 0, leagueName, style);
-                    setExcelCellValue(guestRow, 1, guestTeamName, style);
+                    setExcelCellValue(guestRow, 1, leagueName, style);
+                    setExcelCellValue(guestRow, 2, guestTeamName, style);
                     startRowIndex++;
                 } else {
                     // 联赛已录入
-                    String homeTeamId = Dictionary.ESPORT_RG_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
-                    String guestTeamId = Dictionary.ESPORT_RG_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
+                    String homeTeamId = teamMapping.get(homeTeamName.toUpperCase());
+                    String guestTeamId = teamMapping.get(guestTeamName.toUpperCase());
 
-                    String leagueCellValue = leagueName + "(" + leagueId + ")";
                     if (homeTeamId == null) {
                         HSSFRow homeRow = sheet.createRow(startRowIndex);
-                        setExcelCellValue(homeRow, 0, leagueCellValue, null);
-                        setExcelCellValue(homeRow, 1, homeTeamName, style);
+                        setExcelCellValue(homeRow, 0, leagueId, null);
+                        setExcelCellValue(homeRow, 1, leagueName, null);
+                        setExcelCellValue(homeRow, 2, homeTeamName, style);
                         startRowIndex++;
                     } else {
                         HSSFRow homeRow = sheet.createRow(startRowIndex);
-                        setExcelCellValue(homeRow, 0, leagueCellValue, null);
-                        setExcelCellValue(homeRow, 1, homeTeamName, null);
+                        setExcelCellValue(homeRow, 0, leagueId, null);
+                        setExcelCellValue(homeRow, 1, leagueName, null);
+                        setExcelCellValue(homeRow, 2, homeTeamName, null);
+                        setExcelCellValue(homeRow, 3, homeTeamId, null);
                         startRowIndex++;
                     }
 
                     if (guestTeamId == null) {
                         HSSFRow guestRow = sheet.createRow(startRowIndex);
-                        setExcelCellValue(guestRow, 0, leagueCellValue, null);
-                        setExcelCellValue(guestRow, 1, guestTeamName, style);
+                        setExcelCellValue(guestRow, 0, leagueId, null);
+                        setExcelCellValue(guestRow, 1, leagueName, null);
+                        setExcelCellValue(guestRow, 2, guestTeamName, style);
                         startRowIndex++;
                     } else {
                         HSSFRow guestRow = sheet.createRow(startRowIndex);
-                        setExcelCellValue(guestRow, 0, leagueCellValue, null);
-                        setExcelCellValue(guestRow, 1, guestTeamName, null);
+                        setExcelCellValue(guestRow, 0, leagueId, null);
+                        setExcelCellValue(guestRow, 1, leagueName, null);
+                        setExcelCellValue(guestRow, 2, guestTeamName, null);
+                        setExcelCellValue(guestRow, 3, guestTeamId, null);
                         startRowIndex++;
                     }
                 }
@@ -531,8 +553,10 @@ public class MappingSupportService {
         setExcelCellValue(typeRow, 0, type, style);
         startRowIndex += 2;
 
-        List list = new ArrayList();
+        Map<String, String> leagueMapping = Dictionary.ESPORT_TF_LEAGUE_MAPPING.get(type);
+        Map<String, String> teamMapping = Dictionary.ESPORT_TF_TEAM_MAPPING.get(type);
 
+        List list = new ArrayList();
         Integer gameId = null;
         if (Constant.ESPORTS_TYPE_LOL.equalsIgnoreCase(type)) {
             gameId = TFConstant.GAME_ID_LOL;
@@ -566,7 +590,7 @@ public class MappingSupportService {
 
                 // 联赛名
                 String leagueName = tfESportsResultModel.getCompetitionName().trim();
-                String leagueId = Dictionary.ESPORT_TF_LEAGUE_MAPPING.get(leagueName);
+                String leagueId = leagueMapping.get(leagueName);
 
                 // 主客队信息
                 String homeTeamName = null;
@@ -587,41 +611,46 @@ public class MappingSupportService {
                 if (leagueId == null) {
                     // 联赛未录入
                     HSSFRow homeRow = sheet.createRow(startRowIndex);
-                    setExcelCellValue(homeRow, 0, leagueName, style);
-                    setExcelCellValue(homeRow, 1, homeTeamName, style);
+                    setExcelCellValue(homeRow, 1, leagueName, style);
+                    setExcelCellValue(homeRow, 2, homeTeamName, style);
                     startRowIndex++;
 
                     HSSFRow guestRow = sheet.createRow(startRowIndex);
-                    setExcelCellValue(guestRow, 0, leagueName, style);
-                    setExcelCellValue(guestRow, 1, guestTeamName, style);
+                    setExcelCellValue(guestRow, 1, leagueName, style);
+                    setExcelCellValue(guestRow, 2, guestTeamName, style);
                     startRowIndex++;
                 } else {
                     // 联赛已录入
-                    String homeTeamId = Dictionary.ESPORT_TF_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
-                    String guestTeamId = Dictionary.ESPORT_TF_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
+                    String homeTeamId = teamMapping.get(homeTeamName.toUpperCase());
+                    String guestTeamId = teamMapping.get(guestTeamName.toUpperCase());
 
-                    String leagueCellValue = leagueName + "(" + leagueId + ")";
                     if (homeTeamId == null) {
                         HSSFRow homeRow = sheet.createRow(startRowIndex);
-                        setExcelCellValue(homeRow, 0, leagueCellValue, null);
-                        setExcelCellValue(homeRow, 1, homeTeamName, style);
+                        setExcelCellValue(homeRow, 0, leagueId, null);
+                        setExcelCellValue(homeRow, 1, leagueName, null);
+                        setExcelCellValue(homeRow, 2, homeTeamName, style);
                         startRowIndex++;
                     } else {
                         HSSFRow homeRow = sheet.createRow(startRowIndex);
-                        setExcelCellValue(homeRow, 0, leagueCellValue, null);
-                        setExcelCellValue(homeRow, 1, homeTeamName, null);
+                        setExcelCellValue(homeRow, 0, leagueId, null);
+                        setExcelCellValue(homeRow, 1, leagueName, null);
+                        setExcelCellValue(homeRow, 2, homeTeamName, null);
+                        setExcelCellValue(homeRow, 3, homeTeamId, null);
                         startRowIndex++;
                     }
 
                     if (guestTeamId == null) {
                         HSSFRow guestRow = sheet.createRow(startRowIndex);
-                        setExcelCellValue(guestRow, 0, leagueCellValue, null);
-                        setExcelCellValue(guestRow, 1, guestTeamName, style);
+                        setExcelCellValue(guestRow, 0, leagueId, null);
+                        setExcelCellValue(guestRow, 1, leagueName, null);
+                        setExcelCellValue(guestRow, 2, guestTeamName, style);
                         startRowIndex++;
                     } else {
                         HSSFRow guestRow = sheet.createRow(startRowIndex);
-                        setExcelCellValue(guestRow, 0, leagueCellValue, null);
-                        setExcelCellValue(guestRow, 1, guestTeamName, null);
+                        setExcelCellValue(guestRow, 0, leagueId, null);
+                        setExcelCellValue(guestRow, 1, leagueName, null);
+                        setExcelCellValue(guestRow, 2, guestTeamName, null);
+                        setExcelCellValue(guestRow, 3, guestTeamId, null);
                         startRowIndex++;
                     }
                 }
@@ -641,6 +670,9 @@ public class MappingSupportService {
         HSSFRow typeRow = sheet.createRow(startRowIndex);
         setExcelCellValue(typeRow, 0, type, style);
         startRowIndex += 2;
+
+        Map<String, String> leagueMapping = Dictionary.ESPORT_FY_LEAGUE_MAPPING.get(type);
+        Map<String, String> teamMapping = Dictionary.ESPORT_FY_TEAM_MAPPING.get(type);
 
         Map<String, String> headers = getRequestHeaders(FYConstant.PATH_MATCH_LIST);
         Map<String, Object> map = HttpClientUtils.postFrom(FYConstant.FY_BASE_URL, null, headers, Map.class, ProxyConstant.USE_PROXY);
@@ -677,7 +709,7 @@ public class MappingSupportService {
                         // 联赛名
                         String leagueName = (String) match.get("LeagueName");
                         leagueName = leagueName.trim();
-                        String leagueId = Dictionary.ESPORT_FY_LEAGUE_MAPPING.get(leagueName);
+                        String leagueId = leagueMapping.get(leagueName);
 
 
                         // 主客队信息
@@ -689,40 +721,45 @@ public class MappingSupportService {
                         if (leagueId == null) {
                             // 联赛未录入
                             HSSFRow homeRow = sheet.createRow(startRowIndex);
-                            setExcelCellValue(homeRow, 0, leagueName, style);
-                            setExcelCellValue(homeRow, 1, homeTeamName, style);
+                            setExcelCellValue(homeRow, 1, leagueName, style);
+                            setExcelCellValue(homeRow, 2, homeTeamName, style);
                             startRowIndex++;
 
                             HSSFRow guestRow = sheet.createRow(startRowIndex);
-                            setExcelCellValue(guestRow, 0, leagueName, style);
-                            setExcelCellValue(guestRow, 1, guestTeamName, style);
+                            setExcelCellValue(guestRow, 1, leagueName, style);
+                            setExcelCellValue(guestRow, 2, guestTeamName, style);
                             startRowIndex++;
                         } else {
-                            String homeTeamId = Dictionary.ESPORT_FY_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
-                            String guestTeamId = Dictionary.ESPORT_FY_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
+                            String homeTeamId = teamMapping.get(homeTeamName.toUpperCase());
+                            String guestTeamId = teamMapping.get(guestTeamName.toUpperCase());
 
-                            String leagueCellValue = leagueName + "(" + leagueId + ")";
                             if (homeTeamId == null) {
                                 HSSFRow homeRow = sheet.createRow(startRowIndex);
-                                setExcelCellValue(homeRow, 0, leagueCellValue, null);
-                                setExcelCellValue(homeRow, 1, homeTeamName, style);
+                                setExcelCellValue(homeRow, 0, leagueId, null);
+                                setExcelCellValue(homeRow, 1, leagueName, null);
+                                setExcelCellValue(homeRow, 2, homeTeamName, style);
                                 startRowIndex++;
                             } else {
                                 HSSFRow homeRow = sheet.createRow(startRowIndex);
-                                setExcelCellValue(homeRow, 0, leagueCellValue, null);
-                                setExcelCellValue(homeRow, 1, homeTeamName, null);
+                                setExcelCellValue(homeRow, 0, leagueId, null);
+                                setExcelCellValue(homeRow, 1, leagueName, null);
+                                setExcelCellValue(homeRow, 2, homeTeamName, null);
+                                setExcelCellValue(homeRow, 3, homeTeamId, null);
                                 startRowIndex++;
                             }
 
                             if (guestTeamId == null) {
                                 HSSFRow guestRow = sheet.createRow(startRowIndex);
-                                setExcelCellValue(guestRow, 0, leagueCellValue, null);
-                                setExcelCellValue(guestRow, 1, guestTeamName, style);
+                                setExcelCellValue(guestRow, 0, leagueId, null);
+                                setExcelCellValue(guestRow, 1, leagueName, null);
+                                setExcelCellValue(guestRow, 2, guestTeamName, style);
                                 startRowIndex++;
                             } else {
                                 HSSFRow guestRow = sheet.createRow(startRowIndex);
-                                setExcelCellValue(guestRow, 0, leagueCellValue, null);
-                                setExcelCellValue(guestRow, 1, guestTeamName, null);
+                                setExcelCellValue(guestRow, 0, leagueId, null);
+                                setExcelCellValue(guestRow, 1, leagueName, null);
+                                setExcelCellValue(guestRow, 2, guestTeamName, null);
+                                setExcelCellValue(guestRow, 3, guestTeamId, null);
                                 startRowIndex++;
                             }
                         }

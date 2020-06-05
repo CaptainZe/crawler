@@ -1,4 +1,4 @@
-package com.ze.crawler.core.constants.enums;
+package com.ze.crawler.core.enums;
 
 import lombok.Getter;
 

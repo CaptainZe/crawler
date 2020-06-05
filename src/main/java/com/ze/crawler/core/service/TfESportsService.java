@@ -120,11 +120,17 @@ public class TfESportsService implements BaseService {
         // 获取对应盘口字典表
         Map<String, String> dishMapping = Dictionary.getEsportDishMappingByTypeAndDishType(type, Constant.ESPORTS_DISH_TF);
 
+        Map<String, String> leagueMapping = Dictionary.ESPORT_TF_LEAGUE_MAPPING.get(type);
+        Map<String, String> teamMapping = Dictionary.ESPORT_TF_TEAM_MAPPING.get(type);
+        if (leagueMapping == null || teamMapping == null) {
+            return;
+        }
+
         for (Object object : result) {
             TfESportsResultModel tfESportsResultModel = JSON.parseObject(JSON.toJSONString(object), TfESportsResultModel.class);
             // 联赛名
             String leagueName = tfESportsResultModel.getCompetitionName().trim();
-            String leagueId = Dictionary.ESPORT_TF_LEAGUE_MAPPING.get(leagueName);
+            String leagueId = leagueMapping.get(leagueName);
             if (leagueId == null) {
                 continue;
             }
@@ -151,8 +157,8 @@ public class TfESportsService implements BaseService {
             guestTeamName = guestTeamName.trim();
 
             // 获取主客队信息
-            String homeTeamId = Dictionary.ESPORT_TF_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
-            String guestTeamId = Dictionary.ESPORT_TF_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
+            String homeTeamId = teamMapping.get(homeTeamName.toUpperCase());
+            String guestTeamId = teamMapping.get(guestTeamName.toUpperCase());
             if (homeTeamId == null || guestTeamId == null) {
                 continue;
             }

@@ -21,6 +21,7 @@ import java.util.*;
 /**
  * RG电竞盘口
  */
+@SuppressWarnings("all")
 @Slf4j
 @Service
 public class RgESportsService implements BaseService {
@@ -108,6 +109,12 @@ public class RgESportsService implements BaseService {
         // 第二天最后时刻。早盘需要使用
         String nextDayLastTime = TimeUtils.getNextDayLastTime();
 
+        Map<String, String> leagueMapping = Dictionary.ESPORT_RG_LEAGUE_MAPPING.get(type);
+        Map<String, String> teamMapping = Dictionary.ESPORT_RG_TEAM_MAPPING.get(type);
+        if (leagueMapping == null || teamMapping == null) {
+            return;
+        }
+
         for (RgESportsResultItemModel item : result) {
             // 赛事名
             String gameName = item.getGameName();
@@ -146,7 +153,7 @@ public class RgESportsService implements BaseService {
 
             // 赛事信息获取
             String leagueName = item.getTournamentName().trim();
-            String leagueId = Dictionary.ESPORT_RG_LEAGUE_MAPPING.get(leagueName);
+            String leagueId = leagueMapping.get(leagueName);
             if (leagueId == null) {
                 continue;
             }
@@ -179,8 +186,8 @@ public class RgESportsService implements BaseService {
             guestTeamName = guestTeamName.trim();
 
             // 获取主客队信息
-            String dishHomeTeamId = Dictionary.ESPORT_RG_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
-            String dishGuestTeamId = Dictionary.ESPORT_RG_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
+            String dishHomeTeamId = teamMapping.get(homeTeamName.toUpperCase());
+            String dishGuestTeamId = teamMapping.get(guestTeamName.toUpperCase());
             if (dishHomeTeamId == null || dishGuestTeamId == null) {
                 continue;
             }

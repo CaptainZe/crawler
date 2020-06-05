@@ -75,6 +75,12 @@ public class FyESportsService implements BaseService {
         // 第二天最后时刻
         String nextDayLastTime = TimeUtils.getNextDayLastTime();
 
+        Map<String, String> leagueMapping = Dictionary.ESPORT_FY_LEAGUE_MAPPING.get(type);
+        Map<String, String> teamMapping = Dictionary.ESPORT_FY_TEAM_MAPPING.get(type);
+        if (leagueMapping == null || teamMapping == null) {
+            return;
+        }
+
         if (!CollectionUtils.isEmpty(matchList)) {
             // 遍历
             for (Map<String, Object> match : matchList) {
@@ -121,7 +127,7 @@ public class FyESportsService implements BaseService {
                     continue;
                 }
                 leagueName = leagueName.trim();
-                String leagueId = Dictionary.ESPORT_FY_LEAGUE_MAPPING.get(leagueName);
+                String leagueId = leagueMapping.get(leagueName);
                 if (leagueId == null) {
                     continue;
                 }
@@ -142,8 +148,8 @@ public class FyESportsService implements BaseService {
                 guestTeamName = guestTeamName.trim();
 
                 // 获取主客队信息
-                String homeTeamId = Dictionary.ESPORT_FY_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
-                String guestTeamId = Dictionary.ESPORT_FY_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
+                String homeTeamId = teamMapping.get(homeTeamName.toUpperCase());
+                String guestTeamId = teamMapping.get(guestTeamName.toUpperCase());
                 if (homeTeamId == null || guestTeamId == null) {
                     continue;
                 }
@@ -198,13 +204,13 @@ public class FyESportsService implements BaseService {
                                 /*
                                     对应的具体赔率
                                     1、输赢盘： 0是主队 1是客队
-                                    2、大小盘： 0是大  2是小
+                                    2、大小盘： 0是大  1是小
                                     3、让分盘： 0是主队 1是客队
                                     4、单双盘： 0是单 1是双
                                     5、是否盘： 0是是 1是否
                                  */
                                 List<Map<String, Object>> items = (List<Map<String, Object>>) bet.get("Items");
-                                if (CollectionUtils.isEmpty(items) || items.size() < 2) {
+                                if (CollectionUtils.isEmpty(items) || items.size() != 2) {
                                     continue;
                                 }
 
