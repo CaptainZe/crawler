@@ -255,6 +255,11 @@ public class MappingService {
                 // 各列信息
                 String type = getCellValue(row.getCell(0));
                 String id = getCellValue(row.getCell(1));
+
+                if (StringUtils.isEmpty(type)) {
+                    continue;
+                }
+
                 String pbName = getCellValue(row.getCell(2));
                 String rgName = getCellValue(row.getCell(3));
                 String tfName = getCellValue(row.getCell(4));
@@ -293,62 +298,68 @@ public class MappingService {
                 }
             }
 
-            // 2. sheet[1] -- 队伍映射表
-            HSSFSheet teamMappingSheet = workbook.getSheetAt(1);
-            for (int rowIndex=1; rowIndex <= teamMappingSheet.getLastRowNum(); rowIndex++) {
-                // 列顺序: 赛事类型、ID、平博电竞、RG电竞、TF电竞、IM电竞
-                HSSFRow row = teamMappingSheet.getRow(rowIndex);
-                if (row == null) {
-                    continue;
-                }
-                if (row.getCell(0) == null) {
-                    // 分隔线
-                    continue;
-                }
+            // 2. sheet[1~4] -- 队伍映射表
+            for (int teamSheetIndex=1; teamSheetIndex<5; teamSheetIndex++) {
+                HSSFSheet teamMappingSheet = workbook.getSheetAt(teamSheetIndex);
+                for (int rowIndex=1; rowIndex <= teamMappingSheet.getLastRowNum(); rowIndex++) {
+                    // 列顺序: 赛事类型、ID、平博电竞、RG电竞、TF电竞、IM电竞
+                    HSSFRow row = teamMappingSheet.getRow(rowIndex);
+                    if (row == null) {
+                        continue;
+                    }
+                    if (row.getCell(0) == null) {
+                        // 分隔线
+                        continue;
+                    }
 
-                // 各列信息
-                String type = getCellValue(row.getCell(0));
-                String id = getCellValue(row.getCell(1));
-                String pbName = getCellValue(row.getCell(2));
-                String rgName = getCellValue(row.getCell(3));
-                String tfName = getCellValue(row.getCell(4));
-                String imName = getCellValue(row.getCell(5));
-                String fyName = getCellValue(row.getCell(6));
+                    // 各列信息
+                    String type = getCellValue(row.getCell(0));
+                    if (StringUtils.isEmpty(type)) {
+                        continue;
+                    }
 
-                if (!StringUtils.isEmpty(pbName)) {
-                    List<String> pbNames = splitCellValue(pbName);
-                    for (String name : pbNames) {
-                        Dictionary.ESPORT_PB_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
+                    String id = getCellValue(row.getCell(1));
+                    String pbName = getCellValue(row.getCell(2));
+                    String rgName = getCellValue(row.getCell(3));
+                    String tfName = getCellValue(row.getCell(4));
+                    String imName = getCellValue(row.getCell(5));
+                    String fyName = getCellValue(row.getCell(6));
+
+                    if (!StringUtils.isEmpty(pbName)) {
+                        List<String> pbNames = splitCellValue(pbName);
+                        for (String name : pbNames) {
+                            Dictionary.ESPORT_PB_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
+                        }
                     }
-                }
-                if (!StringUtils.isEmpty(rgName)) {
-                    List<String> rgNames = splitCellValue(rgName);
-                    for (String name : rgNames) {
-                        Dictionary.ESPORT_RG_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
+                    if (!StringUtils.isEmpty(rgName)) {
+                        List<String> rgNames = splitCellValue(rgName);
+                        for (String name : rgNames) {
+                            Dictionary.ESPORT_RG_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
+                        }
                     }
-                }
-                if (!StringUtils.isEmpty(tfName)) {
-                    List<String> tfNames = splitCellValue(tfName);
-                    for (String name : tfNames) {
-                        Dictionary.ESPORT_TF_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
+                    if (!StringUtils.isEmpty(tfName)) {
+                        List<String> tfNames = splitCellValue(tfName);
+                        for (String name : tfNames) {
+                            Dictionary.ESPORT_TF_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
+                        }
                     }
-                }
-                if (!StringUtils.isEmpty(imName)) {
-                    List<String> imNames = splitCellValue(imName);
-                    for (String name : imNames) {
-                        Dictionary.ESPORT_IM_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
+                    if (!StringUtils.isEmpty(imName)) {
+                        List<String> imNames = splitCellValue(imName);
+                        for (String name : imNames) {
+                            Dictionary.ESPORT_IM_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
+                        }
                     }
-                }
-                if (!StringUtils.isEmpty(fyName)) {
-                    List<String> fyNames = splitCellValue(fyName);
-                    for (String name : fyNames) {
-                        Dictionary.ESPORT_FY_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
+                    if (!StringUtils.isEmpty(fyName)) {
+                        List<String> fyNames = splitCellValue(fyName);
+                        for (String name : fyNames) {
+                            Dictionary.ESPORT_FY_TEAM_MAPPING.get(type).put(name.toUpperCase(), id);
+                        }
                     }
                 }
             }
 
-            // 3. sheet[2] -- 盘口映射表
-            HSSFSheet dishMappingSheet = workbook.getSheetAt(2);
+            // 3. sheet[5] -- 盘口映射表
+            HSSFSheet dishMappingSheet = workbook.getSheetAt(5);
             for (int rowIndex=1; rowIndex <= dishMappingSheet.getLastRowNum(); rowIndex++) {
                 // 列顺序: 赛事类型、盘口类型、ID、平博电竞、RG电竞、TF电竞、IM电竞（匹配名）、IM电竞（显示名）
                 HSSFRow row = dishMappingSheet.getRow(rowIndex);
@@ -361,6 +372,10 @@ public class MappingService {
                 }
 
                 String leagueType = getCellValue(row.getCell(0));
+                if (StringUtils.isEmpty(leagueType)) {
+                    continue;
+                }
+
                 String dishType = getCellValue(row.getCell(1));
                 String id = getCellValue(row.getCell(2));
                 String pbName = getCellValue(row.getCell(3));
