@@ -34,7 +34,7 @@ public class ESportsExecutor {
     @Autowired
     private TfESportsService tfESportsService;
     @Autowired
-    private ImESportsService imESportsService;
+    private ImESportsServiceV1 imESportsServiceV1;
     @Autowired
     private FyESportsService fyESportsService;
     @Autowired
@@ -66,7 +66,7 @@ public class ESportsExecutor {
         CrawlerThread pb = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, pbESportsService);
         CrawlerThread rg = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, rgESportsService);
         CrawlerThread tf = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, tfESportsService);
-        CrawlerThread im = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, imESportsService);
+        CrawlerThread im = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, imESportsServiceV1);
         CrawlerThread fy = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, fyESportsService);
         threads.add(pb);
         threads.add(rg);

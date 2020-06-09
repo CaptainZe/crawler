@@ -306,6 +306,11 @@ public class FyESportsService implements BaseService {
 
         if (oddsItems.containsKey(oddsId.toString())) {
             Map<String, Object> oddsItem = oddsItems.get(oddsId.toString());
+            Integer isLock = (Integer) oddsItem.get("IsLock");
+            if (isLock == FYConstant.IS_LOCK) {
+                return null;
+            }
+
             BigDecimal odds = (BigDecimal) oddsItem.get("Odds");
             double o = CommonUtils.setScale(odds.doubleValue(), 3);
             return BigDecimal.valueOf(o).toString();
