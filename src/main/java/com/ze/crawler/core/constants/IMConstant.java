@@ -7,9 +7,12 @@ public class IMConstant {
 
     // 基础URL
     public final static String IM_BASE_URL = "https://imes-vkg.roshan88.com/Sportsbook/GetMatch";
-
     // 获取更多赔率 (%s替换替换顺序: ParentMatchNo)
     public final static String IM_MORE_URL = "https://imes-vkg.roshan88.com/Sportsbook/GetMatchDetail?ParentMatchNo=%s";
+
+    // [new]基础URL
+    public final static String IM_BASE_URL_V1 = "https://imes-vkg.roshan88.com/api/GetIndexMatch";
+    public final static String IM_MORE_URL_V1 = "https://imes-vkg.roshan88.com/api/GetMatchDetailsByParent";
 
     // 赛事类型
     public final static Integer SPORT_ID_CSGO = 47;   // CS:GO
@@ -20,6 +23,11 @@ public class IMConstant {
     /**
      * 一些常量
      */
+    public final static Integer GAME_STATUS_V1 = -1; // 未开始
+    public final static Integer DISH_STATUS_V1 = 1; // 未锁
+    public final static Integer HOME_TEAM_ODDS_CODE_V1 = 1;
+    public final static Integer GUEST_TEAM_ODDS_CODE_V1 = 2;
+
     public final static Integer GAME_STATUS = 0; // 未开始
     public final static String SKIP_DISH = "PARENT"; // 跳过的盘口
 

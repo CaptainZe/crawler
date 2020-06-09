@@ -20,6 +20,8 @@ public class FYConstant {
 
     // 状态
     public static final String MATCH_STATUS_BEGIN = "Begin";
+    // 盘口锁
+    public static final Integer IS_LOCK = 1;
 
     // 赔率index
     public static final int INDEX_FIRST = 0;

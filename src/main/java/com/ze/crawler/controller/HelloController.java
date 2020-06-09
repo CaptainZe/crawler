@@ -23,6 +23,8 @@ public class HelloController {
     @Autowired
     private ImESportsService imESportsService;
     @Autowired
+    private ImESportsServiceV1 imESportsServicev1;
+    @Autowired
     private FyESportsService fyESportsService;
     @Autowired
     private ESportsExecutor eSportsExecutor;
@@ -42,13 +44,13 @@ public class HelloController {
     @RequestMapping("/test")
     public void test() {
         TeamFilterModel teamFilterModel = new TeamFilterModel();
-        teamFilterModel.setTeamOne("10106");
-        teamFilterModel.setTeamTwo("10101");
+        teamFilterModel.setTeamOne("10105");
+        teamFilterModel.setTeamTwo("10114");
 
         pbESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
         rgESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
         tfESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
-        imESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
+        imESportsServicev1.crawler("110", Constant.ESPORTS_TYPE_LOL,null, null);
         fyESportsService.crawler("110", Constant.ESPORTS_TYPE_DOTA2,null, null);
     }
 

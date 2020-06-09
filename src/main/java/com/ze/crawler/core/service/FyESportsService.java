@@ -204,7 +204,7 @@ public class FyESportsService implements BaseService {
                                     5、是否盘： 0是是 1是否
                                  */
                                 List<Map<String, Object>> items = (List<Map<String, Object>>) bet.get("Items");
-                                if (CollectionUtils.isEmpty(items) || items.size() < 2) {
+                                if (CollectionUtils.isEmpty(items) || items.size() != 2) {
                                     continue;
                                 }
 
@@ -300,6 +300,11 @@ public class FyESportsService implements BaseService {
 
         if (oddsItems.containsKey(oddsId.toString())) {
             Map<String, Object> oddsItem = oddsItems.get(oddsId.toString());
+            Integer isLock = (Integer) oddsItem.get("IsLock");
+            if (isLock == FYConstant.IS_LOCK) {
+                return null;
+            }
+
             BigDecimal odds = (BigDecimal) oddsItem.get("Odds");
             double o = CommonUtils.setScale(odds.doubleValue(), 3);
             return BigDecimal.valueOf(o).toString();
