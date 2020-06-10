@@ -151,7 +151,7 @@ public class MappingSupportService {
         }
 
         JSONObject body = getBaseBody(sportId);
-        Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL_V1, body, Map.class);
+        Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL_V1, body, Map.class, ProxyConstant.USE_PROXY);
         if (map != null && map.get("Sport") != null) {
             List<Map<String, Object>> sports = (List<Map<String, Object>>) map.get("Sport");
             if (!CollectionUtils.isEmpty(sports)) {
