@@ -142,7 +142,7 @@ public class WeiKongService {
         if (!CollectionUtils.isEmpty(wkList)) {
             for (Wk wk : wkList) {
                 if (WKConstant.ENABLE_TRUE.equalsIgnoreCase(wk.getEnable())) {
-                    Integer usage = wk.getUsage();
+                    Integer usage = wk.getUsageScene();
                     if (usage.equals(WKConstant.USAGE_ESPORT)) {
                         WKConstant.WK_ESPORTS.put(wk.getwId(), wk.getRoomA());
                         WKConstant.WK_ESPORTS_BP.put(wk.getwId(), wk.getRoomB());

@@ -11,7 +11,7 @@ public class Wk {
     private String roomA;
     private String roomB;
     private String roomC;
-    private Integer usage;
+    private Integer usageScene;
     private String loginTime;
     private String enable;
 
@@ -66,13 +66,13 @@ public class Wk {
     }
 
     @Basic
-    @Column(name = "usage")
-    public Integer getUsage() {
-        return usage;
+    @Column(name = "usage_scene")
+    public Integer getUsageScene() {
+        return usageScene;
     }
 
-    public void setUsage(Integer usage) {
-        this.usage = usage;
+    public void setUsageScene(Integer usageScene) {
+        this.usageScene = usageScene;
     }
 
     @Basic
@@ -105,13 +105,13 @@ public class Wk {
                 Objects.equals(roomA, wk.roomA) &&
                 Objects.equals(roomB, wk.roomB) &&
                 Objects.equals(roomC, wk.roomC) &&
-                Objects.equals(usage, wk.usage) &&
+                Objects.equals(usageScene, wk.usageScene) &&
                 Objects.equals(loginTime, wk.loginTime) &&
                 Objects.equals(enable, wk.enable);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(wcId, wId, roomA, roomB, roomC, usage, loginTime, enable);
+        return Objects.hash(wcId, wId, roomA, roomB, roomC, usageScene, loginTime, enable);
     }
 }

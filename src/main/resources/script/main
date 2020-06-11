@@ -40,6 +40,7 @@ CREATE TABLE `t_wk` (
   `room_a` varchar(100) NOT NULL COMMENT '群1 - 电竞娱乐使用',
   `room_b` varchar(100) DEFAULT NULL COMMENT '群2 - 电竞包赔使用',
   `room_c` varchar(100) DEFAULT NULL COMMENT '群3 - 足篮使用',
+  `usage_scene` INT NULL COMMENT '使用场景',
   `login_time` varchar(50) DEFAULT NULL COMMENT '登录时间',
   `enable` varchar(20) DEFAULT NULL COMMENT '登录时间',
   PRIMARY KEY (`wc_id`)
