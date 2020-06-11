@@ -16,6 +16,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.*;
@@ -137,111 +138,104 @@ public class MappingSupportService {
         Map<String, String> leagueMapping = Dictionary.ESPORT_IM_LEAGUE_MAPPING.get(type);
         Map<String, String> teamMapping = Dictionary.ESPORT_IM_TEAM_MAPPING.get(type);
 
-        JSONObject body = getBaseBody(null, null);
-        Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL, body, Map.class);
-        if (map != null && map.get("d") != null) {
-            List<List<Object>> d = (List<List<Object>>) map.get("d");
-            if (!CollectionUtils.isEmpty(d)) {
-                Integer sportId = null;
-                if (Constant.ESPORTS_TYPE_LOL.equalsIgnoreCase(type)) {
-                    sportId = IMConstant.SPORT_ID_LOL;
-                } else if (Constant.ESPORTS_TYPE_DOTA2.equalsIgnoreCase(type)) {
-                    sportId = IMConstant.SPORT_ID_DOTA2;
-                } else if (Constant.ESPORTS_TYPE_CSGO.equalsIgnoreCase(type)) {
-                    sportId = IMConstant.SPORT_ID_CSGO;
-                } else if (Constant.ESPORTS_TYPE_KPL.equalsIgnoreCase(type)) {
-                    sportId = IMConstant.SPORT_ID_KPL;
-                }
+        Integer sportId = null;
+        if (Constant.ESPORTS_TYPE_LOL.equalsIgnoreCase(type)) {
+            sportId = IMConstant.SPORT_ID_LOL;
+        } else if (Constant.ESPORTS_TYPE_DOTA2.equalsIgnoreCase(type)) {
+            sportId = IMConstant.SPORT_ID_DOTA2;
+        } else if (Constant.ESPORTS_TYPE_CSGO.equalsIgnoreCase(type)) {
+            sportId = IMConstant.SPORT_ID_CSGO;
+        } else if (Constant.ESPORTS_TYPE_KPL.equalsIgnoreCase(type)) {
+            sportId = IMConstant.SPORT_ID_KPL;
+        }
 
-                if (sportId != null) {
-                    for (List<Object> league : d) {
-                        // [8]
-                        Integer gameType = (Integer) league.get(8);
-                        if (!sportId.equals(gameType)) {
-                            continue;
-                        }
+        if (sportId == null) {
+            return startRowIndex+1;
+        }
 
-                        // [1][5]都有联赛信息,目前取[5]
-                        List<String> leagueNames = (List<String>) league.get(5);
-                        if (CollectionUtils.isEmpty(leagueNames) && leagueNames.size() < 2) {
-                            continue;
-                        }
+        JSONObject body = getBaseBody(sportId);
+        Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL_V1, body, Map.class, ProxyConstant.USE_PROXY);
+        if (map != null && map.get("Sport") != null) {
+            List<Map<String, Object>> sports = (List<Map<String, Object>>) map.get("Sport");
+            if (!CollectionUtils.isEmpty(sports)) {
+                for (Map<String, Object> sport : sports) {
+                    Integer returnSportId = (Integer) sport.get("SportId");
+                    if (returnSportId != sportId) {
+                        continue;
+                    }
 
-                        // 联赛名
-                        String leagueName = leagueNames.get(1).trim();
-                        String leagueId = leagueMapping.get(leagueName);
+                    List<Map<String, Object>> leagues = (List<Map<String, Object>>) sport.get("LG");
+                    if (!CollectionUtils.isEmpty(leagues)) {
+                        for (Map<String, Object> league : leagues) {
+                            // 联赛名
+                            String leagueName = (String) league.get("BaseLGName");
+                            leagueName = leagueName.trim();
+                            String leagueId = leagueMapping.get(leagueName);
 
-                        // [10]比赛列表
-                        List<List<Object>> games = (List<List<Object>>) league.get(10);
-                        if (!CollectionUtils.isEmpty(games)) {
-                            for (List<Object> game : games) {
-                                // [5]主队    [6]客队
-                                List<String> homeTeamNames = (List<String>) game.get(5);
-                                if (CollectionUtils.isEmpty(homeTeamNames) && homeTeamNames.size() < 2) {
-                                    continue;
-                                }
-                                // 主队名
-                                String homeTeamName = homeTeamNames.get(2);
-                                homeTeamName = homeTeamName.trim();
-
-                                List<String> guestTeamNames = (List<String>) game.get(6);
-                                if (CollectionUtils.isEmpty(guestTeamNames) && guestTeamNames.size() < 2) {
-                                    continue;
-                                }
-                                // 客队名
-                                String guestTeamName = guestTeamNames.get(2);
-                                guestTeamName = guestTeamName.trim();
-
-                                if (leagueId == null) {
-                                    // 联赛未录入
-                                    HSSFRow homeRow = sheet.createRow(startRowIndex);
-                                    setExcelCellValue(homeRow, 1, leagueName, style);
-                                    setExcelCellValue(homeRow, 2, homeTeamName, style);
-                                    startRowIndex++;
-
-                                    HSSFRow guestRow = sheet.createRow(startRowIndex);
-                                    setExcelCellValue(guestRow, 1, leagueName, style);
-                                    setExcelCellValue(guestRow, 2, guestTeamName, style);
-                                    startRowIndex++;
-                                } else {
-                                    // 联赛已录入
-                                    String homeTeamId = teamMapping.get(homeTeamName.toUpperCase());
-                                    String guestTeamId = teamMapping.get(guestTeamName.toUpperCase());
-
-                                    if (homeTeamId == null) {
-                                        HSSFRow homeRow = sheet.createRow(startRowIndex);
-                                        setExcelCellValue(homeRow, 0, leagueId, null);
-                                        setExcelCellValue(homeRow, 1, leagueName, null);
-                                        setExcelCellValue(homeRow, 2, homeTeamName, style);
-                                        startRowIndex++;
-                                    } else {
-                                        HSSFRow homeRow = sheet.createRow(startRowIndex);
-                                        setExcelCellValue(homeRow, 0, leagueId, null);
-                                        setExcelCellValue(homeRow, 1, leagueName, null);
-                                        setExcelCellValue(homeRow, 2, homeTeamName, null);
-                                        setExcelCellValue(homeRow, 3, homeTeamId, null);
-                                        startRowIndex++;
+                            List<Map<String, Object>> games = (List<Map<String, Object>>) league.get("ParentMatch");
+                            if (!CollectionUtils.isEmpty(games)) {
+                                for (Map<String, Object> game : games) {
+                                    // 主队
+                                    String homeTeamName = (String) game.get("PHTName");
+                                    homeTeamName = homeTeamName.trim();
+                                    // 客队
+                                    String guestTeamName = (String) game.get("PATName");
+                                    guestTeamName = guestTeamName.trim();
+                                    if (StringUtils.isEmpty(homeTeamName) || StringUtils.isEmpty(guestTeamName)) {
+                                        continue;
                                     }
 
-                                    if (guestTeamId == null) {
+                                    if (leagueId == null) {
+                                        // 联赛未录入
+                                        HSSFRow homeRow = sheet.createRow(startRowIndex);
+                                        setExcelCellValue(homeRow, 1, leagueName, style);
+                                        setExcelCellValue(homeRow, 2, homeTeamName, style);
+                                        startRowIndex++;
+
                                         HSSFRow guestRow = sheet.createRow(startRowIndex);
-                                        setExcelCellValue(guestRow, 0, leagueId, null);
-                                        setExcelCellValue(guestRow, 1, leagueName, null);
+                                        setExcelCellValue(guestRow, 1, leagueName, style);
                                         setExcelCellValue(guestRow, 2, guestTeamName, style);
                                         startRowIndex++;
                                     } else {
-                                        HSSFRow guestRow = sheet.createRow(startRowIndex);
-                                        setExcelCellValue(guestRow, 0, leagueId, null);
-                                        setExcelCellValue(guestRow, 1, leagueName, null);
-                                        setExcelCellValue(guestRow, 2, guestTeamName, null);
-                                        setExcelCellValue(guestRow, 3, guestTeamId, null);
-                                        startRowIndex++;
+                                        // 联赛已录入
+                                        String homeTeamId = teamMapping.get(homeTeamName.toUpperCase());
+                                        String guestTeamId = teamMapping.get(guestTeamName.toUpperCase());
+
+                                        if (homeTeamId == null) {
+                                            HSSFRow homeRow = sheet.createRow(startRowIndex);
+                                            setExcelCellValue(homeRow, 0, leagueId, null);
+                                            setExcelCellValue(homeRow, 1, leagueName, null);
+                                            setExcelCellValue(homeRow, 2, homeTeamName, style);
+                                            startRowIndex++;
+                                        } else {
+                                            HSSFRow homeRow = sheet.createRow(startRowIndex);
+                                            setExcelCellValue(homeRow, 0, leagueId, null);
+                                            setExcelCellValue(homeRow, 1, leagueName, null);
+                                            setExcelCellValue(homeRow, 2, homeTeamName, null);
+                                            setExcelCellValue(homeRow, 3, homeTeamId, null);
+                                            startRowIndex++;
+                                        }
+
+                                        if (guestTeamId == null) {
+                                            HSSFRow guestRow = sheet.createRow(startRowIndex);
+                                            setExcelCellValue(guestRow, 0, leagueId, null);
+                                            setExcelCellValue(guestRow, 1, leagueName, null);
+                                            setExcelCellValue(guestRow, 2, guestTeamName, style);
+                                            startRowIndex++;
+                                        } else {
+                                            HSSFRow guestRow = sheet.createRow(startRowIndex);
+                                            setExcelCellValue(guestRow, 0, leagueId, null);
+                                            setExcelCellValue(guestRow, 1, leagueName, null);
+                                            setExcelCellValue(guestRow, 2, guestTeamName, null);
+                                            setExcelCellValue(guestRow, 3, guestTeamId, null);
+                                            startRowIndex++;
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        startRowIndex++;
+                            startRowIndex++;
+                        }
                     }
                 }
             }
@@ -800,54 +794,14 @@ public class MappingSupportService {
     /**
      * 获取请求body
      */
-    private JSONObject getBaseBody(Integer sportId, String parentMatchNo) {
+    private JSONObject getBaseBody(Integer sportId) {
         JSONObject body = new JSONObject();
-        body.put("WalletMode", 2);
-        body.put("WalletBalanceDisplayEnabled", true);
-        body.put("WalletBalanceRefreshInterval", 60);
-        body.put("OddsType", 2);
-        body.put("Language", 1);
-        body.put("ShowStatistics", 0);
-        body.put("ExtraFilter", "48");
-        body.put("CompanyId", "1582");
-        body.put("AcceptAnyOdds", false);
-        body.put("AcceptHigherOdds", true);
-        body.put("SeasonId", 0);
-        body.put("VIPSpread", 1);
-        body.put("Playsite", false);
-        body.put("SportId", -1);    // 请求具体比赛时,需要替换 ("SportId": "45")
-        if (sportId != null) {
-            body.put("SportId", sportId);
-        }
-        body.put("Market", 0);
-        body.put("OddsPageCode", 0);
-        body.put("ShowStatsLeftFloatMenu", false);
-        body.put("ShowMatchResults", true);
-        body.put("ShowTeamLeftFloatMenu", true);
-        body.put("ShowTermsLeftFloatMenu", true);
-        body.put("ShowAnnouncementLeftFloatMenu", true);
-        body.put("ShowCMS", false);
-        body.put("showAnnouncement", true);
-        body.put("TranslationCode", "REAL");
-        body.put("IsMultipleCurrency", false);
-        body.put("QueryToken", "");
-        body.put("LiveStream", 1);
-        body.put("MobileMerchantHomeUrl", null);
-        body.put("IndexMatchesReloadIntervalSeconds", 20);
-        body.put("LiveBallsReloadIntervalSeconds", 7);
-        body.put("SmvReloadIntervalSeconds", 10);
-        body.put("ParlayViewReloadIntervalSeconds", 10);
-        body.put("NoSponsorAdsInVideo", false);
-        body.put("FilterSportId", -1);
-        body.put("PageSportIds", Collections.singletonList(sportId));
-        body.put("PageMarket", 3);
-        body.put("ViewType", 2);
-        body.put("MemberCode", "");
-        if (parentMatchNo != null) {
-            body.put("ParentMatchNo", null);    // 请求具体比赛时,需要替换 ("ParentMatchNo": "9793752")
-        }
-        body.put("ParentMatchNo", parentMatchNo);
-        body.put("MatchIdList", null);
+        body.put("BettingChannel", 1);
+        body.put("EventMarket", -99);
+        body.put("Language", "chs");
+        body.put("Token", null);
+        body.put("BaseLGIds", Collections.singletonList(-99));
+        body.put("SportId", sportId);
         return body;
     }
 

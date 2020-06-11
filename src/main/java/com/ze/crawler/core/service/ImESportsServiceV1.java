@@ -6,8 +6,8 @@ import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
 import com.ze.crawler.core.constants.IMConstant;
 import com.ze.crawler.core.constants.ProxyConstant;
-import com.ze.crawler.core.constants.enums.ImSpecialDishEnum;
 import com.ze.crawler.core.entity.ImEsports;
+import com.ze.crawler.core.enums.ImSpecialDishEnum;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.ImEsportsRepository;
 import com.ze.crawler.core.service.log.LogService;
@@ -109,6 +109,12 @@ public class ImESportsServiceV1 implements BaseService {
             sportId = IMConstant.SPORT_ID_KPL;
         }
 
+        Map<String, String> leagueMapping = Dictionary.ESPORT_IM_LEAGUE_MAPPING.get(type);
+        Map<String, String> teamMapping = Dictionary.ESPORT_IM_TEAM_MAPPING.get(type);
+        if (leagueMapping == null || teamMapping == null) {
+            return;
+        }
+
         if (sportId != null) {
             for (Map<String, Object> sport : sports) {
                 Integer returnSportId = (Integer) sport.get("SportId");
@@ -122,7 +128,7 @@ public class ImESportsServiceV1 implements BaseService {
                         // 联赛名
                         String leagueName = (String) league.get("BaseLGName");
                         leagueName = leagueName.trim();
-                        String leagueId = Dictionary.ESPORT_IM_LEAGUE_MAPPING.get(leagueName);
+                        String leagueId = leagueMapping.get(leagueName);
                         if (leagueId == null) {
                             continue;
                         }
@@ -166,8 +172,8 @@ public class ImESportsServiceV1 implements BaseService {
                                     continue;
                                 }
                                 // 获取主客队信息
-                                String homeTeamId = Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
-                                String guestTeamId = Dictionary.ESPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
+                                String homeTeamId = teamMapping.get(homeTeamName.toUpperCase());
+                                String guestTeamId = teamMapping.get(guestTeamName.toUpperCase());
                                 if (homeTeamId == null || guestTeamId == null) {
                                     continue;
                                 }
