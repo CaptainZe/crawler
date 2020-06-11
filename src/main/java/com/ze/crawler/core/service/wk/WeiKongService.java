@@ -13,10 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * 微控
@@ -66,7 +63,7 @@ public class WeiKongService {
         String url = getUrl(api);
         JSONObject body = new JSONObject();
         body.put("wId", wId);
-        body.put("wcId", WKConstant.WK_ESPORTS_BP.get(wId));
+        body.put("wcId", WKConstant.WK_CHECK.get(wId));
         body.put("content", content);
         Map<String, Object> response = HttpClientUtils.post(url, body, Map.class, WKConstant.AUTHORIZATION);
         return JSON.toJSONString(response);
@@ -130,14 +127,29 @@ public class WeiKongService {
      * 刷新&初始化
      */
     private void initAndRefreshWkInfo() {
-        WKConstant.WK_ESPORTS_YL.clear();
+        WKConstant.WK_USAGE_INFO.clear();
+        WKConstant.WK_CHECK.clear();
+        WKConstant.WK_ESPORTS.clear();
         WKConstant.WK_ESPORTS_BP.clear();
+        WKConstant.WK_SPORTS.clear();
+
+        // 初始化使用场景
+        WKConstant.WK_USAGE_INFO.put(WKConstant.SEND_TYPE_ESPORTS, WKConstant.WK_ESPORTS);
+        WKConstant.WK_USAGE_INFO.put(WKConstant.SEND_TYPE_ESPORTS_BP, WKConstant.WK_ESPORTS_BP);
+        WKConstant.WK_USAGE_INFO.put(WKConstant.SEND_TYPE_SPORTS, WKConstant.WK_SPORTS);
+
         List<Wk> wkList = wkRepository.findAll();
         if (!CollectionUtils.isEmpty(wkList)) {
             for (Wk wk : wkList) {
                 if (WKConstant.ENABLE_TRUE.equalsIgnoreCase(wk.getEnable())) {
-                    WKConstant.WK_ESPORTS_YL.put(wk.getwId(), wk.getRoomA());
-                    WKConstant.WK_ESPORTS_BP.put(wk.getwId(), wk.getRoomB());
+                    Integer usage = wk.getUsage();
+                    if (usage.equals(WKConstant.USAGE_ESPORT)) {
+                        WKConstant.WK_ESPORTS.put(wk.getwId(), wk.getRoomA());
+                        WKConstant.WK_ESPORTS_BP.put(wk.getwId(), wk.getRoomB());
+                    } else if (usage.equals(WKConstant.USAGE_SPORT)) {
+                        WKConstant.WK_SPORTS.put(wk.getwId(), wk.getRoomC());
+                    }
+                    WKConstant.WK_CHECK.put(wk.getwId(), wk.getRoomA());
                 }
             }
         }
@@ -149,23 +161,21 @@ public class WeiKongService {
     private JSONObject getRandomAccount(Integer sendType) {
         JSONObject jsonObject = new JSONObject();
 
-        Map<String, String> wkInfo = WKConstant.WK_ESPORTS_YL;
-        // fixme 扩展点
-        if (sendType.equals(WKConstant.ESPORTS_BP)) {
-            wkInfo = WKConstant.WK_ESPORTS_BP;
-        }
+        Map<String, String> wkInfo = WKConstant.WK_USAGE_INFO.get(sendType);
 
-        Random random = new Random();
-        int r = random.nextInt(wkInfo.keySet().size());
+        if (wkInfo.keySet().size() > 1) {
+            Random random = new Random();
+            int r = random.nextInt(wkInfo.keySet().size());
 
-        int i = 0;
-        for (String key : wkInfo.keySet()) {
-            if (r == i) {
-                jsonObject.put("wId", key);
-                jsonObject.put("wcId", wkInfo.get(key));
-                return jsonObject;
+            int i = 0;
+            for (String key : wkInfo.keySet()) {
+                if (r == i) {
+                    jsonObject.put("wId", key);
+                    jsonObject.put("wcId", wkInfo.get(key));
+                    return jsonObject;
+                }
+                i++;
             }
-            i++;
         }
 
         String wId = wkInfo.keySet().iterator().next();

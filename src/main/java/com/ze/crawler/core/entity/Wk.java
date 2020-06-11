@@ -10,6 +10,8 @@ public class Wk {
     private String wId;
     private String roomA;
     private String roomB;
+    private String roomC;
+    private Integer usage;
     private String loginTime;
     private String enable;
 
@@ -54,6 +56,26 @@ public class Wk {
     }
 
     @Basic
+    @Column(name = "room_c")
+    public String getRoomC() {
+        return roomC;
+    }
+
+    public void setRoomC(String roomC) {
+        this.roomC = roomC;
+    }
+
+    @Basic
+    @Column(name = "usage")
+    public Integer getUsage() {
+        return usage;
+    }
+
+    public void setUsage(Integer usage) {
+        this.usage = usage;
+    }
+
+    @Basic
     @Column(name = "login_time")
     public String getLoginTime() {
         return loginTime;
@@ -82,12 +104,14 @@ public class Wk {
                 Objects.equals(wId, wk.wId) &&
                 Objects.equals(roomA, wk.roomA) &&
                 Objects.equals(roomB, wk.roomB) &&
+                Objects.equals(roomC, wk.roomC) &&
+                Objects.equals(usage, wk.usage) &&
                 Objects.equals(loginTime, wk.loginTime) &&
                 Objects.equals(enable, wk.enable);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(wcId, wId, roomA, roomB, loginTime, enable);
+        return Objects.hash(wcId, wId, roomA, roomB, roomC, usage, loginTime, enable);
     }
 }

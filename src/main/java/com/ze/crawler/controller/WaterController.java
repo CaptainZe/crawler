@@ -43,6 +43,12 @@ public class WaterController {
         bp.setTeamB("0");
         waterControlRepository.save(bp);
 
+        WaterControl ty = new WaterControl();
+        ty.setId(CrawlerTask.TY_CONTROL_ID);
+        ty.setEnable(ENABLE_OFF);
+        ty.setThreshold(DEFAULT_THRESHOLD);
+        waterControlRepository.save(ty);
+
         return true;
     }
 
@@ -78,6 +84,15 @@ public class WaterController {
         waterControl.setLeague(league);
         waterControl.setTeamA(teamA);
         waterControl.setTeamB(teamB);
+        waterControlRepository.save(waterControl);
+        return true;
+    }
+
+    @RequestMapping("/ty_control")
+    public boolean tyControl(@RequestParam String open, @RequestParam String threshold) {
+        WaterControl waterControl = waterControlRepository.getOne(CrawlerTask.TY_CONTROL_ID);
+        waterControl.setEnable(open);
+        waterControl.setThreshold(threshold);
         waterControlRepository.save(waterControl);
         return true;
     }

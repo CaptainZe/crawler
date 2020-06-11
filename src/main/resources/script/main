@@ -37,16 +37,13 @@ DROP TABLE IF EXISTS `t_wk`;
 CREATE TABLE `t_wk` (
   `wc_id` varchar(50) NOT NULL COMMENT '微信id',
   `w_id` varchar(100) NOT NULL COMMENT '微信实例ID',
-  `wc_name` varchar(100) NOT NULL COMMENT '微信名',
-  `target_wc_id` varchar(100) DEFAULT NULL COMMENT '要发送的目标微信id',
+  `room_a` varchar(100) NOT NULL COMMENT '群1 - 电竞娱乐使用',
+  `room_b` varchar(100) DEFAULT NULL COMMENT '群2 - 电竞包赔使用',
+  `room_c` varchar(100) DEFAULT NULL COMMENT '群3 - 足篮使用',
   `login_time` varchar(50) DEFAULT NULL COMMENT '登录时间',
+  `enable` varchar(20) DEFAULT NULL COMMENT '登录时间',
   PRIMARY KEY (`wc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='微控信息';
-
-ALTER TABLE `t_wk`
-CHANGE COLUMN `w_id` `w_id` VARCHAR(100) NULL COMMENT '微信实例ID' ,
-CHANGE COLUMN `wc_name` `room_a` VARCHAR(100) NULL COMMENT '群1 - 电竞娱乐使用' ,
-CHANGE COLUMN `target_wc_id` `room_b` VARCHAR(100) NULL DEFAULT NULL COMMENT '群2 - 电竞包赔使用' ;
 
 DROP TABLE IF EXISTS `t_water_control`;
 CREATE TABLE `t_water_control` (
