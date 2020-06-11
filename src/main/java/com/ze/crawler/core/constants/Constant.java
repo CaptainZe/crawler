@@ -27,16 +27,18 @@ public class Constant {
     public static final String DISH_NAME_WILDCARD_T2 = "$T2";
 
     // 映射解析路径
-    public static final String ESPORT_MAPPING_FILE_PATH = "D:/Crawler/mapping/esport_mapping_new.xls";  // 电竞
+    public static final String ESPORT_MAPPING_FILE_PATH = "D:/Crawler/mapping/esport_mapping.xls";  // 电竞
     public static final String SPORT_MAPPING_FILE_PATH = "D:/Crawler/mapping/sport_mapping.xls";    // 体育
 
     // 日志类型
     // 电竞
-    public final static int LOG_TYPE_PARSE_ESPORTS_ERROR = 1;                   // 电竞解析错误
-    public final static int LOG_TYPE_ESPORTS_INVOKE_ERROR = 2;                  // 电竞爬虫调用错误
-    public final static int LOG_TYPE_ESPORTS_WATER_CALCULATE_ERROR = 3;         // 电竞水量计算错误
+    public final static int LOG_TYPE_PARSE_ESPORTS_ERROR = 11;                   // 电竞解析错误
+    public final static int LOG_TYPE_ESPORTS_INVOKE_ERROR = 12;                  // 电竞爬虫调用错误
+    public final static int LOG_TYPE_ESPORTS_WATER_CALCULATE_ERROR = 13;         // 电竞水量计算错误
     // 体育
-    public final static int LOG_TYPE_PARSE_SPORTS_ERROR = 4;                    // 体育解析错误
+    public final static int LOG_TYPE_PARSE_SPORTS_ERROR = 21;                   // 体育解析错误
+    public final static int LOG_TYPE_SPORTS_INVOKE_ERROR = 22;                  // 体育爬虫调用错误
+    public final static int LOG_TYPE_SPORTS_WATER_CALCULATE_ERROR = 23;         // 体育水量计算错误
 
     // 各下注盘类型
     public final static String DISH_TYPE_SYP = "输赢盘";

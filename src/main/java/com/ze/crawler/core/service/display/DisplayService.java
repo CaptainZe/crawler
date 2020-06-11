@@ -121,6 +121,7 @@ public class DisplayService {
      * @return
      */
     private String getEsportsDishName(Integer dish) {
+        // 电竞模块
         if (Constant.ESPORTS_DISH_PB.equals(dish)) {
             return "平博电竞";
         } else if (Constant.ESPORTS_DISH_RG.equals(dish)) {
@@ -132,6 +133,20 @@ public class DisplayService {
         } else if (Constant.ESPORTS_DISH_FY.equals(dish)) {
             return "泛亚电竞";
         }
+
+        // 体育模块
+        if (Constant.SPORTS_DISH_PB.equals(dish)) {
+            return "平博体育";
+        } else if (Constant.SPORTS_DISH_IM.equals(dish)) {
+            return "IM体育";
+        } else if (Constant.SPORTS_DISH_YB.equals(dish)) {
+            return "188体育";
+        } else if (Constant.SPORTS_DISH_SB.equals(dish)) {
+            return "沙巴体育";
+        } else if (Constant.SPORTS_DISH_BTI.equals(dish)) {
+            return "BTI体育";
+        }
+
         return null;
     }
 }

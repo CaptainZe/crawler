@@ -15,12 +15,19 @@ public class WKConstant {
     public final static String TRY_AGAIN = "请再试一次！";
 
     // 微控账号信息   Key: wId  Value:target
-    public final static Map<String, String> WK_ESPORTS_YL = new HashMap<>();    // 电竞 - 娱乐
+    public final static Map<String, String> WK_CHECK = new HashMap<>();        // 检查
+    public final static Map<String, String> WK_ESPORTS = new HashMap<>();    // 电竞
     public final static Map<String, String> WK_ESPORTS_BP = new HashMap<>();    // 电竞 - 包赔
+    public final static Map<String, String> WK_SPORTS = new HashMap<>();        // 体育
+    public final static Map<Integer, Map<String, String>> WK_USAGE_INFO = new HashMap<>();
 
     // 发送类型
-    public final static Integer ESPORTS_YL = 1;
-    public final static Integer ESPORTS_BP = 2;
+    public final static Integer SEND_TYPE_ESPORTS = 1;
+    public final static Integer SEND_TYPE_ESPORTS_BP = 2;
+    public final static Integer SEND_TYPE_SPORTS = 3;
+    // 使用场景
+    public final static Integer USAGE_ESPORT = 1;
+    public final static Integer USAGE_SPORT = 2;
 
     public final static String ENABLE_TRUE = "true";
 }

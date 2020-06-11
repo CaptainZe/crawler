@@ -21,7 +21,7 @@ public class WkController {
     @RequestMapping("/check")
     public Map<String, String> check() {
         Map<String, String> map = new HashMap<>();
-        for (String wid : WKConstant.WK_ESPORTS_BP.keySet()) {
+        for (String wid : WKConstant.WK_CHECK.keySet()) {
             String s = weiKongService.sendTextByWid(wid, wid + ":OK");
             map.put(wid, s);
         }

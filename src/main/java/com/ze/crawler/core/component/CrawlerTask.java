@@ -6,6 +6,7 @@ import com.ze.crawler.core.entity.WaterControl;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.WaterControlRepository;
 import com.ze.crawler.core.service.executor.ESportsExecutor;
+import com.ze.crawler.core.service.executor.SportsExecutor;
 import com.ze.crawler.core.utils.LangUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,11 +23,14 @@ public class CrawlerTask {
     @Autowired
     private ESportsExecutor eSportsExecutor;
     @Autowired
+    private SportsExecutor sportsExecutor;
+    @Autowired
     private WaterControlRepository waterControlRepository;
 
     // 水量控制
-    public final static String YL_CONTROL_ID = "00000"; // 娱乐
-    public final static String BP_CONTROL_ID = "11111"; // 包赔
+    public final static String YL_CONTROL_ID = "00000"; // 电竞 - 娱乐
+    public final static String BP_CONTROL_ID = "11111"; // 电竞 - 包赔
+    public final static String TY_CONTROL_ID = "22222"; // 体育
 
     /**
      * 包赔
@@ -144,5 +148,35 @@ public class CrawlerTask {
             eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_KPL, null, null, threshold, null);
         }
         System.out.println("王者荣耀 执行完成");
+    }
+
+    /* 体育 */
+
+    /**
+     * 足球
+     */
+    @Scheduled(initialDelay = 1000 * 60 * 5, fixedDelay = 1000 * 60 * 5)
+    public void soccerTask() {
+        WaterControl waterControl = waterControlRepository.getOne(TY_CONTROL_ID);
+        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
+            double threshold = Double.parseDouble(waterControl.getThreshold());
+
+            sportsExecutor.executor(LangUtils.generateUuid(), Constant.SPORTS_TYPE_SOCCER, null, null, threshold, null);
+        }
+        System.out.println("足球 执行完成");
+    }
+
+    /**
+     * 篮球
+     */
+    @Scheduled(initialDelay = 1000 * 60 * 6, fixedDelay = 1000 * 60 * 5)
+    public void basketballTask() {
+        WaterControl waterControl = waterControlRepository.getOne(TY_CONTROL_ID);
+        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
+            double threshold = Double.parseDouble(waterControl.getThreshold());
+
+            sportsExecutor.executor(LangUtils.generateUuid(), Constant.SPORTS_TYPE_BASKETBALL, null, null, threshold, null);
+        }
+        System.out.println("篮球 执行完成");
     }
 }
