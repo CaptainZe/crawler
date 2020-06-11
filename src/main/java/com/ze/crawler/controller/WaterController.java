@@ -88,6 +88,12 @@ public class WaterController {
         return true;
     }
 
+    /**
+     * 电竞 - 体育报水控制器
+     * @param open
+     * @param threshold
+     * @return
+     */
     @RequestMapping("/ty_control")
     public boolean tyControl(@RequestParam String open, @RequestParam String threshold) {
         WaterControl waterControl = waterControlRepository.getOne(CrawlerTask.TY_CONTROL_ID);
