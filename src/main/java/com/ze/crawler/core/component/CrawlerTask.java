@@ -66,7 +66,7 @@ public class CrawlerTask {
                     for (String type : map.keySet()) {
                         if (!CollectionUtils.isEmpty(map.get(type))) {
                             eSportsExecutor.executor(LangUtils.generateUuid(), type,
-                                    map.get(type), null, threshold, Constant.ESPORTS_DISH_PB);
+                                    map.get(type), null, threshold, null);
                         }
                     }
                 }

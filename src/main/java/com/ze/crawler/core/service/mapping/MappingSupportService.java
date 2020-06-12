@@ -217,8 +217,8 @@ public class MappingSupportService {
                             matchHomeTeamName = replaceKill(homeTeamName);
                             matchGuestTeamName = replaceKill(guestTeamName);
                         } else {
-                            matchHomeTeamName = homeTeamName.toUpperCase();
-                            matchGuestTeamName = guestTeamName.toUpperCase();
+                            matchHomeTeamName = homeTeamName;
+                            matchGuestTeamName = guestTeamName;
                         }
 
                         if (leagueId == null) {
@@ -288,9 +288,9 @@ public class MappingSupportService {
      */
     private String replaceKill(String teamName) {
         if (teamName.contains(PBConstant.TEAM_NAME_KILL_SUFFIX)) {
-            return teamName.replace(PBConstant.TEAM_NAME_KILL_SUFFIX, "").trim().toUpperCase();
+            return teamName.replace(PBConstant.TEAM_NAME_KILL_SUFFIX, "").trim();
         } else if (teamName.contains(PBConstant.TEAM_NAME_KILL_SUFFIX_EN)) {
-            return teamName.replace(PBConstant.TEAM_NAME_KILL_SUFFIX_EN, "").trim().toUpperCase();
+            return teamName.replace(PBConstant.TEAM_NAME_KILL_SUFFIX_EN, "").trim();
         }
         return teamName.toUpperCase();
     }
