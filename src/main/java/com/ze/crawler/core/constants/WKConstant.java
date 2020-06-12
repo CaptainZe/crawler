@@ -8,17 +8,17 @@ import java.util.Map;
  */
 public class WKConstant {
     // 微控域名
-    public final static String DOMAIN = "http://xingshenapi.com/";
+    public final static String DOMAIN = "http://xingshenwk.com/";
     // Authorization 登录一次永不失效
     public final static String AUTHORIZATION = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXNzd29yZCI6ImUxMGFkYzM5NDliYTU5YWJiZTU2ZTA1N2YyMGY4ODNld1BDUDZvSVgyI0goMjVhcyIsImlzcyI6InhpbmdzaGVuZyIsImFjY291bnQiOiIxNTk1OTA0Njg5NCJ9.WA93YzyXsAcIjS0tvwPk0a886L_D20OpyLAWCqgo3x8";
     // 重试文本
     public final static String TRY_AGAIN = "请再试一次！";
 
     // 微控账号信息   Key: wId  Value:target
-    public final static Map<String, String> WK_CHECK = new HashMap<>();        // 检查
-    public final static Map<String, String> WK_ESPORTS = new HashMap<>();    // 电竞
-    public final static Map<String, String> WK_ESPORTS_BP = new HashMap<>();    // 电竞 - 包赔
-    public final static Map<String, String> WK_SPORTS = new HashMap<>();        // 体育
+    public final static Map<String, String> WK_CHECK = new HashMap<>();          // 检查
+    public final static Map<String, String> WK_ESPORTS = new HashMap<>();        // 电竞
+    public final static Map<String, String> WK_ESPORTS_BP = new HashMap<>();     // 电竞 - 包赔
+    public final static Map<String, String> WK_SPORTS = new HashMap<>();         // 体育
     public final static Map<Integer, Map<String, String>> WK_USAGE_INFO = new HashMap<>();
 
     // 发送类型

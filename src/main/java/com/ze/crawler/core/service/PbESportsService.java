@@ -173,8 +173,8 @@ public class PbESportsService implements BaseService {
                                     String matchHomeTeamName = null;
                                     String matchGuestTeamName = null;
                                     if (isKill(homeTeamName)) {
-                                        matchHomeTeamName = homeTeamName.replace(PBConstant.TEAM_NAME_KILL_SUFFIX, "").trim().toUpperCase();
-                                        matchGuestTeamName = guestTeamName.replace(PBConstant.TEAM_NAME_KILL_SUFFIX, "").trim().toUpperCase();
+                                        matchHomeTeamName = replaceKill(homeTeamName);
+                                        matchGuestTeamName = replaceKill(guestTeamName);
                                     } else {
                                         matchHomeTeamName = homeTeamName.toUpperCase();
                                         matchGuestTeamName = guestTeamName.toUpperCase();
@@ -996,7 +996,21 @@ public class PbESportsService implements BaseService {
      * @return
      */
     private boolean isKill(String teamName) {
-        return teamName.endsWith(PBConstant.TEAM_NAME_KILL_SUFFIX);
+        return teamName.contains(PBConstant.TEAM_NAME_KILL_SUFFIX) || teamName.contains(PBConstant.TEAM_NAME_KILL_SUFFIX_EN);
+    }
+
+    /**
+     * 替换击杀数后缀
+     * @param teamName
+     * @return
+     */
+    private String replaceKill(String teamName) {
+        if (teamName.contains(PBConstant.TEAM_NAME_KILL_SUFFIX)) {
+            return teamName.replace(PBConstant.TEAM_NAME_KILL_SUFFIX, "").trim().toUpperCase();
+        } else if (teamName.contains(PBConstant.TEAM_NAME_KILL_SUFFIX_EN)) {
+            return teamName.replace(PBConstant.TEAM_NAME_KILL_SUFFIX_EN, "").trim().toUpperCase();
+        }
+        return teamName.toUpperCase();
     }
 
     /**

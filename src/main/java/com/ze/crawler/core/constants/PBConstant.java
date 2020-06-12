@@ -29,6 +29,7 @@ public class PBConstant {
      * 一些常量
      */
     public static final String TEAM_NAME_KILL_SUFFIX = "（击杀数）";
+    public static final String TEAM_NAME_KILL_SUFFIX_EN = "(Kills)";
 
     public static final String LEAGUE_PREFIX_LOL = "英雄联盟";
     public static final String LEAGUE_PREFIX_LOL_EN = "League of Legends";
