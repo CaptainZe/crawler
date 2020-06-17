@@ -166,17 +166,17 @@ public class CrawlerTask {
         System.out.println("足球 执行完成");
     }
 
-    /**
-     * 篮球
-     */
-    @Scheduled(initialDelay = 1000 * 60 * 6, fixedDelay = 1000 * 60 * 5)
-    public void basketballTask() {
-        WaterControl waterControl = waterControlRepository.getOne(TY_CONTROL_ID);
-        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
-            double threshold = Double.parseDouble(waterControl.getThreshold());
-
-            sportsExecutor.executor(LangUtils.generateUuid(), Constant.SPORTS_TYPE_BASKETBALL, null, null, threshold, null);
-        }
-        System.out.println("篮球 执行完成");
-    }
+//    /**
+//     * 篮球
+//     */
+//    @Scheduled(initialDelay = 1000 * 60 * 6, fixedDelay = 1000 * 60 * 5)
+//    public void basketballTask() {
+//        WaterControl waterControl = waterControlRepository.getOne(TY_CONTROL_ID);
+//        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
+//            double threshold = Double.parseDouble(waterControl.getThreshold());
+//
+//            sportsExecutor.executor(LangUtils.generateUuid(), Constant.SPORTS_TYPE_BASKETBALL, null, null, threshold, null);
+//        }
+//        System.out.println("篮球 执行完成");
+//    }
 }

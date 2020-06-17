@@ -9,10 +9,7 @@ import com.ze.crawler.core.entity.YbbSports;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.YbbSportsRepository;
 import com.ze.crawler.core.service.log.LogService;
-import com.ze.crawler.core.utils.CommonUtils;
-import com.ze.crawler.core.utils.FilterUtils;
-import com.ze.crawler.core.utils.HttpClientUtils;
-import com.ze.crawler.core.utils.LangUtils;
+import com.ze.crawler.core.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +18,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -139,15 +138,17 @@ public class YbbSportsService implements BaseService {
                                     }
                                     // home team name
                                     String homeTeamName = (String) teamInfo.get(0);
+                                    homeTeamName = homeTeamName.trim();
                                     // guest team name
                                     String guestTeamName = (String) teamInfo.get(1);
+                                    guestTeamName = guestTeamName.trim();
                                     if (StringUtils.isEmpty(homeTeamName) || StringUtils.isEmpty(guestTeamName)) {
                                         continue;
                                     }
 
                                     // 获取主客队信息
-                                    String homeTeamId = Dictionary.SPORT_YB_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName);
-                                    String guestTeamId = Dictionary.SPORT_YB_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName);
+                                    String homeTeamId = Dictionary.SPORT_YB_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
+                                    String guestTeamId = Dictionary.SPORT_YB_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
                                     if (homeTeamId == null || guestTeamId == null) {
                                         continue;
                                     }
@@ -367,8 +368,24 @@ public class YbbSportsService implements BaseService {
      * @param startTime
      * @return
      */
-    private String getStartTime(String startTime) {
-        return startTime.replace("T", " ");
+    private String getStartTime(String startTimeStr) {
+        startTimeStr = startTimeStr.substring(0, startTimeStr.lastIndexOf("-"));
+        startTimeStr = startTimeStr.replace("T", " ");
+
+        SimpleDateFormat sdf = new SimpleDateFormat(TimeUtils.TIME_FORMAT_2);
+        try {
+            Date startDate = sdf.parse(startTimeStr);
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+            calendar.setTime(startDate);
+
+            // 加12小时
+            calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) + 12);
+            return TimeUtils.format(calendar.getTime().getTime());
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
     /**
@@ -384,6 +401,7 @@ public class YbbSportsService implements BaseService {
         params.put("VersionH", 0);
         params.put("VersionT", -1);
         params.put("IsEventMenu", false);
+        params.put("SportID", 1);
         params.put("CompetitionID", -1);
         params.put("oIsInplayAll", false);
         params.put("oIsFirstLoad", true);
@@ -392,7 +410,6 @@ public class YbbSportsService implements BaseService {
         params.put("oPageNo", 0);
         params.put("LiveCenterEventId", 0);
         params.put("LiveCenterSportId", 0);
-        params.put("SportID", 1);
         if (isToday) {
             params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
             params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under?q=&country=CN&currency=RMB&tzoff=-240&reg=China&rc=CN&allowRacing=false");

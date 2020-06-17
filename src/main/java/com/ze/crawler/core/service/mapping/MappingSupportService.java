@@ -660,9 +660,6 @@ public class MappingSupportService {
     /* ====================== IM电竞 - end  ====================== */
 
     /* ====================== 泛亚电竞 - start  ====================== */
-    /**
-     * 泛亚
-     */
     private int fyESport(HSSFSheet sheet, String type, int startRowIndex, HSSFCellStyle style) {
         log.info("泛亚电竞_" + type);
 
@@ -796,10 +793,28 @@ public class MappingSupportService {
             style.setFillForegroundColor(HSSFColor.RED.index);    //填红色
 
             // 平博体育
+            int rowIndex = 1;
+            HSSFSheet pbSheet = workbook.getSheetAt(0);
+            // 足球
+            rowIndex = pbSport(pbSheet, Constant.SPORTS_TYPE_SOCCER, rowIndex, style);
+            // 篮球
+            rowIndex = pbSport(pbSheet, Constant.SPORTS_TYPE_BASKETBALL, rowIndex, style);
 
             // im体育
+            rowIndex = 1;
+            HSSFSheet imSheet = workbook.getSheetAt(1);
+            // 足球
+            rowIndex = imSport(imSheet, Constant.SPORTS_TYPE_SOCCER, rowIndex, style);
+            // 篮球
+            rowIndex = imSport(imSheet, Constant.SPORTS_TYPE_BASKETBALL, rowIndex, style);
 
             // 188体育
+            rowIndex = 1;
+            HSSFSheet ybbSheet = workbook.getSheetAt(2);
+            // 足球
+            rowIndex = ybbSport(ybbSheet, Constant.SPORTS_TYPE_SOCCER, rowIndex, style);
+            // 篮球
+            rowIndex = ybbSport(ybbSheet, Constant.SPORTS_TYPE_BASKETBALL, rowIndex, style);
 
             out = new FileOutputStream(SPORT_MAPPING_SUPPORT_FILE_PATH);
             workbook.write(out);
@@ -816,6 +831,416 @@ public class MappingSupportService {
             }
         }
     }
+
+    /* ====================== 平博体育 - start  ====================== */
+    private int pbSport(HSSFSheet sheet, String type, int startRowIndex, HSSFCellStyle style) {
+        log.info("平博体育_" + type);
+
+        // 设置类型
+        HSSFRow typeRow = sheet.createRow(startRowIndex);
+        setExcelCellValue(typeRow, 0, type, style);
+        startRowIndex += 2;
+
+        List<List<Object>> allLeagues = new ArrayList<>();
+
+        String sp = null;
+        if (type.equalsIgnoreCase(Constant.SPORTS_TYPE_BASKETBALL)) {
+            sp = PBConstant.SP_BASKETBALL;
+        } else if (type.equalsIgnoreCase(Constant.SPORTS_TYPE_SOCCER)) {
+            sp = PBConstant.SP_SOCCER;
+        }
+        if (sp == null) {
+            return startRowIndex+1;
+        }
+        // 今天
+        String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, sp, "", System.currentTimeMillis());
+        Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.USE_PROXY);
+        if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
+            List<Object> n = (List<Object>) map.get("n");
+            if (!CollectionUtils.isEmpty(n)) {
+                List<Object> sports = (List<Object>) n.get(0);
+                if (!CollectionUtils.isEmpty(sports)) {
+                    // 联赛列表
+                    List<List<Object>> leagues = (List<List<Object>>) sports.get(2);
+                    if (!CollectionUtils.isEmpty(leagues)) {
+                        allLeagues.addAll(leagues);
+                    }
+                }
+            }
+        }
+        // 早盘
+        String zpUrl = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_ZP, sp, TimeUtils.getDate(), System.currentTimeMillis());
+        Map<String, Object> zpMap = HttpClientUtils.get(zpUrl, Map.class, ProxyConstant.USE_PROXY);
+        if (zpMap != null && zpMap.get("n") != null && !CollectionUtils.isEmpty((List<Object>) zpMap.get("n"))) {
+            List<Object> n = (List<Object>) zpMap.get("n");
+            if (!CollectionUtils.isEmpty(n)) {
+                List<Object> sports = (List<Object>) n.get(0);
+                if (!CollectionUtils.isEmpty(sports)) {
+                    // 联赛列表
+                    List<List<Object>> leagues = (List<List<Object>>) sports.get(2);
+                    if (!CollectionUtils.isEmpty(leagues)) {
+                        allLeagues.addAll(leagues);
+                    }
+                }
+            }
+        }
+
+        if (!CollectionUtils.isEmpty(allLeagues)) {
+            // 遍历联赛列表
+            for (List<Object> league : allLeagues) {
+                // 联赛名
+                String leagueName = ((String) league.get(1)).trim();
+                String leagueId = Dictionary.SPORT_PB_LEAGUE_MAPPING.get(leagueName);
+
+                // 具体比赛列表
+                List<List<Object>> games = (List<List<Object>>) league.get(2);
+                if (!CollectionUtils.isEmpty(games)) {
+                    for (List<Object> game : games) {
+                        // home team name
+                        String homeTeamName = (String) game.get(1);
+                        homeTeamName = homeTeamName.trim();
+                        // guest team name
+                        String guestTeamName = (String) game.get(2);
+                        guestTeamName = guestTeamName.trim();
+
+                        if (leagueId == null) {
+                            // 联赛未录入
+                            HSSFRow homeRow = sheet.createRow(startRowIndex);
+                            setExcelCellValue(homeRow, 0, leagueName, style);
+                            setExcelCellValue(homeRow, 1, homeTeamName, style);
+                            startRowIndex++;
+
+                            HSSFRow guestRow = sheet.createRow(startRowIndex);
+                            setExcelCellValue(guestRow, 0, leagueName, style);
+                            setExcelCellValue(guestRow, 1, guestTeamName, style);
+                            startRowIndex++;
+                        } else {
+                            // 联赛已录入
+                            String homeTeamId = Dictionary.SPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
+                            String guestTeamId = Dictionary.SPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
+
+                            String leagueCellValue = leagueName + "(" + leagueId + ")";
+                            if (homeTeamId == null) {
+                                HSSFRow homeRow = sheet.createRow(startRowIndex);
+                                setExcelCellValue(homeRow, 0, leagueCellValue, null);
+                                setExcelCellValue(homeRow, 1, homeTeamName, style);
+                                startRowIndex++;
+                            } else {
+                                HSSFRow homeRow = sheet.createRow(startRowIndex);
+                                setExcelCellValue(homeRow, 0, leagueCellValue, null);
+                                setExcelCellValue(homeRow, 1, homeTeamName, null);
+                                startRowIndex++;
+                            }
+
+                            if (guestTeamId == null) {
+                                HSSFRow guestRow = sheet.createRow(startRowIndex);
+                                setExcelCellValue(guestRow, 0, leagueCellValue, null);
+                                setExcelCellValue(guestRow, 1, guestTeamName, style);
+                                startRowIndex++;
+                            } else {
+                                HSSFRow guestRow = sheet.createRow(startRowIndex);
+                                setExcelCellValue(guestRow, 0, leagueCellValue, null);
+                                setExcelCellValue(guestRow, 1, guestTeamName, null);
+                                startRowIndex++;
+                            }
+                        }
+                    }
+                }
+
+                startRowIndex++;
+            }
+        }
+
+        return startRowIndex+1;
+    }
+    /* ====================== 平博体育 - end  ====================== */
+
+    /* ====================== IM体育 - start  ====================== */
+    private int imSport(HSSFSheet sheet, String type, int startRowIndex, HSSFCellStyle style) {
+        log.info("IM体育_" + type);
+
+        // 设置类型
+        HSSFRow typeRow = sheet.createRow(startRowIndex);
+        setExcelCellValue(typeRow, 0, type, style);
+        startRowIndex += 2;
+
+        Integer sportId = null;
+        if (Constant.SPORTS_TYPE_SOCCER.equalsIgnoreCase(type)) {
+            sportId = IMConstant.SPORT_ID_SOCCER;
+        } else if (Constant.SPORTS_TYPE_BASKETBALL.equalsIgnoreCase(type)) {
+            sportId = IMConstant.SPORT_ID_BASKETBALL;
+        }
+
+        if (sportId != null) {
+            List<Map<String, Object>> allSel = new ArrayList<>();
+
+            // 今日
+            JSONObject todayBody = getBaseBody(sportId, IMConstant.MARKET_TODAY, null, null);
+            Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, todayBody, Map.class, ProxyConstant.USE_PROXY);
+            if (map != null && map.get("sel") != null) {
+                List<Map<String, Object>> sels = (List<Map<String, Object>>) map.get("sel");
+                if (!CollectionUtils.isEmpty(sels)) {
+                    allSel.addAll(sels);
+                }
+            }
+
+            // 早盘
+            String zpDate = TimeUtils.getNextDay(TimeUtils.TIME_FORMAT_3);
+            JSONObject zpBody = getBaseBody(sportId, IMConstant.MARKET_ZP, zpDate, zpDate);
+            Map<String, Object> zpMap = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, zpBody, Map.class, ProxyConstant.USE_PROXY);
+            if (zpMap != null && zpMap.get("sel") != null) {
+                List<Map<String, Object>> sels = (List<Map<String, Object>>) zpMap.get("sel");
+                if (!CollectionUtils.isEmpty(sels)) {
+                    allSel.addAll(sels);
+                }
+            }
+
+            if (!CollectionUtils.isEmpty(allSel)) {
+                for (Map<String, Object> sel : allSel) {
+                    // 联赛名
+                    String leagueName = ((String) sel.get("cn")).trim();
+                    // 赛事信息获取
+                    String leagueId = Dictionary.SPORT_IM_LEAGUE_MAPPING.get(leagueName);
+
+                    // 队伍名
+                    String homeTeamName = ((String) sel.get("htn")).trim();
+                    String guestTeamName = ((String) sel.get("atn")).trim();
+
+                    if (leagueId == null) {
+                        // 联赛未录入
+                        HSSFRow homeRow = sheet.createRow(startRowIndex);
+                        setExcelCellValue(homeRow, 0, leagueName, style);
+                        setExcelCellValue(homeRow, 1, homeTeamName, style);
+                        startRowIndex++;
+
+                        HSSFRow guestRow = sheet.createRow(startRowIndex);
+                        setExcelCellValue(guestRow, 0, leagueName, style);
+                        setExcelCellValue(guestRow, 1, guestTeamName, style);
+                        startRowIndex++;
+                    } else {
+                        // 联赛已录入
+                        String homeTeamId = Dictionary.SPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
+                        String guestTeamId = Dictionary.SPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
+
+                        String leagueCellValue = leagueName + "(" + leagueId + ")";
+                        if (homeTeamId == null) {
+                            HSSFRow homeRow = sheet.createRow(startRowIndex);
+                            setExcelCellValue(homeRow, 0, leagueCellValue, null);
+                            setExcelCellValue(homeRow, 1, homeTeamName, style);
+                            startRowIndex++;
+                        } else {
+                            HSSFRow homeRow = sheet.createRow(startRowIndex);
+                            setExcelCellValue(homeRow, 0, leagueCellValue, null);
+                            setExcelCellValue(homeRow, 1, homeTeamName, null);
+                            startRowIndex++;
+                        }
+
+                        if (guestTeamId == null) {
+                            HSSFRow guestRow = sheet.createRow(startRowIndex);
+                            setExcelCellValue(guestRow, 0, leagueCellValue, null);
+                            setExcelCellValue(guestRow, 1, guestTeamName, style);
+                            startRowIndex++;
+                        } else {
+                            HSSFRow guestRow = sheet.createRow(startRowIndex);
+                            setExcelCellValue(guestRow, 0, leagueCellValue, null);
+                            setExcelCellValue(guestRow, 1, guestTeamName, null);
+                            startRowIndex++;
+                        }
+                    }
+
+                    startRowIndex++;
+                }
+            }
+        }
+
+        return startRowIndex + 1;
+    }
+
+    /**
+     * 获取请求Body
+     */
+    private JSONObject getBaseBody(Integer sportId, Integer market, String dateFrom, String dateTo) {
+        JSONObject body = new JSONObject();
+        body.put("BetTypeIds", new Integer[] {1, 2, 3});
+        body.put("DateFrom", null);        body.put("DateTo", null);
+        if (!StringUtils.isEmpty(dateFrom) && !StringUtils.isEmpty(dateTo)) {
+            body.put("DateFrom", dateFrom);
+            body.put("DateTo", dateTo);
+        }
+        body.put("IsCombo", false);
+        body.put("Market", market);
+        body.put("MatchDay", 0);
+        body.put("OddsType", 3);
+        body.put("PeriodIds", new Integer[] {1, 2});
+        body.put("Season", 0);
+        body.put("SortType", 1);
+        body.put("SportId", sportId);
+        return body;
+    }
+    /* ====================== Im体育 - end  ====================== */
+
+    /* ====================== 188体育 - start  ====================== */
+    private int ybbSport(HSSFSheet sheet, String type, int startRowIndex, HSSFCellStyle style) {
+        log.info("188体育_" + type);
+
+        // 设置类型
+        HSSFRow typeRow = sheet.createRow(startRowIndex);
+        setExcelCellValue(typeRow, 0, type, style);
+        startRowIndex += 2;
+
+        List<Map<String, Object>> allLagues = new ArrayList<>();
+
+        // 今日
+        String url = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
+        Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(true), Map.class, ProxyConstant.USE_PROXY);
+        if (map != null && map.get("mod") != null) {
+            Map<String, Object> mod = (Map<String, Object>) map.get("mod");
+            if (!CollectionUtils.isEmpty(mod)) {
+                List<Map<String, Object>> d = (List<Map<String, Object>>) mod.get("d");
+                if (!CollectionUtils.isEmpty(d)) {
+                    Map<String, Object> cMap = d.get(0);
+                    if (!CollectionUtils.isEmpty(cMap)) {
+                        // 联赛列表
+                        List<Map<String, Object>> leagues = (List<Map<String, Object>>) cMap.get("c");
+                        if (!CollectionUtils.isEmpty(leagues)) {
+                            allLagues.addAll(leagues);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 早盘
+        String zpUrl = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
+        Map<String, Object> zpMap = HttpClientUtils.postFrom(zpUrl, getFormData(false), Map.class, ProxyConstant.USE_PROXY);
+        if (zpMap != null && zpMap.get("mod") != null) {
+            Map<String, Object> mod = (Map<String, Object>) zpMap.get("mod");
+            if (!CollectionUtils.isEmpty(mod)) {
+                List<Map<String, Object>> d = (List<Map<String, Object>>) mod.get("d");
+                if (!CollectionUtils.isEmpty(d)) {
+                    Map<String, Object> cMap = d.get(0);
+                    if (!CollectionUtils.isEmpty(cMap)) {
+                        // 联赛列表
+                        List<Map<String, Object>> leagues = (List<Map<String, Object>>) cMap.get("c");
+                        if (!CollectionUtils.isEmpty(leagues)) {
+                            allLagues.addAll(leagues);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!CollectionUtils.isEmpty(allLagues)) {
+            for (Map<String, Object> league : allLagues) {
+                // 联赛名
+                String leagueName = (String) league.get("n");
+                String leagueId = Dictionary.SPORT_YB_LEAGUE_MAPPING.get(leagueName);
+
+                List<Map<String, Object>> games = (List<Map<String, Object>>) league.get("e");
+                if (!CollectionUtils.isEmpty(games)) {
+                    for (Map<String, Object> game : games) {
+                        // 判断是不是角球/罚牌数等，需要跳过
+                        Map<String, Object> cei = (Map<String, Object>) game.get("cei");
+                        String n = (String) cei.get("n");
+                        if (!"".equals(n)) {
+                            continue;
+                        }
+
+                        // 队伍信息
+                        List<String> teamInfo = (List<String>) game.get("i");
+                        if (CollectionUtils.isEmpty(teamInfo) || teamInfo.size() < 2) {
+                            continue;
+                        }
+                        // home team name
+                        String homeTeamName = (String) teamInfo.get(0);
+                        homeTeamName = homeTeamName.trim();
+                        // guest team name
+                        String guestTeamName = (String) teamInfo.get(1);
+                        guestTeamName = guestTeamName.trim();
+
+                        if (leagueId == null) {
+                            // 联赛未录入
+                            HSSFRow homeRow = sheet.createRow(startRowIndex);
+                            setExcelCellValue(homeRow, 0, leagueName, style);
+                            setExcelCellValue(homeRow, 1, homeTeamName, style);
+                            startRowIndex++;
+
+                            HSSFRow guestRow = sheet.createRow(startRowIndex);
+                            setExcelCellValue(guestRow, 0, leagueName, style);
+                            setExcelCellValue(guestRow, 1, guestTeamName, style);
+                            startRowIndex++;
+                        } else {
+                            // 联赛已录入
+                            String homeTeamId = Dictionary.SPORT_YB_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
+                            String guestTeamId = Dictionary.SPORT_YB_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
+
+                            String leagueCellValue = leagueName + "(" + leagueId + ")";
+                            if (homeTeamId == null) {
+                                HSSFRow homeRow = sheet.createRow(startRowIndex);
+                                setExcelCellValue(homeRow, 0, leagueCellValue, null);
+                                setExcelCellValue(homeRow, 1, homeTeamName, style);
+                                startRowIndex++;
+                            } else {
+                                HSSFRow homeRow = sheet.createRow(startRowIndex);
+                                setExcelCellValue(homeRow, 0, leagueCellValue, null);
+                                setExcelCellValue(homeRow, 1, homeTeamName, null);
+                                startRowIndex++;
+                            }
+
+                            if (guestTeamId == null) {
+                                HSSFRow guestRow = sheet.createRow(startRowIndex);
+                                setExcelCellValue(guestRow, 0, leagueCellValue, null);
+                                setExcelCellValue(guestRow, 1, guestTeamName, style);
+                                startRowIndex++;
+                            } else {
+                                HSSFRow guestRow = sheet.createRow(startRowIndex);
+                                setExcelCellValue(guestRow, 0, leagueCellValue, null);
+                                setExcelCellValue(guestRow, 1, guestTeamName, null);
+                                startRowIndex++;
+                            }
+                        }
+                    }
+                }
+
+                startRowIndex++;
+            }
+        }
+
+        return startRowIndex + 1;
+    }
+
+    /**
+     * 请求参数
+     */
+    private Map<String, Object> getFormData(boolean isToday) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("IsFirstLoad", true);
+        params.put("VersionL", -1);
+        params.put("VersionU", 0);
+        params.put("VersionS", -1);
+        params.put("VersionF", -1);
+        params.put("VersionH", 0);
+        params.put("VersionT", -1);
+        params.put("IsEventMenu", false);
+        params.put("CompetitionID", -1);
+        params.put("oIsInplayAll", false);
+        params.put("oIsFirstLoad", true);
+        params.put("oSortBy", 1);
+        params.put("oOddsType", 0);
+        params.put("oPageNo", 0);
+        params.put("LiveCenterEventId", 0);
+        params.put("LiveCenterSportId", 0);
+        params.put("SportID", 1);
+        if (isToday) {
+            params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
+            params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under?q=&country=CN&currency=RMB&tzoff=-240&reg=China&rc=CN&allowRacing=false");
+        } else {
+            params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/tomorrow/full-time-asian-handicap-and-over-under");
+            params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
+        }
+        return params;
+    }
+    /* ====================== 188体育 - end  ====================== */
 
     /**
      * 设置单元格值

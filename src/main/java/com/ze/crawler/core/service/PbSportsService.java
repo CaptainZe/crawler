@@ -139,16 +139,18 @@ public class PbSportsService implements BaseService {
                                     String startTime = TimeUtils.format(startTimestamp);
                                     // home team name
                                     String homeTeamName = (String) game.get(1);
+                                    homeTeamName = homeTeamName.trim();
                                     // guest team name
                                     String guestTeamName = (String) game.get(2);
+                                    guestTeamName = guestTeamName.trim();
 
                                     if (StringUtils.isEmpty(homeTeamName) || StringUtils.isEmpty(guestTeamName)) {
                                         continue;
                                     }
 
                                     // 获取主客队信息
-                                    String homeTeamId = Dictionary.SPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName);
-                                    String guestTeamId = Dictionary.SPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName);
+                                    String homeTeamId = Dictionary.SPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
+                                    String guestTeamId = Dictionary.SPORT_PB_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
                                     if (homeTeamId == null || guestTeamId == null) {
                                         continue;
                                     }

@@ -2,7 +2,6 @@ package com.ze.crawler.core.service.water;
 
 import com.alibaba.fastjson.JSON;
 import com.ze.crawler.core.constants.Constant;
-import com.ze.crawler.core.constants.Dictionary;
 import com.ze.crawler.core.constants.PBConstant;
 import com.ze.crawler.core.entity.Sports;
 import com.ze.crawler.core.entity.WaterYield;
@@ -35,7 +34,7 @@ public class WaterCalculator {
     /**
      * 计算水量
      */
-    public void calculateWater(Map<Integer, List<? extends Sports>> sportsMap, double threshold, Integer main, Integer sendType) {
+    public void calculateWater(Map<String, String> dishTypeMapping, Map<Integer, List<? extends Sports>> sportsMap, double threshold, Integer main, Integer sendType) {
         Set<Integer> alreadyDoMain = new HashSet<>();
 
         if (main == null) {
@@ -56,7 +55,7 @@ public class WaterCalculator {
                             for (Sports mainSports : mianSportsList) {
                                 for (Sports rpSports : rpSportsList) {
                                     // 匹配对手盘
-                                    List<WaterYield> waterYields = matchRivalPlateAndCalculateAndDisplay(mainKey, mainSports, rp, rpSports, threshold);
+                                    List<WaterYield> waterYields = matchRivalPlateAndCalculateAndDisplay(dishTypeMapping, mainKey, mainSports, rp, rpSports, threshold);
                                     if (!CollectionUtils.isEmpty(waterYields)) {
                                         waterYieldList.addAll(waterYields);
                                     }
@@ -85,7 +84,7 @@ public class WaterCalculator {
                         for (Sports mainSports : mianSportsList) {
                             for (Sports rpSports : rpSportsList) {
                                 // 匹配对手盘
-                                List<WaterYield> waterYields = matchRivalPlateAndCalculateAndDisplay(main, mainSports, rp, rpSports, threshold);
+                                List<WaterYield> waterYields = matchRivalPlateAndCalculateAndDisplay(dishTypeMapping, main, mainSports, rp, rpSports, threshold);
                                 if (!CollectionUtils.isEmpty(waterYields)) {
                                     waterYieldList.addAll(waterYields);
                                 }
@@ -104,7 +103,7 @@ public class WaterCalculator {
     /**
      * 匹配对手盘 & 计算水量 & 报水存储
      */
-    private List<WaterYield> matchRivalPlateAndCalculateAndDisplay(Integer mainDish, Sports mainSports, Integer rpDish, Sports rpSports, double threshold) {
+    private List<WaterYield> matchRivalPlateAndCalculateAndDisplay(Map<String, String> dishTypeMapping, Integer mainDish, Sports mainSports, Integer rpDish, Sports rpSports, double threshold) {
         List<WaterYield> waterYields = new ArrayList<>();
 
         // 基础判断
@@ -113,7 +112,7 @@ public class WaterCalculator {
                 && rpSports.getLeagueId().equals(mainSports.getLeagueId())) {
 
             // 盘口类型
-            String dishType = Dictionary.ESPORT_DISH_TYPE_MAPPING.get(mainSports.getDishId());
+            String dishType = dishTypeMapping.get(mainSports.getDishId());
 
             // 由于各个盘口的主客队定义不一样，只要两队一样，就认为是同一场比赛
             if (rpSports.getHomeTeamId().equals(mainSports.getHomeTeamId())

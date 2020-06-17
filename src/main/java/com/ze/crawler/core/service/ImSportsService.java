@@ -79,8 +79,8 @@ public class ImSportsService implements BaseService {
             retryCount = 0;
             while (true) {
                 String zpDate = TimeUtils.getNextDay(TimeUtils.TIME_FORMAT_3);
-                JSONObject todayBody = getBaseBody(sportId, IMConstant.MARKET_ZP, zpDate, zpDate);
-                Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, todayBody, Map.class, ProxyConstant.USE_PROXY);
+                JSONObject zpBody = getBaseBody(sportId, IMConstant.MARKET_ZP, zpDate, zpDate);
+                Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, zpBody, Map.class, ProxyConstant.USE_PROXY);
                 if (map != null && map.get("sel") != null) {
                     List<Map<String, Object>> sels = (List<Map<String, Object>>) map.get("sel");
                     if (!CollectionUtils.isEmpty(sels)) {
@@ -137,8 +137,8 @@ public class ImSportsService implements BaseService {
                 }
 
                 // 获取主客队信息
-                String homeTeamId = Dictionary.SPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName);
-                String guestTeamId = Dictionary.SPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName);
+                String homeTeamId = Dictionary.SPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(homeTeamName.toUpperCase());
+                String guestTeamId = Dictionary.SPORT_IM_LEAGUE_TEAM_MAPPING.get(leagueId).get(guestTeamName.toUpperCase());
                 if (homeTeamId == null || guestTeamId == null) {
                     continue;
                 }
@@ -358,21 +358,20 @@ public class ImSportsService implements BaseService {
      */
     private JSONObject getBaseBody(Integer sportId, Integer market, String dateFrom, String dateTo) {
         JSONObject body = new JSONObject();
-        body.put("Sport", sportId);
-        body.put("Market", market);
-        body.put("BetTypes", new Integer[] {1, 2, 3});
-        body.put("Periods", new Integer[] {1, 2});
-        body.put("IsCombo", false);
-        body.put("Season", null);
-        body.put("MatchDay", null);
-        body.put("SortType", 1);
-        body.put("OddsType", 3);
-        body.put("DateFrom", null);
-        body.put("DateTo", null);
+        body.put("BetTypeIds", new Integer[] {1, 2, 3});
+        body.put("DateFrom", null);        body.put("DateTo", null);
         if (!StringUtils.isEmpty(dateFrom) && !StringUtils.isEmpty(dateTo)) {
             body.put("DateFrom", dateFrom);
             body.put("DateTo", dateTo);
         }
+        body.put("IsCombo", false);
+        body.put("Market", market);
+        body.put("MatchDay", 0);
+        body.put("OddsType", 3);
+        body.put("PeriodIds", new Integer[] {1, 2});
+        body.put("Season", 0);
+        body.put("SortType", 1);
+        body.put("SportId", sportId);
         return body;
     }
 
