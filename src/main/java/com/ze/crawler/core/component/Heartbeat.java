@@ -56,7 +56,7 @@ public class Heartbeat {
         int retryCount = 0;
         while (true) {
             String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, PBConstant.SP_ESPORTS, TimeUtils.getDate(), System.currentTimeMillis());
-            Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> map = HttpClientUtils.get(url, Map.class);
             if (map != null) {
                 break;
             }
@@ -65,6 +65,7 @@ public class Heartbeat {
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
                 weiKongService.sendText("平博电竞异常", WKConstant.SEND_TYPE_ESPORTS);
+                break;
             }
         }
     }
@@ -75,7 +76,7 @@ public class Heartbeat {
         int retryCount = 0;
         while (true) {
             String url = String.format(RGConstant.RG_BASE_URL, 0, RGConstant.MATCH_TYPE_TODAY);
-            RgESportsResultModel rgESportsResultModel = HttpClientUtils.get(url, RgESportsResultModel.class, ProxyConstant.USE_PROXY);
+            RgESportsResultModel rgESportsResultModel = HttpClientUtils.get(url, RgESportsResultModel.class);
             if (rgESportsResultModel != null) {
                 break;
             }
@@ -84,6 +85,7 @@ public class Heartbeat {
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
                 weiKongService.sendText("RG电竞异常", WKConstant.SEND_TYPE_ESPORTS);
+                break;
             }
         }
     }
@@ -97,7 +99,7 @@ public class Heartbeat {
         int retryCount = 0;
         while (true) {
             String url = String.format(TFConstant.TF_TODAY_URL, TFConstant.GAME_ID_DOTA2);
-            List tfESportsResultModels = HttpClientUtils.get(url, List.class, AUTHORIZATION, ProxyConstant.USE_PROXY);
+            List tfESportsResultModels = HttpClientUtils.get(url, List.class, AUTHORIZATION);
             if (tfESportsResultModels != null) {
                 break;
             }
@@ -106,6 +108,7 @@ public class Heartbeat {
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
                 weiKongService.sendText("TF电竞异常", WKConstant.SEND_TYPE_ESPORTS);
+                break;
             }
         }
     }
@@ -125,6 +128,7 @@ public class Heartbeat {
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
                 weiKongService.sendText("IM电竞异常", WKConstant.SEND_TYPE_ESPORTS);
+                break;
             }
         }
     }
@@ -155,6 +159,7 @@ public class Heartbeat {
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
                 weiKongService.sendText("泛亚电竞异常", WKConstant.SEND_TYPE_ESPORTS);
+                break;
             }
         }
     }

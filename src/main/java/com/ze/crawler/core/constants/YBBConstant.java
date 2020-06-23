@@ -13,6 +13,8 @@ public class YBBConstant {
     public final static String ODDS_TYPE_RFP_1ST = "ah1st";
     public final static String ODDS_TYPE_DXP = "ou";
     public final static String ODDS_TYPE_DXP_1ST = "ou1st";
+    public final static String ODDS_TYPE_SYP = "ml";
+    public final static String ODDS_TYPE_SYP_1ST = "ml1st";
 
     // 体育 - 自定义的盘口名 （这个几个字典表中的名字不可变）
     public static final String CUSTOM_DISH_NAME_FULL_SYP = "全场_独赢";

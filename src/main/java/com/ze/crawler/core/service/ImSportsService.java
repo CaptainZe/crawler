@@ -119,7 +119,7 @@ public class ImSportsService implements BaseService {
                 String leagueName = ((String) sel.get("cn")).trim();
 
                 // 赛事信息获取
-                String leagueId = Dictionary.SPORT_IM_LEAGUE_MAPPING.get(leagueName);
+                String leagueId = Dictionary.SPORT_IM_LEAGUE_MAPPING.get(type).get(leagueName);
                 if (leagueId == null) {
                     continue;
                 }
@@ -168,7 +168,7 @@ public class ImSportsService implements BaseService {
                 initImSports.setStartTime(startTime);
 
                 // 获取对应盘口字典表
-                Map<String, String> dishMapping = Dictionary.getSportDishMappingByTypeAndDishType(type, Constant.SPORTS_DISH_IM);
+                Map<String, String> dishMapping = Dictionary.SPORT_IM_DISH_MAPPING.get(type);
 
                 // 具体盘口数据
                 List<ImSports> imSportsList = new ArrayList<>();
@@ -358,8 +358,9 @@ public class ImSportsService implements BaseService {
      */
     private JSONObject getBaseBody(Integer sportId, Integer market, String dateFrom, String dateTo) {
         JSONObject body = new JSONObject();
-        body.put("BetTypeIds", new Integer[] {1, 2, 3});
-        body.put("DateFrom", null);        body.put("DateTo", null);
+        body.put("BetTypeIds", new Integer[] {1, 2, 4});
+        body.put("DateFrom", null);
+        body.put("DateTo", null);
         if (!StringUtils.isEmpty(dateFrom) && !StringUtils.isEmpty(dateTo)) {
             body.put("DateFrom", dateFrom);
             body.put("DateTo", dateTo);

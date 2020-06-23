@@ -10,15 +10,16 @@ import com.ze.crawler.core.service.executor.SportsExecutor;
 import com.ze.crawler.core.utils.LangUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
 /**
- * 临时爬虫任务
+ * 临时爬虫任务V2 - 异步执行
  */
-//@Component
-public class CrawlerTask {
+@Component
+public class CrawlerTaskV2 {
     @Autowired
     private ESportsExecutor eSportsExecutor;
     @Autowired
@@ -31,11 +32,13 @@ public class CrawlerTask {
     public final static String BP_CONTROL_ID = "11111"; // 电竞 - 包赔
     public final static String TY_CONTROL_ID = "22222"; // 体育
 
-    /**
-     * 包赔
-     */
+    /* 电竞 */
+
     @Scheduled(initialDelay = 1000 * 30, fixedDelay = 1000 * 60 * 5)
-    public void bpTask() {
+    public void esportRun() {
+        System.out.println("电竞 执行开始");
+
+        System.out.println("电竞包赔 执行开始");
         WaterControl waterControl = waterControlRepository.getOne(BP_CONTROL_ID);
         if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
             double threshold = Double.parseDouble(waterControl.getThreshold());
@@ -89,64 +92,28 @@ public class CrawlerTask {
                         Collections.singleton(league), Collections.singletonList(teamFilterModel), threshold, null);
             }
         }
-        System.out.println("包赔 执行完成");
-    }
+        System.out.println("电竞包赔 执行完成");
 
-    /* 娱乐使用 */
-    /**
-     * LOL
-     */
-    @Scheduled(initialDelay = 1000 * 60, fixedDelay = 1000 * 60 * 5)
-    public void lolTask() {
-        WaterControl waterControl = waterControlRepository.getOne(YL_CONTROL_ID);
-        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
-            double threshold = Double.parseDouble(waterControl.getThreshold());
+        System.out.println("电竞娱乐 执行开始");
+        WaterControl ylWaterControl = waterControlRepository.getOne(YL_CONTROL_ID);
+        if (WaterController.ENABLE_ON.equals(ylWaterControl.getEnable())) {
+            double threshold = Double.parseDouble(ylWaterControl.getThreshold());
 
-            eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_LOL, null, null, threshold, null);
+            List<String> esportType = new ArrayList<>();
+            esportType.add(Constant.ESPORTS_TYPE_LOL);
+            esportType.add(Constant.ESPORTS_TYPE_DOTA2);
+            esportType.add(Constant.ESPORTS_TYPE_CSGO);
+            esportType.add(Constant.ESPORTS_TYPE_KPL);
+
+            for (String type : esportType) {
+                eSportsExecutor.executor(LangUtils.generateUuid(), type, null, null, threshold, null);
+
+                System.out.println(type + " 执行完成");
+            }
         }
-        System.out.println("LOL 执行完成");
-    }
+        System.out.println("电竞娱乐 执行完成");
 
-    /**
-     * DOTA2
-     */
-    @Scheduled(initialDelay = 1000 * 60 * 2, fixedDelay = 1000 * 60 * 5)
-    public void dotaTask() {
-        WaterControl waterControl = waterControlRepository.getOne(YL_CONTROL_ID);
-        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
-            double threshold = Double.parseDouble(waterControl.getThreshold());
-
-            eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_DOTA2, null, null, threshold, null);
-        }
-        System.out.println("DOTA2 执行完成");
-    }
-
-    /**
-     * CSGO
-     */
-    @Scheduled(initialDelay = 1000 * 60 * 3, fixedDelay = 1000 * 60 * 5)
-    public void csTask() {
-        WaterControl waterControl = waterControlRepository.getOne(YL_CONTROL_ID);
-        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
-            double threshold = Double.parseDouble(waterControl.getThreshold());
-
-            eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_CSGO, null, null, threshold, null);
-        }
-        System.out.println("CSGO 执行完成");
-    }
-
-    /**
-     * 王者荣耀
-     */
-    @Scheduled(initialDelay = 1000 * 60 * 4, fixedDelay = 1000 * 60 * 5)
-    public void kplTask() {
-        WaterControl waterControl = waterControlRepository.getOne(YL_CONTROL_ID);
-        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
-            double threshold = Double.parseDouble(waterControl.getThreshold());
-
-            eSportsExecutor.executor(LangUtils.generateUuid(), Constant.ESPORTS_TYPE_KPL, null, null, threshold, null);
-        }
-        System.out.println("王者荣耀 执行完成");
+        System.out.println("电竞 执行完成");
     }
 
     /* 体育 */
@@ -154,28 +121,24 @@ public class CrawlerTask {
     /**
      * 足球
      */
-    @Scheduled(initialDelay = 1000 * 60 * 5, fixedDelay = 1000 * 60 * 5)
-    public void soccerTask() {
+    @Scheduled(initialDelay = 1000 * 30, fixedDelay = 1000 * 60 * 5)
+    public void sportRun() {
+        System.out.println("体育 执行开始");
+
         WaterControl waterControl = waterControlRepository.getOne(TY_CONTROL_ID);
         if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
             double threshold = Double.parseDouble(waterControl.getThreshold());
 
-            sportsExecutor.executor(LangUtils.generateUuid(), Constant.SPORTS_TYPE_SOCCER, null, null, threshold, null);
-        }
-        System.out.println("足球 执行完成");
-    }
+            List<String> sportType = new ArrayList<>();
+            sportType.add(Constant.SPORTS_TYPE_SOCCER);
+            sportType.add(Constant.SPORTS_TYPE_BASKETBALL);
 
-    /**
-     * 篮球
-     */
-    @Scheduled(initialDelay = 1000 * 60 * 6, fixedDelay = 1000 * 60 * 5)
-    public void basketballTask() {
-        WaterControl waterControl = waterControlRepository.getOne(TY_CONTROL_ID);
-        if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
-            double threshold = Double.parseDouble(waterControl.getThreshold());
+            for (String type : sportType) {
+                sportsExecutor.executor(LangUtils.generateUuid(), type, null, null, threshold, null);
 
-            sportsExecutor.executor(LangUtils.generateUuid(), Constant.SPORTS_TYPE_BASKETBALL, null, null, threshold, null);
+                System.out.println(type + " 执行完成");
+            }
         }
-        System.out.println("篮球 执行完成");
+        System.out.println("体育 执行完成");
     }
 }

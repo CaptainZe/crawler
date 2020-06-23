@@ -243,6 +243,13 @@ public class HttpClientUtils {
     /**
      * 网络请求POST - From方式请求
      */
+    public static <T> T postFrom(String url, Map<String, Object> params, Class<T> clazz) {
+        return postFrom(url, params, null, clazz, false);
+    }
+
+    /**
+     * 网络请求POST - From方式请求
+     */
     public static <T> T postFrom(String url, Map<String, Object> params, Class<T> clazz, boolean proxy) {
         return postFrom(url, params, null, clazz, proxy);
     }

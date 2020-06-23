@@ -72,7 +72,7 @@ public class PbESportsService implements BaseService {
         while (true) {
             // 早盘
             String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_ZP, PBConstant.SP_ESPORTS, TimeUtils.getDate(), System.currentTimeMillis());
-            Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> map = HttpClientUtils.get(url, Map.class);
             if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
                 try {
                     parseEsports(taskId, type, map, appointedLeagues, appointedTeams);
@@ -239,6 +239,8 @@ public class PbESportsService implements BaseService {
                                 }
                             }
                         }
+
+
                     }
                 }
             }
@@ -366,7 +368,7 @@ public class PbESportsService implements BaseService {
         int retryCount = 0;
         while (true) {
             String moreUrl = String.format(PBConstant.PB_MORE_URL, PBConstant.MK_MORE, meParam, System.currentTimeMillis());
-            Map<String, List<Object>> moreMap = HttpClientUtils.get(moreUrl, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, List<Object>> moreMap = HttpClientUtils.get(moreUrl, Map.class);
             if (moreMap != null && moreMap.get("e") != null && !CollectionUtils.isEmpty((List<Object>) moreMap.get("e"))) {
                 try {
                     if (initPbEsports.getType().equalsIgnoreCase(Constant.ESPORTS_TYPE_LOL) || initPbEsports.getType().equalsIgnoreCase(Constant.ESPORTS_TYPE_DOTA2)) {
@@ -611,7 +613,7 @@ public class PbESportsService implements BaseService {
         int retryCount = 0;
         while (true) {
             String moreUrl = String.format(PBConstant.PB_MORE_URL, PBConstant.MK_MORE, meParam, System.currentTimeMillis());
-            Map<String, List<Object>> moreMap = HttpClientUtils.get(moreUrl, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, List<Object>> moreMap = HttpClientUtils.get(moreUrl, Map.class);
             if (moreMap != null && moreMap.get("e") != null && !CollectionUtils.isEmpty((List<Object>) moreMap.get("e"))) {
                 try {
                     dealLoLOrDotaKillMore(initPbEsports, moreMap);

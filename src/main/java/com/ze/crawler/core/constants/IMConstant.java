@@ -52,7 +52,7 @@ public class IMConstant {
 
     public final static Integer BTI_RFP = 1;    // 让分盘
     public final static Integer BTI_DXP = 2;    // 大小盘
-    public final static Integer BTI_SYP = 3;    // 输赢盘
+    public final static Integer BTI_SYP = 4;    // 输赢盘
 
     public final static Integer PI_FULL = 1;        // 全场
     public final static Integer PI_FIRST_HALF = 2;  // 上半场

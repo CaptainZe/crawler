@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
 import com.ze.crawler.core.constants.PBConstant;
-import com.ze.crawler.core.constants.ProxyConstant;
 import com.ze.crawler.core.entity.PbSports;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.PbSportsRepository;
@@ -51,7 +50,7 @@ public class PbSportsService implements BaseService {
         while (true) {
             // 今天
             String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, sp, "", System.currentTimeMillis());
-            Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> map = HttpClientUtils.get(url, Map.class);
             if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
                 try {
                     parseSports(taskId, type, map, appointedLeagues, appointedTeams);
@@ -75,7 +74,7 @@ public class PbSportsService implements BaseService {
         while (true) {
             // 早盘
             String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_ZP, sp, TimeUtils.getDate(), System.currentTimeMillis());
-            Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> map = HttpClientUtils.get(url, Map.class);
             if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
                 try {
                     parseSports(taskId, type, map, appointedLeagues, appointedTeams);
@@ -117,8 +116,13 @@ public class PbSportsService implements BaseService {
                             // 联赛名
                             String leagueName = ((String) league.get(1)).trim();
 
+                            // 忽略角球和红黄牌
+                            if (leagueName.contains(PBConstant.LEAGUE_NAME_IGNORE_JQ) || leagueName.contains(PBConstant.LEAGUE_NAME_IGNORE_HHP)) {
+                                continue;
+                            }
+
                             // 赛事信息获取
-                            String leagueId = Dictionary.SPORT_PB_LEAGUE_MAPPING.get(leagueName);
+                            String leagueId = Dictionary.SPORT_PB_LEAGUE_MAPPING.get(type).get(leagueName);
                             if (leagueId == null) {
                                 continue;
                             }
@@ -190,7 +194,7 @@ public class PbSportsService implements BaseService {
      */
     private void dealSports(Integer meParam, PbSports initPbSports, Map<String, List<Object>> dishMap){
         // 获取对应盘口字典表
-        Map<String, String> dishMapping = Dictionary.getSportDishMappingByTypeAndDishType(initPbSports.getType(), Constant.SPORTS_DISH_PB);
+        Map<String, String> dishMapping = Dictionary.SPORT_PB_DISH_MAPPING.get(initPbSports.getType());
 
         List<PbSports> pbSportsList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(dishMap)) {
@@ -317,7 +321,7 @@ public class PbSportsService implements BaseService {
         int retryCount = 0;
         while (true) {
             String moreUrl = String.format(PBConstant.PB_MORE_URL, PBConstant.MK_MORE, meParam, System.currentTimeMillis());
-            Map<String, List<Object>> moreMap = HttpClientUtils.get(moreUrl, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, List<Object>> moreMap = HttpClientUtils.get(moreUrl, Map.class);
             if (moreMap != null && moreMap.get("e") != null && !CollectionUtils.isEmpty((List<Object>) moreMap.get("e"))) {
                 try {
                     dealSportsMore(initPbSports, moreMap);
@@ -344,7 +348,7 @@ public class PbSportsService implements BaseService {
      */
     private void dealSportsMore(PbSports initPbSports, Map<String, List<Object>> moreMap) {
         // 获取对应盘口字典表
-        Map<String, String> dishMapping = Dictionary.getSportDishMappingByTypeAndDishType(initPbSports.getType(), Constant.SPORTS_DISH_PB);
+        Map<String, String> dishMapping = Dictionary.SPORT_PB_DISH_MAPPING.get(initPbSports.getType());
 
         List<PbSports> pbSportsList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(moreMap)) {

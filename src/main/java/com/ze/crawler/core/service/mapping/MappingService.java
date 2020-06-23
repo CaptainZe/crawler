@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -26,6 +27,8 @@ public class MappingService {
     // 完成返回值
     private static final String DONE = "done";
 
+    /*      体育      */
+
     /**
      * 解析并缓存体育映射表
      */
@@ -34,6 +37,9 @@ public class MappingService {
         try (FileInputStream fis = new FileInputStream(excelFile)) {
             // 打开工作表
             HSSFWorkbook workbook = new HSSFWorkbook(fis);
+
+            // 初始化体育字典表
+            initSportDictionary();
 
             // 1. sheet[0] -- 联赛映射表
             HSSFSheet leagueMappingSheet = workbook.getSheetAt(0);
@@ -49,6 +55,7 @@ public class MappingService {
                 }
 
                 // 各列信息
+                String type = getCellValue(row.getCell(0));
                 String id = getCellValue(row.getCell(1));
                 String pbName = getCellValue(row.getCell(2));
                 String ybName = getCellValue(row.getCell(3));
@@ -59,31 +66,31 @@ public class MappingService {
                 if (!StringUtils.isEmpty(pbName)) {
                     List<String> pbNames = splitCellValue(pbName);
                     for (String name : pbNames) {
-                        Dictionary.SPORT_PB_LEAGUE_MAPPING.put(name, id);
+                        Dictionary.SPORT_PB_LEAGUE_MAPPING.get(type).put(name, id);
                     }
                 }
                 if (!StringUtils.isEmpty(ybName)) {
                     List<String> ybNames = splitCellValue(ybName);
                     for (String name : ybNames) {
-                        Dictionary.SPORT_YB_LEAGUE_MAPPING.put(name, id);
+                        Dictionary.SPORT_YB_LEAGUE_MAPPING.get(type).put(name, id);
                     }
                 }
                 if (!StringUtils.isEmpty(sbName)) {
                     List<String> sbNames = splitCellValue(sbName);
                     for (String name : sbNames) {
-                        Dictionary.SPORT_SB_LEAGUE_MAPPING.put(name, id);
+                        Dictionary.SPORT_SB_LEAGUE_MAPPING.get(type).put(name, id);
                     }
                 }
                 if (!StringUtils.isEmpty(imName)) {
                     List<String> imNames = splitCellValue(imName);
                     for (String name : imNames) {
-                        Dictionary.SPORT_IM_LEAGUE_MAPPING.put(name, id);
+                        Dictionary.SPORT_IM_LEAGUE_MAPPING.get(type).put(name, id);
                     }
                 }
                 if (!StringUtils.isEmpty(btiName)) {
                     List<String> btiNames = splitCellValue(btiName);
                     for (String name : btiNames) {
-                        Dictionary.SPORT_BTI_LEAGUE_MAPPING.put(name, id);
+                        Dictionary.SPORT_BTI_LEAGUE_MAPPING.get(type).put(name, id);
                     }
                 }
             }
@@ -180,40 +187,20 @@ public class MappingService {
                 String imName = getCellValue(row.getCell(6));
                 String btiName = getCellValue(row.getCell(7));
 
-                if (Constant.SPORTS_TYPE_SOCCER.equalsIgnoreCase(leagueType)) {
-                    // 足球
-                    if (!StringUtils.isEmpty(pbName)) {
-                        Dictionary.SPORT_SOCCER_PB_DISH_MAPPING.put(pbName, id);
-                    }
-                    if (!StringUtils.isEmpty(ybName)) {
-                        Dictionary.SPORT_SOCCER_YB_DISH_MAPPING.put(ybName, id);
-                    }
-                    if (!StringUtils.isEmpty(sbName)) {
-                        Dictionary.SPORT_SOCCER_SB_DISH_MAPPING.put(sbName, id);
-                    }
-                    if (!StringUtils.isEmpty(imName)) {
-                        Dictionary.SPORT_SOCCER_IM_DISH_MAPPING.put(imName, id);
-                    }
-                    if (!StringUtils.isEmpty(btiName)) {
-                        Dictionary.SPORT_SOCCER_BTI_DISH_MAPPING.put(btiName, id);
-                    }
-                } else if (Constant.SPORTS_TYPE_BASKETBALL.equalsIgnoreCase(leagueType)) {
-                    // 足球
-                    if (!StringUtils.isEmpty(pbName)) {
-                        Dictionary.SPORT_BASKETBALL_PB_DISH_MAPPING.put(pbName, id);
-                    }
-                    if (!StringUtils.isEmpty(ybName)) {
-                        Dictionary.SPORT_BASKETBALL_YB_DISH_MAPPING.put(ybName, id);
-                    }
-                    if (!StringUtils.isEmpty(sbName)) {
-                        Dictionary.SPORT_BASKETBALL_SB_DISH_MAPPING.put(sbName, id);
-                    }
-                    if (!StringUtils.isEmpty(imName)) {
-                        Dictionary.SPORT_BASKETBALL_IM_DISH_MAPPING.put(imName, id);
-                    }
-                    if (!StringUtils.isEmpty(btiName)) {
-                        Dictionary.SPORT_BASKETBALL_BTI_DISH_MAPPING.put(btiName, id);
-                    }
+                if (!StringUtils.isEmpty(pbName)) {
+                    Dictionary.SPORT_PB_DISH_MAPPING.get(leagueType).put(pbName, id);
+                }
+                if (!StringUtils.isEmpty(ybName)) {
+                    Dictionary.SPORT_YB_DISH_MAPPING.get(leagueType).put(ybName, id);
+                }
+                if (!StringUtils.isEmpty(sbName)) {
+                    Dictionary.SPORT_SB_DISH_MAPPING.get(leagueType).put(sbName, id);
+                }
+                if (!StringUtils.isEmpty(imName)) {
+                    Dictionary.SPORT_IM_DISH_MAPPING.get(leagueType).put(imName, id);
+                }
+                if (!StringUtils.isEmpty(btiName)) {
+                    Dictionary.SPORT_BTI_DISH_MAPPING.get(leagueType).put(btiName, id);
                 }
 
                 // 盘口类型映射
@@ -225,6 +212,37 @@ public class MappingService {
             return e.getLocalizedMessage();
         }
     }
+
+    /**
+     * 体育字典初始化
+     */
+    private void initSportDictionary() {
+        // 联赛
+        Dictionary.SPORT_PB_LEAGUE_MAPPING.put(Constant.SPORTS_TYPE_SOCCER, new HashMap<>());
+        Dictionary.SPORT_PB_LEAGUE_MAPPING.put(Constant.SPORTS_TYPE_BASKETBALL, new HashMap<>());
+        Dictionary.SPORT_YB_LEAGUE_MAPPING.put(Constant.SPORTS_TYPE_SOCCER, new HashMap<>());
+        Dictionary.SPORT_YB_LEAGUE_MAPPING.put(Constant.SPORTS_TYPE_BASKETBALL, new HashMap<>());
+        Dictionary.SPORT_SB_LEAGUE_MAPPING.put(Constant.SPORTS_TYPE_SOCCER, new HashMap<>());
+        Dictionary.SPORT_SB_LEAGUE_MAPPING.put(Constant.SPORTS_TYPE_BASKETBALL, new HashMap<>());
+        Dictionary.SPORT_IM_LEAGUE_MAPPING.put(Constant.SPORTS_TYPE_SOCCER, new HashMap<>());
+        Dictionary.SPORT_IM_LEAGUE_MAPPING.put(Constant.SPORTS_TYPE_BASKETBALL, new HashMap<>());
+        Dictionary.SPORT_BTI_LEAGUE_MAPPING.put(Constant.SPORTS_TYPE_SOCCER, new HashMap<>());
+        Dictionary.SPORT_BTI_LEAGUE_MAPPING.put(Constant.SPORTS_TYPE_BASKETBALL, new HashMap<>());
+        
+        // 盘口
+        Dictionary.SPORT_PB_DISH_MAPPING.put(Constant.SPORTS_TYPE_SOCCER, new HashMap<>());
+        Dictionary.SPORT_PB_DISH_MAPPING.put(Constant.SPORTS_TYPE_BASKETBALL, new HashMap<>());
+        Dictionary.SPORT_YB_DISH_MAPPING.put(Constant.SPORTS_TYPE_SOCCER, new HashMap<>());
+        Dictionary.SPORT_YB_DISH_MAPPING.put(Constant.SPORTS_TYPE_BASKETBALL, new HashMap<>());
+        Dictionary.SPORT_SB_DISH_MAPPING.put(Constant.SPORTS_TYPE_SOCCER, new HashMap<>());
+        Dictionary.SPORT_SB_DISH_MAPPING.put(Constant.SPORTS_TYPE_BASKETBALL, new HashMap<>());
+        Dictionary.SPORT_IM_DISH_MAPPING.put(Constant.SPORTS_TYPE_SOCCER, new HashMap<>());
+        Dictionary.SPORT_IM_DISH_MAPPING.put(Constant.SPORTS_TYPE_BASKETBALL, new HashMap<>());
+        Dictionary.SPORT_BTI_DISH_MAPPING.put(Constant.SPORTS_TYPE_SOCCER, new HashMap<>());
+        Dictionary.SPORT_BTI_DISH_MAPPING.put(Constant.SPORTS_TYPE_BASKETBALL, new HashMap<>());
+    }
+
+    /*      电竞      */
 
     /**
      * 解析并缓存电竞映射表

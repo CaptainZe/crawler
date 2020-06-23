@@ -854,7 +854,7 @@ public class MappingSupportService {
         }
         // 今天
         String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, sp, "", System.currentTimeMillis());
-        Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.USE_PROXY);
+        Map<String, Object> map = HttpClientUtils.get(url, Map.class);
         if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
             List<Object> n = (List<Object>) map.get("n");
             if (!CollectionUtils.isEmpty(n)) {
@@ -870,7 +870,7 @@ public class MappingSupportService {
         }
         // 早盘
         String zpUrl = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_ZP, sp, TimeUtils.getDate(), System.currentTimeMillis());
-        Map<String, Object> zpMap = HttpClientUtils.get(zpUrl, Map.class, ProxyConstant.USE_PROXY);
+        Map<String, Object> zpMap = HttpClientUtils.get(zpUrl, Map.class);
         if (zpMap != null && zpMap.get("n") != null && !CollectionUtils.isEmpty((List<Object>) zpMap.get("n"))) {
             List<Object> n = (List<Object>) zpMap.get("n");
             if (!CollectionUtils.isEmpty(n)) {
@@ -890,7 +890,13 @@ public class MappingSupportService {
             for (List<Object> league : allLeagues) {
                 // 联赛名
                 String leagueName = ((String) league.get(1)).trim();
-                String leagueId = Dictionary.SPORT_PB_LEAGUE_MAPPING.get(leagueName);
+
+                // 忽略角球和红黄牌
+                if (leagueName.contains(PBConstant.LEAGUE_NAME_IGNORE_JQ) || leagueName.contains(PBConstant.LEAGUE_NAME_IGNORE_HHP)) {
+                    continue;
+                }
+
+                String leagueId = Dictionary.SPORT_PB_LEAGUE_MAPPING.get(type).get(leagueName);
 
                 // 具体比赛列表
                 List<List<Object>> games = (List<List<Object>>) league.get(2);
@@ -1000,7 +1006,7 @@ public class MappingSupportService {
                     // 联赛名
                     String leagueName = ((String) sel.get("cn")).trim();
                     // 赛事信息获取
-                    String leagueId = Dictionary.SPORT_IM_LEAGUE_MAPPING.get(leagueName);
+                    String leagueId = Dictionary.SPORT_IM_LEAGUE_MAPPING.get(type).get(leagueName);
 
                     // 队伍名
                     String homeTeamName = ((String) sel.get("htn")).trim();
@@ -1092,7 +1098,7 @@ public class MappingSupportService {
 
         // 今日
         String url = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
-        Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(true), Map.class, ProxyConstant.USE_PROXY);
+        Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(true, type), Map.class, ProxyConstant.USE_PROXY);
         if (map != null && map.get("mod") != null) {
             Map<String, Object> mod = (Map<String, Object>) map.get("mod");
             if (!CollectionUtils.isEmpty(mod)) {
@@ -1111,19 +1117,21 @@ public class MappingSupportService {
         }
 
         // 早盘
-        String zpUrl = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
-        Map<String, Object> zpMap = HttpClientUtils.postFrom(zpUrl, getFormData(false), Map.class, ProxyConstant.USE_PROXY);
-        if (zpMap != null && zpMap.get("mod") != null) {
-            Map<String, Object> mod = (Map<String, Object>) zpMap.get("mod");
-            if (!CollectionUtils.isEmpty(mod)) {
-                List<Map<String, Object>> d = (List<Map<String, Object>>) mod.get("d");
-                if (!CollectionUtils.isEmpty(d)) {
-                    Map<String, Object> cMap = d.get(0);
-                    if (!CollectionUtils.isEmpty(cMap)) {
-                        // 联赛列表
-                        List<Map<String, Object>> leagues = (List<Map<String, Object>>) cMap.get("c");
-                        if (!CollectionUtils.isEmpty(leagues)) {
-                            allLagues.addAll(leagues);
+        if (Constant.SPORTS_TYPE_SOCCER.equalsIgnoreCase(type)) {
+            String zpUrl = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
+            Map<String, Object> zpMap = HttpClientUtils.postFrom(zpUrl, getFormData(false, type), Map.class, ProxyConstant.USE_PROXY);
+            if (zpMap != null && zpMap.get("mod") != null) {
+                Map<String, Object> mod = (Map<String, Object>) zpMap.get("mod");
+                if (!CollectionUtils.isEmpty(mod)) {
+                    List<Map<String, Object>> d = (List<Map<String, Object>>) mod.get("d");
+                    if (!CollectionUtils.isEmpty(d)) {
+                        Map<String, Object> cMap = d.get(0);
+                        if (!CollectionUtils.isEmpty(cMap)) {
+                            // 联赛列表
+                            List<Map<String, Object>> leagues = (List<Map<String, Object>>) cMap.get("c");
+                            if (!CollectionUtils.isEmpty(leagues)) {
+                                allLagues.addAll(leagues);
+                            }
                         }
                     }
                 }
@@ -1134,7 +1142,7 @@ public class MappingSupportService {
             for (Map<String, Object> league : allLagues) {
                 // 联赛名
                 String leagueName = (String) league.get("n");
-                String leagueId = Dictionary.SPORT_YB_LEAGUE_MAPPING.get(leagueName);
+                String leagueId = Dictionary.SPORT_YB_LEAGUE_MAPPING.get(type).get(leagueName);
 
                 List<Map<String, Object>> games = (List<Map<String, Object>>) league.get("e");
                 if (!CollectionUtils.isEmpty(games)) {
@@ -1212,7 +1220,7 @@ public class MappingSupportService {
     /**
      * 请求参数
      */
-    private Map<String, Object> getFormData(boolean isToday) {
+    private Map<String, Object> getFormData(boolean isToday, String type) {
         Map<String, Object> params = new HashMap<>();
         params.put("IsFirstLoad", true);
         params.put("VersionL", -1);
@@ -1222,6 +1230,7 @@ public class MappingSupportService {
         params.put("VersionH", 0);
         params.put("VersionT", -1);
         params.put("IsEventMenu", false);
+        params.put("SportID", 1);
         params.put("CompetitionID", -1);
         params.put("oIsInplayAll", false);
         params.put("oIsFirstLoad", true);
@@ -1230,14 +1239,22 @@ public class MappingSupportService {
         params.put("oPageNo", 0);
         params.put("LiveCenterEventId", 0);
         params.put("LiveCenterSportId", 0);
-        params.put("SportID", 1);
-        if (isToday) {
-            params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
-            params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under?q=&country=CN&currency=RMB&tzoff=-240&reg=China&rc=CN&allowRacing=false");
+
+        if (Constant.SPORTS_TYPE_SOCCER.equalsIgnoreCase(type)) {
+            // 足球
+            if (isToday) {
+                params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
+                params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under?q=&country=CN&currency=RMB&tzoff=-240&reg=China&rc=CN&allowRacing=false");
+            } else {
+                params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/tomorrow/full-time-asian-handicap-and-over-under");
+                params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
+            }
         } else {
-            params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/tomorrow/full-time-asian-handicap-and-over-under");
-            params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
+            // 篮球
+            params.put("reqUrl", "/zh-cn/sports/basketball/competition/full-time-asian-handicap-and-over-under");
+            params.put("hisUrl", "/zh-cn/sports/basketball/competition/full-time-asian-handicap-and-over-under?q=&country=CN&currency=RMB&tzoff=-240&reg=China&rc=CN&allowRacing=false");
         }
+
         return params;
     }
     /* ====================== 188体育 - end  ====================== */

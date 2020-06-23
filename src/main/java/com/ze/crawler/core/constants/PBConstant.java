@@ -30,6 +30,8 @@ public class PBConstant {
      */
     public static final String TEAM_NAME_KILL_SUFFIX = "（击杀数）";
     public static final String TEAM_NAME_KILL_SUFFIX_EN = "(Kills)";
+    public static final String LEAGUE_NAME_IGNORE_JQ = "角球";
+    public static final String LEAGUE_NAME_IGNORE_HHP = "红黄牌";
 
     public static final String LEAGUE_PREFIX_LOL = "英雄联盟";
     public static final String LEAGUE_PREFIX_LOL_EN = "League of Legends";

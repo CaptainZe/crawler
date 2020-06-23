@@ -3,7 +3,6 @@ package com.ze.crawler.core.service;
 import com.alibaba.fastjson.JSON;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
-import com.ze.crawler.core.constants.ProxyConstant;
 import com.ze.crawler.core.constants.YBBConstant;
 import com.ze.crawler.core.entity.YbbSports;
 import com.ze.crawler.core.model.TeamFilterModel;
@@ -43,7 +42,7 @@ public class YbbSportsService implements BaseService {
         int retryCount = 0;
         while (true) {
             String url = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
-            Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(true), Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(true, type), Map.class);
             if (map != null && map.get("mod") != null) {
                 try {
                     parseSports(taskId, type, map, appointedLeagues, appointedTeams);
@@ -64,26 +63,28 @@ public class YbbSportsService implements BaseService {
         }
 
         // 明日
-        retryCount = 0;
-        while (true) {
-            String url = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
-            Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(false), Map.class, ProxyConstant.USE_PROXY);
-            if (map != null && map.get("mod") != null) {
-                try {
-                    parseSports(taskId, type, map, appointedLeagues, appointedTeams);
-                } catch (Exception e) {
-                    Map<String, String> data = new HashMap<>();
-                    data.put("url", url);
-                    data.put("result", JSON.toJSONString(map));
-                    data.put("retry_count", String.valueOf(retryCount));
-                    logService.log(Constant.LOG_TYPE_PARSE_SPORTS_ERROR, Constant.SPORTS_DISH_YB.toString(), JSON.toJSONString(data), e);
+        if (Constant.SPORTS_TYPE_SOCCER.equalsIgnoreCase(type)) {
+            retryCount = 0;
+            while (true) {
+                String url = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
+                Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(false, type), Map.class);
+                if (map != null && map.get("mod") != null) {
+                    try {
+                        parseSports(taskId, type, map, appointedLeagues, appointedTeams);
+                    } catch (Exception e) {
+                        Map<String, String> data = new HashMap<>();
+                        data.put("url", url);
+                        data.put("result", JSON.toJSONString(map));
+                        data.put("retry_count", String.valueOf(retryCount));
+                        logService.log(Constant.LOG_TYPE_PARSE_SPORTS_ERROR, Constant.SPORTS_DISH_YB.toString(), JSON.toJSONString(data), e);
+                    }
+                    break;
                 }
-                break;
-            }
 
-            retryCount++;
-            if (retryCount >= Constant.RETRY_COUNT) {
-                break;
+                retryCount++;
+                if (retryCount >= Constant.RETRY_COUNT) {
+                    break;
+                }
             }
         }
 
@@ -109,7 +110,7 @@ public class YbbSportsService implements BaseService {
                             String leagueName = (String) league.get("n");
 
                             // 赛事信息获取
-                            String leagueId = Dictionary.SPORT_YB_LEAGUE_MAPPING.get(leagueName);
+                            String leagueId = Dictionary.SPORT_YB_LEAGUE_MAPPING.get(type).get(leagueName);
                             if (leagueId == null) {
                                 continue;
                             }
@@ -175,7 +176,7 @@ public class YbbSportsService implements BaseService {
                                     initYbbSports.setStartTime(startTime);
 
                                     // 获取对应盘口字典表
-                                    Map<String, String> dishMapping = Dictionary.getSportDishMappingByTypeAndDishType(type, Constant.SPORTS_DISH_YB);
+                                    Map<String, String> dishMapping = Dictionary.SPORT_PB_DISH_MAPPING.get(type);
 
                                     // 具体赔率
                                     Map<String, List<String>> oddsInfo = (Map<String, List<String>>) game.get("o");
@@ -198,6 +199,17 @@ public class YbbSportsService implements BaseService {
                                                     continue;
                                                 }
                                                 tempList = dishHandler4Dxp(initYbbSports, oddsType, odds, dishMapping);
+                                            } else if (YBBConstant.ODDS_TYPE_SYP.equalsIgnoreCase(oddsType)
+                                                    || YBBConstant.ODDS_TYPE_SYP_1ST.equalsIgnoreCase(oddsType)) {
+                                                // 输赢盘, 只要篮球需要
+                                                if (Constant.SPORTS_TYPE_BASKETBALL.equalsIgnoreCase(type)) {
+                                                    List<String> odds = oddsInfo.get(oddsType);
+                                                    if (CollectionUtils.isEmpty(odds)) {
+                                                        continue;
+                                                    }
+
+                                                    tempList = dishHandler4Syp(initYbbSports, oddsType, odds, dishMapping);
+                                                }
                                             } else {
                                                 continue;
                                             }
@@ -321,14 +333,58 @@ public class YbbSportsService implements BaseService {
     }
 
     /**
+     * 盘口处理方式 - 独赢盘
+     */
+    private List<YbbSports> dishHandler4Syp(YbbSports initYbbSports, String oddsType, List<String> odds, Map<String, String> dishMapping) {
+        List<YbbSports> ybbSportsList = new ArrayList<>();
+
+        String dishName = null;
+        if (YBBConstant.ODDS_TYPE_SYP.equalsIgnoreCase(oddsType)) {
+            dishName = YBBConstant.CUSTOM_DISH_NAME_FULL_SYP;
+        } else if (YBBConstant.ODDS_TYPE_SYP_1ST.equalsIgnoreCase(oddsType)) {
+            dishName = YBBConstant.CUSTOM_DISH_NAME_FIRST_HALF_SYP;
+        }
+
+        if (dishName != null) {
+            String dishId = dishMapping.get(dishName);
+            if (dishId != null) {
+                // 主队赔率
+                String homeTeamOdds = odds.get(1);
+                homeTeamOdds = getOdds(homeTeamOdds, true);
+                // 客队赔率
+                String guestTeamOdds = odds.get(3);
+                guestTeamOdds = getOdds(guestTeamOdds, true);
+
+                YbbSports ybbSports = new YbbSports();
+                BeanUtils.copyProperties(initYbbSports, ybbSports);
+                ybbSports.setId(LangUtils.generateUuid());
+                ybbSports.setDishId(dishId);
+                ybbSports.setDishName(dishName);
+                ybbSports.setHomeTeamOdds(homeTeamOdds);
+                ybbSports.setGuestTeamOdds(guestTeamOdds);
+                ybbSportsList.add(ybbSports);
+            }
+        }
+
+        return ybbSportsList;
+    }
+
+    /**
      * 获取赔率 - 由于返回的香港盘的赔率，需要转换为欧洲盘赔率
+     * 独赢盘仍使用欧洲盘
      * @param odds
      * @return
      */
     private String getOdds(String odds) {
+        return getOdds(odds, false);
+    }
+
+    private String getOdds(String odds, boolean isSyp) {
         Double d = CommonUtils.parseDouble(odds);
         BigDecimal bd = BigDecimal.valueOf(d);
-        bd = bd.add(BigDecimal.valueOf(1));
+        if (!isSyp) {
+            bd = bd.add(BigDecimal.valueOf(1));
+        }
         return bd.toString();
     }
 
@@ -369,7 +425,6 @@ public class YbbSportsService implements BaseService {
      * @return
      */
     private String getStartTime(String startTimeStr) {
-        startTimeStr = startTimeStr.substring(0, startTimeStr.lastIndexOf("-"));
         startTimeStr = startTimeStr.replace("T", " ");
 
         SimpleDateFormat sdf = new SimpleDateFormat(TimeUtils.TIME_FORMAT_2);
@@ -391,7 +446,7 @@ public class YbbSportsService implements BaseService {
     /**
      * 请求参数
      */
-    private Map<String, Object> getFormData(boolean isToday) {
+    private Map<String, Object> getFormData(boolean isToday, String type) {
         Map<String, Object> params = new HashMap<>();
         params.put("IsFirstLoad", true);
         params.put("VersionL", -1);
@@ -410,13 +465,22 @@ public class YbbSportsService implements BaseService {
         params.put("oPageNo", 0);
         params.put("LiveCenterEventId", 0);
         params.put("LiveCenterSportId", 0);
-        if (isToday) {
-            params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
-            params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under?q=&country=CN&currency=RMB&tzoff=-240&reg=China&rc=CN&allowRacing=false");
+
+        if (Constant.SPORTS_TYPE_SOCCER.equalsIgnoreCase(type)) {
+            // 足球
+            if (isToday) {
+                params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
+                params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under?q=&country=CN&currency=RMB&tzoff=-240&reg=China&rc=CN&allowRacing=false");
+            } else {
+                params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/tomorrow/full-time-asian-handicap-and-over-under");
+                params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
+            }
         } else {
-            params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/tomorrow/full-time-asian-handicap-and-over-under");
-            params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
+            // 篮球
+            params.put("reqUrl", "/zh-cn/sports/basketball/competition/full-time-asian-handicap-and-over-under");
+            params.put("hisUrl", "/zh-cn/sports/basketball/competition/full-time-asian-handicap-and-over-under?q=&country=CN&currency=RMB&tzoff=-240&reg=China&rc=CN&allowRacing=false");
         }
+
         return params;
     }
 

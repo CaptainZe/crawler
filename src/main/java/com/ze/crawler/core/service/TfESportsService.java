@@ -3,7 +3,6 @@ package com.ze.crawler.core.service;
 import com.alibaba.fastjson.JSON;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
-import com.ze.crawler.core.constants.ProxyConstant;
 import com.ze.crawler.core.constants.TFConstant;
 import com.ze.crawler.core.entity.TfEsports;
 import com.ze.crawler.core.model.*;
@@ -61,7 +60,7 @@ public class TfESportsService implements BaseService {
             int retryCount = 0;
             while (true) {
                 String url = String.format(TFConstant.TF_TODAY_URL, gameId);
-                List tfESportsResultModels = HttpClientUtils.get(url, List.class, AUTHORIZATION, ProxyConstant.USE_PROXY);
+                List tfESportsResultModels = HttpClientUtils.get(url, List.class, AUTHORIZATION);
                 if (!CollectionUtils.isEmpty(tfESportsResultModels)) {
                     try {
                         parseEsports(taskId, type, tfESportsResultModels, appointedLeagues, appointedTeams);
@@ -85,7 +84,7 @@ public class TfESportsService implements BaseService {
             retryCount = 0;
             while (true) {
                 String url = String.format(TFConstant.TF_ZP_URL, gameId, TimeUtils.getNextDay());
-                List tfESportsResultModels = HttpClientUtils.get(url, List.class, AUTHORIZATION, ProxyConstant.USE_PROXY);
+                List tfESportsResultModels = HttpClientUtils.get(url, List.class, AUTHORIZATION);
                 if (!CollectionUtils.isEmpty(tfESportsResultModels)) {
                     try {
                         parseEsports(taskId, type, tfESportsResultModels, appointedLeagues, appointedTeams);
@@ -267,7 +266,7 @@ public class TfESportsService implements BaseService {
                     int retryCount = 0;
                     while (true) {
                         String url = String.format(TFConstant.TF_MAP_URL, eventId, marketTab.getTabName().replace(" ", "%20"));
-                        List tfESportsResultModels = HttpClientUtils.get(url, List.class, AUTHORIZATION, ProxyConstant.USE_PROXY);
+                        List tfESportsResultModels = HttpClientUtils.get(url, List.class, AUTHORIZATION);
                         if (!CollectionUtils.isEmpty(tfESportsResultModels)) {
                             try {
                                 TfESportsResultModel mapResult = JSON.parseObject(JSON.toJSONString(tfESportsResultModels.get(0)), TfESportsResultModel.class);
