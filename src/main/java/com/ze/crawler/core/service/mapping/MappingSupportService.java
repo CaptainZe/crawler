@@ -1005,6 +1005,12 @@ public class MappingSupportService {
                 for (Map<String, Object> sel : allSel) {
                     // 联赛名
                     String leagueName = ((String) sel.get("cn")).trim();
+
+                    // 忽略电竞足球
+                    if (leagueName.startsWith(IMConstant.LEAGUE_NAME_IGNORE_DZZQ)) {
+                        continue;
+                    }
+
                     // 赛事信息获取
                     String leagueId = Dictionary.SPORT_IM_LEAGUE_MAPPING.get(type).get(leagueName);
 
@@ -1142,6 +1148,12 @@ public class MappingSupportService {
             for (Map<String, Object> league : allLagues) {
                 // 联赛名
                 String leagueName = (String) league.get("n");
+
+                // 忽略电子足球和特别投注
+                if (leagueName.startsWith(YBBConstant.LEAGUE_NAME_IGNORE_DZZQ) || leagueName.endsWith(YBBConstant.LEAGUE_NAME_IGNORE_TBTZ)) {
+                    continue;
+                }
+
                 String leagueId = Dictionary.SPORT_YB_LEAGUE_MAPPING.get(type).get(leagueName);
 
                 List<Map<String, Object>> games = (List<Map<String, Object>>) league.get("e");

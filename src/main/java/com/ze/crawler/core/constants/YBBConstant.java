@@ -28,4 +28,7 @@ public class YBBConstant {
     // 盘口的一些描述信息
     public static final String EXTRA_DISH_NAME_GREATER_THAN = "大于";
     public static final String EXTRA_DISH_NAME_LESS_THAN = "小于";
+
+    public static final String LEAGUE_NAME_IGNORE_DZZQ = "电竞足球";
+    public static final String LEAGUE_NAME_IGNORE_TBTZ = "特别投注";
 }

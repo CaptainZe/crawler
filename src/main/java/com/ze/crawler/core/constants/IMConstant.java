@@ -65,4 +65,6 @@ public class IMConstant {
     public static final String CUSTOM_DISH_NAME_FIRST_HALF_SYP = "上半场_独赢";
     public static final String CUSTOM_DISH_NAME_FIRST_HALF_RFP = "上半场_让分盘";
     public static final String CUSTOM_DISH_NAME_FIRST_HALF_DXP = "上半场_大小盘";
+
+    public static final String LEAGUE_NAME_IGNORE_DZZQ = "VS - FIFA";
 }

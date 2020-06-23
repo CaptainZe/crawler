@@ -118,6 +118,11 @@ public class ImSportsService implements BaseService {
                 // 联赛名
                 String leagueName = ((String) sel.get("cn")).trim();
 
+                // 忽略电竞足球
+                if (leagueName.startsWith(IMConstant.LEAGUE_NAME_IGNORE_DZZQ)) {
+                    continue;
+                }
+
                 // 赛事信息获取
                 String leagueId = Dictionary.SPORT_IM_LEAGUE_MAPPING.get(type).get(leagueName);
                 if (leagueId == null) {

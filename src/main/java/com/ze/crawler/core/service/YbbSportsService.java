@@ -109,6 +109,11 @@ public class YbbSportsService implements BaseService {
                             // 联赛名
                             String leagueName = (String) league.get("n");
 
+                            // 忽略电子足球和特别投注
+                            if (leagueName.startsWith(YBBConstant.LEAGUE_NAME_IGNORE_DZZQ) || leagueName.endsWith(YBBConstant.LEAGUE_NAME_IGNORE_TBTZ)) {
+                                continue;
+                            }
+
                             // 赛事信息获取
                             String leagueId = Dictionary.SPORT_YB_LEAGUE_MAPPING.get(type).get(leagueName);
                             if (leagueId == null) {
