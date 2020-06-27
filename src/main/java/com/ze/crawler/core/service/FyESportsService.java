@@ -363,8 +363,11 @@ public class FyESportsService implements BaseService {
         headers.put("ghost", "60e1601dc3964090ac33e4d55ffe0bbe");
         headers.put("origin", "https://jingjib.aabv.top");
         headers.put("path", path);
-        headers.put("referer", "https://jingjib.aabv.top/index.html?v=1.2.22");
-        headers.put("x-forwarded-host", "jingjib.aabv.top");
+        headers.put("referer", "https://jingjib.yqb-sc.top/index.html?v=1.2.51");
+        headers.put("x-forwarded-host", "jingjib.yqb-sc.top");
+        headers.put("sec-fetch-dest", "empty");
+        headers.put("sec-fetch-mode", "cors");
+        headers.put("sec-fetch-site", "cross-site");
 
         return headers;
     }

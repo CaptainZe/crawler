@@ -6,7 +6,7 @@ package com.ze.crawler.core.constants;
 public class FYConstant {
 
     // 基础URL
-    public final static String FY_BASE_URL = "https://api.aabv.top/";
+    public final static String FY_BASE_URL = "https://api.aabv.top:8888/";
 
     // path
     public final static String PATH_MATCH_LIST = "/request/esport/match/list";

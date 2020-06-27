@@ -68,12 +68,12 @@ public class ESportsExecutor {
         CrawlerThread rg = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, rgESportsService);
         CrawlerThread tf = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, tfESportsService);
         CrawlerThread im = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, imESportsServiceV1);
-//        CrawlerThread fy = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, fyESportsService);
+        CrawlerThread fy = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, fyESportsService);
         threads.add(pb);
         threads.add(rg);
         threads.add(tf);
         threads.add(im);
-//        threads.add(fy);
+        threads.add(fy);
 
         try {
             // 执行
