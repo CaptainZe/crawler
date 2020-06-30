@@ -40,7 +40,7 @@ public class FyESportsService implements BaseService {
         int retryCount = 0;
         while (true) {
             Map<String, String> headers = getRequestHeaders(FYConstant.PATH_MATCH_LIST);
-            Map<String, Object> map = HttpClientUtils.postFrom(FYConstant.FY_BASE_URL, null, headers, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> map = HttpClientUtils.postFrom(FYConstant.FY_BASE_URL, null, headers, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_FY));
             if (!CollectionUtils.isEmpty(map)) {
                 Map<String, Object> info = (Map<String, Object>) map.get("info");
                 if (!CollectionUtils.isEmpty(info) && info.containsKey("Match")) {
@@ -177,7 +177,7 @@ public class FyESportsService implements BaseService {
                 // 获取赔率信息
                 Map<String, String> headers = getRequestHeaders(FYConstant.PATH_MATCH_INFO);
                 Map<String, Object> body = getRequestParams(matchId);
-                Map<String, Object> dishMap = HttpClientUtils.postFrom(FYConstant.FY_BASE_URL, body, headers, Map.class, ProxyConstant.USE_PROXY);
+                Map<String, Object> dishMap = HttpClientUtils.postFrom(FYConstant.FY_BASE_URL, body, headers, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_FY));
                 if (!CollectionUtils.isEmpty(dishMap)) {
                     Map<String, Object> info = (Map<String, Object>) dishMap.get("info");
                     if (!CollectionUtils.isEmpty(info)) {

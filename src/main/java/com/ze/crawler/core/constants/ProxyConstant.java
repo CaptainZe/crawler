@@ -1,5 +1,8 @@
 package com.ze.crawler.core.constants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ProxyConstant {
 
     // IP代理
@@ -8,6 +11,7 @@ public class ProxyConstant {
 
     // 是否使用代理的开关
     public static boolean USE_PROXY = false;
+    public static Map<Integer, Boolean> DISH_USE_PROXY = new HashMap<>();
 
     // 代理IP生成场景
     public static String SCENE_ON_OPEN = "ON_OPEN";

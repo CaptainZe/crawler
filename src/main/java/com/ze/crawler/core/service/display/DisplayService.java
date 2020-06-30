@@ -25,8 +25,8 @@ public class DisplayService {
     public String display(String dishType, String waterYield,
                                  Integer mainDish, Sports mainSports, boolean home,
                                  Integer rpDish, Sports rpSports, boolean guest) {
-        String mainDishName = getEsportsDishName(mainDish);
-        String rpDishName = getEsportsDishName(rpDish);
+        String mainDishName = getDishName(mainDish);
+        String rpDishName = getDishName(rpDish);
 
         StringBuilder sb = new StringBuilder();
         sb.append("类型：").append(mainSports.getType()).append("_").append(mainSports.getDishName());
@@ -120,7 +120,7 @@ public class DisplayService {
      * @param dish
      * @return
      */
-    private String getEsportsDishName(Integer dish) {
+    private String getDishName(Integer dish) {
         // 电竞模块
         if (Constant.ESPORTS_DISH_PB.equals(dish)) {
             return "平博电竞";

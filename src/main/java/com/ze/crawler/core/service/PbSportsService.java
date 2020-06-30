@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.ze.crawler.core.constants.Constant;
 import com.ze.crawler.core.constants.Dictionary;
 import com.ze.crawler.core.constants.PBConstant;
+import com.ze.crawler.core.constants.ProxyConstant;
 import com.ze.crawler.core.entity.PbSports;
 import com.ze.crawler.core.model.TeamFilterModel;
 import com.ze.crawler.core.repository.PbSportsRepository;
@@ -50,7 +51,7 @@ public class PbSportsService implements BaseService {
         while (true) {
             // 今天
             String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, sp, "", System.currentTimeMillis());
-            Map<String, Object> map = HttpClientUtils.get(url, Map.class);
+            Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.SPORTS_DISH_PB));
             if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
                 try {
                     parseSports(taskId, type, map, appointedLeagues, appointedTeams);
@@ -74,7 +75,7 @@ public class PbSportsService implements BaseService {
         while (true) {
             // 早盘
             String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_ZP, sp, TimeUtils.getDate(), System.currentTimeMillis());
-            Map<String, Object> map = HttpClientUtils.get(url, Map.class);
+            Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.SPORTS_DISH_PB));
             if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
                 try {
                     parseSports(taskId, type, map, appointedLeagues, appointedTeams);
@@ -321,7 +322,7 @@ public class PbSportsService implements BaseService {
         int retryCount = 0;
         while (true) {
             String moreUrl = String.format(PBConstant.PB_MORE_URL, PBConstant.MK_MORE, meParam, System.currentTimeMillis());
-            Map<String, List<Object>> moreMap = HttpClientUtils.get(moreUrl, Map.class);
+            Map<String, List<Object>> moreMap = HttpClientUtils.get(moreUrl, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.SPORTS_DISH_PB));
             if (moreMap != null && moreMap.get("e") != null && !CollectionUtils.isEmpty((List<Object>) moreMap.get("e"))) {
                 try {
                     dealSportsMore(initPbSports, moreMap);

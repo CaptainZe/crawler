@@ -52,7 +52,7 @@ public class ImSportsService implements BaseService {
             int retryCount = 0;
             while (true) {
                 JSONObject todayBody = getBaseBody(sportId, IMConstant.MARKET_TODAY, null, null);
-                Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, todayBody, Map.class, ProxyConstant.USE_PROXY);
+                Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, todayBody, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.SPORTS_DISH_IM));
                 if (map != null && map.get("sel") != null) {
                     List<Map<String, Object>> sels = (List<Map<String, Object>>) map.get("sel");
                     if (!CollectionUtils.isEmpty(sels)) {
@@ -80,7 +80,7 @@ public class ImSportsService implements BaseService {
             while (true) {
                 String zpDate = TimeUtils.getNextDay(TimeUtils.TIME_FORMAT_3);
                 JSONObject zpBody = getBaseBody(sportId, IMConstant.MARKET_ZP, zpDate, zpDate);
-                Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, zpBody, Map.class, ProxyConstant.USE_PROXY);
+                Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, zpBody, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.SPORTS_DISH_IM));
                 if (map != null && map.get("sel") != null) {
                     List<Map<String, Object>> sels = (List<Map<String, Object>>) map.get("sel");
                     if (!CollectionUtils.isEmpty(sels)) {

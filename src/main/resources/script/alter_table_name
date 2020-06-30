@@ -10,6 +10,7 @@ ALTER TABLE `t_esports_fy` RENAME TO  `t_esports_fy_20200509`;
 ALTER TABLE `t_sports_pb` RENAME TO  `t_sports_pb`;
 ALTER TABLE `t_sports_im` RENAME TO  `t_sports_im`;
 ALTER TABLE `t_sports_ybb` RENAME TO  `t_sports_ybb`;
+ALTER TABLE `t_sports_bti` RENAME TO  `t_sports_bti`;
 
 # 报水
 ALTER TABLE `t_water_yield` RENAME TO  `t_water_yield_20200509`;

@@ -25,4 +25,7 @@ ADD INDEX `INDEX_TASKID` (`task_id` ASC) VISIBLE;
 ALTER TABLE `t_sports_ybb`
 ADD INDEX `INDEX_TASKID` (`task_id` ASC) VISIBLE;
 
+ALTER TABLE `t_sports_bti`
+ADD INDEX `INDEX_TASKID` (`task_id` ASC) VISIBLE;
+
 

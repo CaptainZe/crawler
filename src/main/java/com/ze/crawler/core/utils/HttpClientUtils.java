@@ -34,7 +34,7 @@ public class HttpClientUtils {
     /**
      * 网络请求GET
      */
-    public static <T> T get(String url, Class<T> clazz, String authorization, boolean proxy) {
+    public static <T> T get(String url, Class<T> clazz, Map<String, String> headers, String authorization, boolean proxy) {
         // 1.生成httpclient，相当于该打开一个浏览器
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
@@ -45,6 +45,13 @@ public class HttpClientUtils {
         // 认证token
         if (!StringUtils.isEmpty(authorization)) {
             request.setHeader(Constant.REQUEST_HEADER_AUTHORIZATION, authorization);
+        }
+
+        // 设置自定义请求头
+        if (!CollectionUtils.isEmpty(headers)) {
+            for (String key : headers.keySet()) {
+                request.setHeader(key, headers.get(key));
+            }
         }
 
         // 设置代理 & 设置超时时间
@@ -84,27 +91,27 @@ public class HttpClientUtils {
      * 网络请求GET
      */
     public static <T> T get(String url, Class<T> clazz, String authorization) {
-        return get(url, clazz, authorization, false);
+        return get(url, clazz, null, authorization, false);
     }
-
     /**
      * 网络请求GET
      */
     public static <T> T get(String url, Class<T> clazz) {
-        return get(url, clazz, null, false);
+        return get(url, clazz, null, null, false);
     }
-
     /**
      * 网络请求GET
      */
     public static <T> T get(String url, Class<T> clazz, boolean proxy) {
-        return get(url, clazz, null, proxy);
+        return get(url, clazz, null, null, proxy);
     }
+
+    /* ===================================================================================================== */
 
     /**
      * 网络请求POST
      */
-    public static <T> T post(String url, JSONObject jsonObject, Class<T> clazz, String authorization, boolean proxy) {
+    public static <T> T post(String url, JSONObject jsonObject, Class<T> clazz, Map<String, String> headers, String authorization, boolean proxy) {
         // 1.生成httpclient，相当于该打开一个浏览器
         CloseableHttpClient httpClient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
@@ -121,6 +128,13 @@ public class HttpClientUtils {
             // 认证token
             if (!StringUtils.isEmpty(authorization)) {
                 request.setHeader(Constant.REQUEST_HEADER_AUTHORIZATION, authorization);
+            }
+
+            // 设置自定义请求头
+            if (!CollectionUtils.isEmpty(headers)) {
+                for (String key : headers.keySet()) {
+                    request.setHeader(key, headers.get(key));
+                }
             }
 
             // 设置代理 & 设置超时时间
@@ -160,22 +174,22 @@ public class HttpClientUtils {
      * 网络请求POST
      */
     public static <T> T post(String url, JSONObject jsonObject, Class<T> clazz, String authorization) {
-        return post(url, jsonObject, clazz, authorization, false);
+        return post(url, jsonObject, clazz, null, authorization, false);
     }
-
     /**
      * 网络请求POST
      */
     public static <T> T post(String url, JSONObject jsonObject, Class<T> clazz, boolean proxy) {
-        return post(url, jsonObject, clazz, null, proxy);
+        return post(url, jsonObject, clazz, null, null, proxy);
     }
-
     /**
      * 网络请求POST
      */
     public static <T> T post(String url, JSONObject jsonObject, Class<T> clazz) {
-        return post(url, jsonObject, clazz, null);
+        return post(url, jsonObject, clazz, null, null, false);
     }
+
+    /* ===================================================================================================== */
 
     /**
      * 网络请求POST - From方式请求

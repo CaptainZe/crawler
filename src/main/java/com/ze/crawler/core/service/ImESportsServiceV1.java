@@ -63,7 +63,7 @@ public class ImESportsServiceV1 implements BaseService {
             JSONObject body = getBaseBody(sportId);
             int retryCount = 0;
             while (true) {
-                Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL_V1, body, Map.class, ProxyConstant.USE_PROXY);
+                Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL_V1, body, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_FY));
                 if (map != null && map.get("Sport") != null) {
                     List<Map<String, Object>> sports = (List<Map<String, Object>>) map.get("Sport");
                     if (!CollectionUtils.isEmpty(sports)) {
@@ -194,7 +194,7 @@ public class ImESportsServiceV1 implements BaseService {
                                 while (true) {
                                     String url = String.format(IMConstant.IM_MORE_URL_V1, matchId);
                                     JSONObject body = getMoreBody(pMatchNo);
-                                    Map<String, Object> map = HttpClientUtils.post(url, body, Map.class, ProxyConstant.USE_PROXY);
+                                    Map<String, Object> map = HttpClientUtils.post(url, body, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_FY));
                                     if (map != null && map.get("Sport") != null) {
                                         List<Map<String, Object>> moreSports = (List<Map<String, Object>>) map.get("Sport");
                                         if (!CollectionUtils.isEmpty(moreSports)) {

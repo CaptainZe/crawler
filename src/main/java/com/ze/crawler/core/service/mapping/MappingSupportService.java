@@ -135,7 +135,7 @@ public class MappingSupportService {
 
         // 今天
         String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, PBConstant.SP_ESPORTS, TimeUtils.getDate(), System.currentTimeMillis());
-        Map<String, Object> map = HttpClientUtils.get(url, Map.class);
+        Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_PB));
         if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
             List<Object> n = (List<Object>) map.get("n");
             if (!CollectionUtils.isEmpty(n)) {
@@ -153,7 +153,7 @@ public class MappingSupportService {
 
         // 早盘
         String url2 = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_ZP, PBConstant.SP_ESPORTS, TimeUtils.getDate(), System.currentTimeMillis());
-        Map<String, Object> map2 = HttpClientUtils.get(url2, Map.class);
+        Map<String, Object> map2 = HttpClientUtils.get(url2, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_PB));
         if (map2 != null && map2.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map2.get("n"))) {
             List<Object> n = (List<Object>) map2.get("n");
             if (!CollectionUtils.isEmpty(n)) {
@@ -559,7 +559,7 @@ public class MappingSupportService {
         }
 
         JSONObject body = getBaseBody(sportId);
-        Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL_V1, body, Map.class, ProxyConstant.USE_PROXY);
+        Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL_V1, body, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_IM));
         if (map != null && map.get("Sport") != null) {
             List<Map<String, Object>> sports = (List<Map<String, Object>>) map.get("Sport");
             if (!CollectionUtils.isEmpty(sports)) {
@@ -669,7 +669,7 @@ public class MappingSupportService {
         startRowIndex += 2;
 
         Map<String, String> headers = getRequestHeaders(FYConstant.PATH_MATCH_LIST);
-        Map<String, Object> map = HttpClientUtils.postFrom(FYConstant.FY_BASE_URL, null, headers, Map.class, ProxyConstant.USE_PROXY);
+        Map<String, Object> map = HttpClientUtils.postFrom(FYConstant.FY_BASE_URL, null, headers, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_FY));
         if (!CollectionUtils.isEmpty(map)) {
             Map<String, Object> info = (Map<String, Object>) map.get("info");
             if (!CollectionUtils.isEmpty(info) && info.containsKey("Match")) {
@@ -854,7 +854,7 @@ public class MappingSupportService {
         }
         // 今天
         String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, sp, "", System.currentTimeMillis());
-        Map<String, Object> map = HttpClientUtils.get(url, Map.class);
+        Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.SPORTS_DISH_PB));
         if (map != null && map.get("n") != null && !CollectionUtils.isEmpty((List<Object>) map.get("n"))) {
             List<Object> n = (List<Object>) map.get("n");
             if (!CollectionUtils.isEmpty(n)) {
@@ -870,7 +870,7 @@ public class MappingSupportService {
         }
         // 早盘
         String zpUrl = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_ZP, sp, TimeUtils.getDate(), System.currentTimeMillis());
-        Map<String, Object> zpMap = HttpClientUtils.get(zpUrl, Map.class);
+        Map<String, Object> zpMap = HttpClientUtils.get(zpUrl, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.SPORTS_DISH_PB));
         if (zpMap != null && zpMap.get("n") != null && !CollectionUtils.isEmpty((List<Object>) zpMap.get("n"))) {
             List<Object> n = (List<Object>) zpMap.get("n");
             if (!CollectionUtils.isEmpty(n)) {
@@ -982,7 +982,7 @@ public class MappingSupportService {
 
             // 今日
             JSONObject todayBody = getBaseBody(sportId, IMConstant.MARKET_TODAY, null, null);
-            Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, todayBody, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, todayBody, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.SPORTS_DISH_IM));
             if (map != null && map.get("sel") != null) {
                 List<Map<String, Object>> sels = (List<Map<String, Object>>) map.get("sel");
                 if (!CollectionUtils.isEmpty(sels)) {
@@ -993,7 +993,7 @@ public class MappingSupportService {
             // 早盘
             String zpDate = TimeUtils.getNextDay(TimeUtils.TIME_FORMAT_3);
             JSONObject zpBody = getBaseBody(sportId, IMConstant.MARKET_ZP, zpDate, zpDate);
-            Map<String, Object> zpMap = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, zpBody, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> zpMap = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, zpBody, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.SPORTS_DISH_IM));
             if (zpMap != null && zpMap.get("sel") != null) {
                 List<Map<String, Object>> sels = (List<Map<String, Object>>) zpMap.get("sel");
                 if (!CollectionUtils.isEmpty(sels)) {
@@ -1104,7 +1104,7 @@ public class MappingSupportService {
 
         // 今日
         String url = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
-        Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(true, type), Map.class, ProxyConstant.USE_PROXY);
+        Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(true, type), Map.class);
         if (map != null && map.get("mod") != null) {
             Map<String, Object> mod = (Map<String, Object>) map.get("mod");
             if (!CollectionUtils.isEmpty(mod)) {
@@ -1125,7 +1125,7 @@ public class MappingSupportService {
         // 早盘
         if (Constant.SPORTS_TYPE_SOCCER.equalsIgnoreCase(type)) {
             String zpUrl = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
-            Map<String, Object> zpMap = HttpClientUtils.postFrom(zpUrl, getFormData(false, type), Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> zpMap = HttpClientUtils.postFrom(zpUrl, getFormData(false, type), Map.class);
             if (zpMap != null && zpMap.get("mod") != null) {
                 Map<String, Object> mod = (Map<String, Object>) zpMap.get("mod");
                 if (!CollectionUtils.isEmpty(mod)) {

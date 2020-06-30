@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,8 +31,10 @@ public class Heartbeat {
      * 电竞盘口心跳
      */
     @Scheduled(initialDelay = 1000 * 10, fixedDelay = 1000 * 60 * 60)
-    public void eSportsHeartbeat() {
-        log.info("电竞心跳检测开始");
+    public void heartbeat() {
+        log.info("爬虫心跳检测开始");
+
+        /* 电竞 */
 
         // 平博盘口
         pbHeartbeat();
@@ -48,7 +51,18 @@ public class Heartbeat {
         // 泛亚盘口
         fyHeartbeat();
 
-        log.info("电竞心跳检测结束");
+        /* 体育 */
+
+        // 平博
+        pbHeartbeat4Sport();
+
+        // IM
+        imHeartbeat4Sport();
+
+        // 188
+        ybbHeartbeat4Sport();
+
+        log.info("爬虫心跳检测结束");
     }
 
     /* ====================== 平博电竞 - start  ====================== */
@@ -56,7 +70,7 @@ public class Heartbeat {
         int retryCount = 0;
         while (true) {
             String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, PBConstant.SP_ESPORTS, TimeUtils.getDate(), System.currentTimeMillis());
-            Map<String, Object> map = HttpClientUtils.get(url, Map.class);
+            Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_PB));
             if (map != null) {
                 break;
             }
@@ -119,7 +133,7 @@ public class Heartbeat {
         int retryCount = 0;
         while (true) {
             JSONObject body = getBaseBody(IMConstant.SPORT_ID_DOTA2);
-            Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL_V1, body, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL_V1, body, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_IM));
             if (map != null) {
                 break;
             }
@@ -150,7 +164,7 @@ public class Heartbeat {
         int retryCount = 0;
         while (true) {
             Map<String, String> headers = getRequestHeaders(FYConstant.PATH_MATCH_LIST);
-            Map<String, Object> map = HttpClientUtils.postFrom(FYConstant.FY_BASE_URL, null, headers, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> map = HttpClientUtils.postFrom(FYConstant.FY_BASE_URL, null, headers, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_FY));
             if (map != null) {
                 break;
             }
@@ -178,4 +192,122 @@ public class Heartbeat {
         return headers;
     }
     /* ====================== 泛亚电竞 - end  ====================== */
+
+    /* ====================== 平博体育 - start  ====================== */
+    private void pbHeartbeat4Sport() {
+        int retryCount = 0;
+        while (true) {
+            String url = String.format(PBConstant.PB_BASE_URL, PBConstant.MK_TODAY, PBConstant.SP_SOCCER, "", System.currentTimeMillis());
+            Map<String, Object> map = HttpClientUtils.get(url, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.SPORTS_DISH_PB));
+            if (map != null) {
+                break;
+            }
+
+            retryCount++;
+            if (retryCount >= Constant.RETRY_COUNT) {
+                // 报警
+                weiKongService.sendText("平博体育异常", WKConstant.SEND_TYPE_ESPORTS);
+                break;
+            }
+        }
+    }
+    /* ====================== 平博体育 - end  ====================== */
+
+    /* ====================== IM体育 - start  ====================== */
+    private void imHeartbeat4Sport() {
+        int retryCount = 0;
+        while (true) {
+            JSONObject todayBody = getBaseBody(IMConstant.SPORT_ID_SOCCER, IMConstant.MARKET_TODAY, null, null);
+            Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_SPORT_BASE_URL, todayBody, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.SPORTS_DISH_IM));
+            if (map != null) {
+                break;
+            }
+
+            retryCount++;
+            if (retryCount >= Constant.RETRY_COUNT) {
+                // 报警
+                weiKongService.sendText("IM体育异常", WKConstant.SEND_TYPE_ESPORTS);
+                break;
+            }
+        }
+    }
+
+    private JSONObject getBaseBody(Integer sportId, Integer market, String dateFrom, String dateTo) {
+        JSONObject body = new JSONObject();
+        body.put("BetTypeIds", new Integer[] {1, 2, 4});
+        body.put("DateFrom", null);
+        body.put("DateTo", null);
+        if (!StringUtils.isEmpty(dateFrom) && !StringUtils.isEmpty(dateTo)) {
+            body.put("DateFrom", dateFrom);
+            body.put("DateTo", dateTo);
+        }
+        body.put("IsCombo", false);
+        body.put("Market", market);
+        body.put("MatchDay", 0);
+        body.put("OddsType", 3);
+        body.put("PeriodIds", new Integer[] {1, 2});
+        body.put("Season", 0);
+        body.put("SortType", 1);
+        body.put("SportId", sportId);
+        return body;
+    }
+    /* ====================== IM体育 - end  ====================== */
+
+    /* ====================== 188体育 - start  ====================== */
+    private void ybbHeartbeat4Sport() {
+        int retryCount = 0;
+        while (true) {
+            String url = String.format(YBBConstant.YBB_BASE_URL, System.currentTimeMillis());
+            Map<String, Object> map = HttpClientUtils.postFrom(url, getFormData(true, Constant.SPORTS_TYPE_SOCCER), Map.class);
+            if (map != null) {
+                break;
+            }
+
+            retryCount++;
+            if (retryCount >= Constant.RETRY_COUNT) {
+                // 报警
+                weiKongService.sendText("188体育异常", WKConstant.SEND_TYPE_ESPORTS);
+                break;
+            }
+        }
+    }
+
+    private Map<String, Object> getFormData(boolean isToday, String type) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("IsFirstLoad", true);
+        params.put("VersionL", -1);
+        params.put("VersionU", 0);
+        params.put("VersionS", -1);
+        params.put("VersionF", -1);
+        params.put("VersionH", 0);
+        params.put("VersionT", -1);
+        params.put("IsEventMenu", false);
+        params.put("SportID", 1);
+        params.put("CompetitionID", -1);
+        params.put("oIsInplayAll", false);
+        params.put("oIsFirstLoad", true);
+        params.put("oSortBy", 1);
+        params.put("oOddsType", 0);
+        params.put("oPageNo", 0);
+        params.put("LiveCenterEventId", 0);
+        params.put("LiveCenterSportId", 0);
+
+        if (Constant.SPORTS_TYPE_SOCCER.equalsIgnoreCase(type)) {
+            // 足球
+            if (isToday) {
+                params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
+                params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under?q=&country=CN&currency=RMB&tzoff=-240&reg=China&rc=CN&allowRacing=false");
+            } else {
+                params.put("reqUrl", "/zh-cn/sports/football/matches-by-date/tomorrow/full-time-asian-handicap-and-over-under");
+                params.put("hisUrl", "/zh-cn/sports/football/matches-by-date/today/full-time-asian-handicap-and-over-under");
+            }
+        } else {
+            // 篮球
+            params.put("reqUrl", "/zh-cn/sports/basketball/competition/full-time-asian-handicap-and-over-under");
+            params.put("hisUrl", "/zh-cn/sports/basketball/competition/full-time-asian-handicap-and-over-under?q=&country=CN&currency=RMB&tzoff=-240&reg=China&rc=CN&allowRacing=false");
+        }
+
+        return params;
+    }
+    /* ====================== 188体育 - end  ====================== */
 }

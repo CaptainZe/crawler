@@ -22,7 +22,7 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 /**
- * IM电竞盘口
+ * IM电竞盘口 (废弃)
  */
 @SuppressWarnings("all")
 @Slf4j
@@ -48,7 +48,7 @@ public class ImESportsService implements BaseService {
         JSONObject body = getBaseBody(null, null);
         int retryCount = 0;
         while (true) {
-            Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL, body, Map.class, ProxyConstant.USE_PROXY);
+            Map<String, Object> map = HttpClientUtils.post(IMConstant.IM_BASE_URL, body, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_FY));
             if (map != null && map.get("d") != null) {
                 List<List<Object>> d = (List<List<Object>>) map.get("d");
                 if (!CollectionUtils.isEmpty(d)) {
@@ -189,7 +189,7 @@ public class ImESportsService implements BaseService {
                         while (true) {
                             String url = String.format(IMConstant.IM_MORE_URL, matchId);
                             JSONObject body = getBaseBody(sportId, matchId);
-                            Map<String, Object> map = HttpClientUtils.post(url, body, Map.class, ProxyConstant.USE_PROXY);
+                            Map<String, Object> map = HttpClientUtils.post(url, body, Map.class, ProxyConstant.DISH_USE_PROXY.get(Constant.ESPORTS_DISH_FY));
                             if (map != null && map.get("d") != null) {
                                 List<List<Object>> moreD = (List<List<Object>>) map.get("d");
                                 if (!CollectionUtils.isEmpty(moreD)) {
