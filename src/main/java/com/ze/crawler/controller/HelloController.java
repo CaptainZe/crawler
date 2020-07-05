@@ -35,6 +35,8 @@ public class HelloController {
     private ImSportsService imSportsService;
     @Autowired
     private YbbSportsService ybbSportsService;
+    @Autowired
+    private BtiSportService btiSportService;
 
     @RequestMapping("/index")
     public String index() {
@@ -56,9 +58,10 @@ public class HelloController {
 
     @RequestMapping("/sports")
     public void sports() {
-        pbSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
-        imSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
-        ybbSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
+//        pbSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
+//        imSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
+//        ybbSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
+        btiSportService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
     }
 
     @RequestMapping("/executor")
