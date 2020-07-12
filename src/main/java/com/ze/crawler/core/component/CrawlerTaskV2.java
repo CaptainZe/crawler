@@ -28,9 +28,11 @@ public class CrawlerTaskV2 {
     private WaterControlRepository waterControlRepository;
 
     // 水量控制
-    public final static String YL_CONTROL_ID = "00000"; // 电竞 - 娱乐
-    public final static String BP_CONTROL_ID = "11111"; // 电竞 - 包赔
-    public final static String TY_CONTROL_ID = "22222"; // 体育
+    public final static String YL_CONTROL_ID = "00000";     // 电竞 - 娱乐
+    public final static String BP_CONTROL_ID = "11111";     // 电竞 - 包赔
+    public final static String TY_CONTROL_ID = "22222";     // 体育
+    public final static String TY_BP_CONTROL_ID = "33333";  // 体育 - 包赔
+    public final static String DJ_ZD_CONTROL_ID = "44444";  // 电竞 - 指定盘口
 
     /* 电竞 */
 
@@ -94,6 +96,25 @@ public class CrawlerTaskV2 {
         }
         System.out.println("电竞包赔 执行完成");
 
+        System.out.println("电竞-指定盘口 执行开始");
+        WaterControl zdWaterControl = waterControlRepository.getOne(DJ_ZD_CONTROL_ID);
+        if (WaterController.ENABLE_ON.equals(zdWaterControl.getEnable())) {
+            double threshold = Double.parseDouble(zdWaterControl.getThreshold());
+
+            List<String> esportType = new ArrayList<>();
+            esportType.add(Constant.ESPORTS_TYPE_LOL);
+            esportType.add(Constant.ESPORTS_TYPE_DOTA2);
+            esportType.add(Constant.ESPORTS_TYPE_CSGO);
+            esportType.add(Constant.ESPORTS_TYPE_KPL);
+
+            for (String type : esportType) {
+                eSportsExecutor.executor(LangUtils.generateUuid(), type, null, null, threshold, Constant.ESPORTS_DISH_IM);
+
+                System.out.println(type + " 执行完成");
+            }
+        }
+        System.out.println("电竞-指定盘口 执行完成");
+
         System.out.println("电竞娱乐 执行开始");
         WaterControl ylWaterControl = waterControlRepository.getOne(YL_CONTROL_ID);
         if (WaterController.ENABLE_ON.equals(ylWaterControl.getEnable())) {
@@ -125,6 +146,53 @@ public class CrawlerTaskV2 {
     public void sportRun() {
         System.out.println("体育 执行开始");
 
+        System.out.println("体育-包赔 执行开始");
+        WaterControl bpWaterControl = waterControlRepository.getOne(TY_BP_CONTROL_ID);
+        if (WaterController.ENABLE_ON.equals(bpWaterControl.getEnable())) {
+            double threshold = Double.parseDouble(bpWaterControl.getThreshold());
+
+            if ("0".equals(bpWaterControl.getTeamA()) || "0".equals(bpWaterControl.getTeamB())) {
+                String league = bpWaterControl.getLeague();
+                List<String> leagueList = Arrays.asList(league.split(","));
+                if (!CollectionUtils.isEmpty(leagueList)) {
+                    Map<String, Set<String>> map = new HashMap<>();
+                    map.put(Constant.SPORTS_TYPE_SOCCER, new HashSet<>());
+                    map.put(Constant.SPORTS_TYPE_BASKETBALL, new HashSet<>());
+
+                    for (String l : leagueList) {
+                        if (l.startsWith("1")) {
+                            map.get(Constant.SPORTS_TYPE_SOCCER).add(l);
+                        } else if (l.startsWith("2")) {
+                            map.get(Constant.SPORTS_TYPE_BASKETBALL).add(l);
+                        }
+                    }
+
+                    for (String type : map.keySet()) {
+                        if (!CollectionUtils.isEmpty(map.get(type))) {
+                            sportsExecutor.executor(LangUtils.generateUuid(), type,
+                                    map.get(type), null, threshold, null);
+                        }
+                    }
+                }
+            } else {
+                String type = Constant.SPORTS_TYPE_SOCCER;
+                String league = bpWaterControl.getLeague();
+                if (league.startsWith("2")) {
+                    type = Constant.SPORTS_TYPE_BASKETBALL;
+                }
+
+                TeamFilterModel teamFilterModel = new TeamFilterModel();
+                teamFilterModel.setTeamOne(bpWaterControl.getTeamA());
+                teamFilterModel.setTeamTwo(bpWaterControl.getTeamB());
+
+
+                sportsExecutor.executor(LangUtils.generateUuid(), type,
+                        Collections.singleton(league), Collections.singletonList(teamFilterModel), threshold, null);
+            }
+        }
+        System.out.println("体育-包赔 执行结束");
+
+        System.out.println("体育-娱乐 执行开始");
         WaterControl waterControl = waterControlRepository.getOne(TY_CONTROL_ID);
         if (WaterController.ENABLE_ON.equals(waterControl.getEnable())) {
             double threshold = Double.parseDouble(waterControl.getThreshold());
@@ -139,6 +207,8 @@ public class CrawlerTaskV2 {
                 System.out.println(type + " 执行完成");
             }
         }
+        System.out.println("体育-娱乐 执行完成");
+
         System.out.println("体育 执行完成");
     }
 }

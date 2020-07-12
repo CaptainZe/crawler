@@ -35,11 +35,15 @@ public class SportsExecutor {
     @Autowired
     private YbbSportsService ybbSportsService;
     @Autowired
+    private BtiSportService btiSportService;
+    @Autowired
     private PbSportsRepository pbSportsRepository;
     @Autowired
     private ImSportsRepository imSportsRepository;
     @Autowired
     private YbbSportsRepository ybbSportsRepository;
+    @Autowired
+    private BtiSportsRepository btiSportsRepository;
     @Autowired
     private WaterCalculator waterCalculator;
 
@@ -59,9 +63,11 @@ public class SportsExecutor {
         CrawlerThread pb = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, pbSportsService);
         CrawlerThread im = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, imSportsService);
         CrawlerThread ybb = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, ybbSportsService);
+        CrawlerThread bti = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, btiSportService);
         threads.add(pb);
         threads.add(im);
         threads.add(ybb);
+        threads.add(bti);
 
         try {
             // 执行
@@ -77,10 +83,12 @@ public class SportsExecutor {
             List<PbSports> pbSportsList = pbSportsRepository.findByTaskId(taskId);
             List<ImSports> imSportsList = imSportsRepository.findByTaskId(taskId);
             List<YbbSports> ybbSportsList = ybbSportsRepository.findByTaskId(taskId);
+            List<BtiSports> btiSportsList = btiSportsRepository.findByTaskId(taskId);
             Map<Integer, List<? extends Sports>> esportsMap = new LinkedHashMap<>();
             esportsMap.put(Constant.SPORTS_DISH_PB, pbSportsList);
             esportsMap.put(Constant.SPORTS_DISH_IM, imSportsList);
             esportsMap.put(Constant.SPORTS_DISH_YB, ybbSportsList);
+            esportsMap.put(Constant.SPORTS_DISH_BTI, btiSportsList);
 
             Map<Integer, List<? extends Sports>> sportsMapOrder = new LinkedHashMap<>();
             if (main != null) {
@@ -91,6 +99,8 @@ public class SportsExecutor {
                     sportsMapOrder.put(Constant.SPORTS_DISH_IM, esportsMap.get(Constant.SPORTS_DISH_IM));
                 } else if (main.equals(Constant.SPORTS_DISH_YB)) {
                     sportsMapOrder.put(Constant.SPORTS_DISH_YB, esportsMap.get(Constant.SPORTS_DISH_YB));
+                } else if (main.equals(Constant.SPORTS_DISH_BTI)) {
+                    sportsMapOrder.put(Constant.SPORTS_DISH_BTI, esportsMap.get(Constant.SPORTS_DISH_BTI));
                 }
                 for (Integer key : esportsMap.keySet()) {
                     sportsMapOrder.put(key, esportsMap.get(key));
@@ -100,7 +110,7 @@ public class SportsExecutor {
             }
 
             // 报水
-            waterCalculator.calculateWater(Dictionary.SPORT_DISH_TYPE_MAPPING, sportsMapOrder, threshold, main, WKConstant.SEND_TYPE_SPORTS);
+            waterCalculator.calculateWater(Dictionary.SPORT_DISH_TYPE_MAPPING, sportsMapOrder, threshold, main, appointedLeagues == null ? WKConstant.SEND_TYPE_SPORTS : WKConstant.SEND_TYPE_SPORTS_BP);
 
             long endTime = System.currentTimeMillis();
             log.info("报水_" + type + "_" + taskId + "_[耗时（秒）: " + CommonUtils.getSeconds(endTime - startTime) + "]");

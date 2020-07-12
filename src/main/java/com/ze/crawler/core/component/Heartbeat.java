@@ -62,6 +62,9 @@ public class Heartbeat {
         // 188
         ybbHeartbeat4Sport();
 
+        // BTI
+        btiHeartbeat4Sport();
+
         log.info("爬虫心跳检测结束");
     }
 
@@ -78,7 +81,7 @@ public class Heartbeat {
             retryCount++;
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
-                weiKongService.sendText("平博电竞异常", WKConstant.SEND_TYPE_ESPORTS);
+                weiKongService.sendText("平博电竞异常", WKConstant.SEND_TYPE_ESPORTS_BP);
                 break;
             }
         }
@@ -98,7 +101,7 @@ public class Heartbeat {
             retryCount++;
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
-                weiKongService.sendText("RG电竞异常", WKConstant.SEND_TYPE_ESPORTS);
+                weiKongService.sendText("RG电竞异常", WKConstant.SEND_TYPE_ESPORTS_BP);
                 break;
             }
         }
@@ -121,7 +124,7 @@ public class Heartbeat {
             retryCount++;
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
-                weiKongService.sendText("TF电竞异常", WKConstant.SEND_TYPE_ESPORTS);
+                weiKongService.sendText("TF电竞异常", WKConstant.SEND_TYPE_ESPORTS_BP);
                 break;
             }
         }
@@ -141,7 +144,7 @@ public class Heartbeat {
             retryCount++;
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
-                weiKongService.sendText("IM电竞异常", WKConstant.SEND_TYPE_ESPORTS);
+                weiKongService.sendText("IM电竞异常", WKConstant.SEND_TYPE_ESPORTS_BP);
                 break;
             }
         }
@@ -172,7 +175,7 @@ public class Heartbeat {
             retryCount++;
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
-                weiKongService.sendText("泛亚电竞异常", WKConstant.SEND_TYPE_ESPORTS);
+                weiKongService.sendText("泛亚电竞异常", WKConstant.SEND_TYPE_ESPORTS_BP);
                 break;
             }
         }
@@ -206,7 +209,7 @@ public class Heartbeat {
             retryCount++;
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
-                weiKongService.sendText("平博体育异常", WKConstant.SEND_TYPE_ESPORTS);
+                weiKongService.sendText("平博体育异常", WKConstant.SEND_TYPE_ESPORTS_BP);
                 break;
             }
         }
@@ -226,7 +229,7 @@ public class Heartbeat {
             retryCount++;
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
-                weiKongService.sendText("IM体育异常", WKConstant.SEND_TYPE_ESPORTS);
+                weiKongService.sendText("IM体育异常", WKConstant.SEND_TYPE_ESPORTS_BP);
                 break;
             }
         }
@@ -266,7 +269,7 @@ public class Heartbeat {
             retryCount++;
             if (retryCount >= Constant.RETRY_COUNT) {
                 // 报警
-                weiKongService.sendText("188体育异常", WKConstant.SEND_TYPE_ESPORTS);
+                weiKongService.sendText("188体育异常", WKConstant.SEND_TYPE_ESPORTS_BP);
                 break;
             }
         }
@@ -310,4 +313,30 @@ public class Heartbeat {
         return params;
     }
     /* ====================== 188体育 - end  ====================== */
+
+    /* ====================== BTI体育 - start  ====================== */
+    private void btiHeartbeat4Sport() {
+        int retryCount = 0;
+        while (true) {
+            String url = String.format(BTIConstant.BTI_TODAY_URL, BTIConstant.BRANCH_ID_SOCCER);
+            List list = HttpClientUtils.get(url, List.class, getRequestHeaders(), null, false);
+            if (list != null) {
+                break;
+            }
+
+            retryCount++;
+            if (retryCount >= Constant.RETRY_COUNT) {
+                // 报警
+                weiKongService.sendText("BTI体育异常", WKConstant.SEND_TYPE_ESPORTS_BP);
+                break;
+            }
+        }
+    }
+
+    private Map<String, String> getRequestHeaders() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("RequestTarget", "AJAXService");
+        return headers;
+    }
+    /* ====================== BTI体育 - end  ====================== */
 }

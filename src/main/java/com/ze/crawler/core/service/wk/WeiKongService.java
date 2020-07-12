@@ -7,17 +7,22 @@ import com.ze.crawler.core.entity.Wk;
 import com.ze.crawler.core.repository.WkRepository;
 import com.ze.crawler.core.utils.HttpClientUtils;
 import com.ze.crawler.core.utils.TimeUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * 微控
  */
+@Slf4j
 @Service
 public class WeiKongService {
     @Autowired
@@ -29,6 +34,7 @@ public class WeiKongService {
     @PostConstruct
     void initWk() {
         initAndRefreshWkInfo();
+        log.info("微控初始化完成");
     }
 
     /**
@@ -72,96 +78,102 @@ public class WeiKongService {
     /**
      * 重新登录全部账号
      */
-    @SuppressWarnings("all")
-    public String reLoginAll() {
-        // 1. 开发者账号退出微控平台（目的：使所有已登录的微信号下线）
-        String logoutApi = "/member/logout";
-        Map<String, Object> r1 = HttpClientUtils.post(getUrl(logoutApi), new JSONObject(), Map.class, WKConstant.AUTHORIZATION);
-        if (r1.get("message").equals("失败")) {
-            return WKConstant.TRY_AGAIN;
+        @SuppressWarnings("all")
+        public String reLoginAll() {
+            // 1. 开发者账号退出微控平台（目的：使所有已登录的微信号下线）
+            String logoutApi = "/member/logout";
+            Map<String, Object> r1 = HttpClientUtils.post(getUrl(logoutApi), new JSONObject(), Map.class, WKConstant.AUTHORIZATION);
+            if (r1.get("message").equals("失败")) {
+                return WKConstant.TRY_AGAIN;
+            }
+
+            // 2. 登录开发者账号
+            String loginApi = "/member/login";
+            JSONObject loginBody = new JSONObject();
+            loginBody.put("account", "15959046894");
+            loginBody.put("password", "123456");
+            Map<String, Object> r2 = HttpClientUtils.post(getUrl(loginApi), loginBody, Map.class);
+            if (r2.get("message").equals("失败")) {
+                return WKConstant.TRY_AGAIN;
+            }
+
+            // 3. 二次登录
+            String secondLoginApi = "/secondLogin";
+            List<Wk> list = wkRepository.findAll();
+            if (!CollectionUtils.isEmpty(list)) {
+                for (Wk wk : list) {
+                    if (WKConstant.ENABLE_TRUE.equalsIgnoreCase(wk.getEnable())) {
+                        JSONObject secondLoginBody = new JSONObject();
+                        secondLoginBody.put("wcId", wk.getWcId());
+                        secondLoginBody.put("type", 2);
+                        Map<String, Object> response = HttpClientUtils.post(getUrl(secondLoginApi), secondLoginBody, Map.class, WKConstant.AUTHORIZATION);
+                        if (response.get("message").equals("失败")) {
+                            return WKConstant.TRY_AGAIN;
+                        }
+                        if (response.get("message").equals("二次登录失败，请重新扫码登录")) {
+                            return "二次登录失败，请重新扫码登录";
+                        }
+
+                        Map<String, Object> data = (Map<String, Object>) response.get("data");
+                        String wId = (String) data.get("wId");
+                        wk.setwId(wId);
+                        wk.setLoginTime(TimeUtils.format(new Date().getTime()));
+                        wkRepository.save(wk);
+                    }
+                }
+            }
+
+            // 4. 刷新缓存
+            initAndRefreshWkInfo();
+
+            return "成功！";
         }
 
-        // 2. 登录开发者账号
-        String loginApi = "/member/login";
-        JSONObject loginBody = new JSONObject();
-        loginBody.put("account", "15959046894");
-        loginBody.put("password", "123456");
-        Map<String, Object> r2 = HttpClientUtils.post(getUrl(loginApi), loginBody, Map.class);
-        if (r2.get("message").equals("失败")) {
-            return WKConstant.TRY_AGAIN;
-        }
+        /**
+         * 刷新&初始化
+         */
+        private void initAndRefreshWkInfo() {
+            WKConstant.WK_USAGE_INFO.clear();
+            WKConstant.WK_CHECK.clear();
+            WKConstant.WK_ESPORTS.clear();
+            WKConstant.WK_ESPORTS_BP.clear();
+            WKConstant.WK_SPORTS.clear();
+            WKConstant.WK_SPORTS_BP.clear();
+            WKConstant.WK_ESPORTS_ZD.clear();
 
-        // 3. 二次登录
-        String secondLoginApi = "/secondLogin";
-        List<Wk> list = wkRepository.findAll();
-        if (!CollectionUtils.isEmpty(list)) {
-            for (Wk wk : list) {
-                if (WKConstant.ENABLE_TRUE.equalsIgnoreCase(wk.getEnable())) {
-                    JSONObject secondLoginBody = new JSONObject();
-                    secondLoginBody.put("wcId", wk.getWcId());
-                    secondLoginBody.put("type", 2);
-                    Map<String, Object> response = HttpClientUtils.post(getUrl(secondLoginApi), secondLoginBody, Map.class, WKConstant.AUTHORIZATION);
-                    if (response.get("message").equals("失败")) {
-                        return WKConstant.TRY_AGAIN;
-                    }
-                    if (response.get("message").equals("二次登录失败，请重新扫码登录")) {
-                        return "二次登录失败，请重新扫码登录";
-                    }
+            // 初始化使用场景
+            WKConstant.WK_USAGE_INFO.put(WKConstant.SEND_TYPE_ESPORTS, WKConstant.WK_ESPORTS);
+            WKConstant.WK_USAGE_INFO.put(WKConstant.SEND_TYPE_ESPORTS_BP, WKConstant.WK_ESPORTS_BP);
+            WKConstant.WK_USAGE_INFO.put(WKConstant.SEND_TYPE_SPORTS, WKConstant.WK_SPORTS);
+            WKConstant.WK_USAGE_INFO.put(WKConstant.SEND_TYPE_SPORTS_BP, WKConstant.WK_SPORTS_BP);
+            WKConstant.WK_USAGE_INFO.put(WKConstant.SEND_TYPE_ESPORTS_ZD, WKConstant.WK_ESPORTS_ZD);
 
-                    Map<String, Object> data = (Map<String, Object>) response.get("data");
-                    String wId = (String) data.get("wId");
-                    wk.setwId(wId);
-                    wk.setLoginTime(TimeUtils.format(new Date().getTime()));
-                    wkRepository.save(wk);
+            List<Wk> wkList = wkRepository.findAll();
+            if (!CollectionUtils.isEmpty(wkList)) {
+                for (Wk wk : wkList) {
+                    if (WKConstant.ENABLE_TRUE.equalsIgnoreCase(wk.getEnable())) {
+                        Integer usage = wk.getUsageScene();
+                        if (usage.equals(WKConstant.USAGE_ESPORT)) {
+                            WKConstant.WK_ESPORTS.put(wk.getwId(), wk.getRoomA());
+                            WKConstant.WK_ESPORTS_BP.put(wk.getwId(), wk.getRoomB());
+                            WKConstant.WK_ESPORTS_ZD.put(wk.getwId(), wk.getRoomE());
+                        } else if (usage.equals(WKConstant.USAGE_SPORT)) {
+                            WKConstant.WK_SPORTS.put(wk.getwId(), wk.getRoomC());
+                            WKConstant.WK_SPORTS_BP.put(wk.getwId(), wk.getRoomD());
+                        }
+                        WKConstant.WK_CHECK.put(wk.getwId(), wk.getRoomB());
+                    }
                 }
             }
         }
 
-        // 4. 刷新缓存
-        initAndRefreshWkInfo();
+        /**
+         * 随机获取一个账号进行发送
+         */
+        private JSONObject getRandomAccount(Integer sendType) {
+            JSONObject jsonObject = new JSONObject();
 
-        return "成功！";
-    }
-
-    /**
-     * 刷新&初始化
-     */
-    private void initAndRefreshWkInfo() {
-        WKConstant.WK_USAGE_INFO.clear();
-        WKConstant.WK_CHECK.clear();
-        WKConstant.WK_ESPORTS.clear();
-        WKConstant.WK_ESPORTS_BP.clear();
-        WKConstant.WK_SPORTS.clear();
-
-        // 初始化使用场景
-        WKConstant.WK_USAGE_INFO.put(WKConstant.SEND_TYPE_ESPORTS, WKConstant.WK_ESPORTS);
-        WKConstant.WK_USAGE_INFO.put(WKConstant.SEND_TYPE_ESPORTS_BP, WKConstant.WK_ESPORTS_BP);
-        WKConstant.WK_USAGE_INFO.put(WKConstant.SEND_TYPE_SPORTS, WKConstant.WK_SPORTS);
-
-        List<Wk> wkList = wkRepository.findAll();
-        if (!CollectionUtils.isEmpty(wkList)) {
-            for (Wk wk : wkList) {
-                if (WKConstant.ENABLE_TRUE.equalsIgnoreCase(wk.getEnable())) {
-                    Integer usage = wk.getUsageScene();
-                    if (usage.equals(WKConstant.USAGE_ESPORT)) {
-                        WKConstant.WK_ESPORTS.put(wk.getwId(), wk.getRoomA());
-                        WKConstant.WK_ESPORTS_BP.put(wk.getwId(), wk.getRoomB());
-                    } else if (usage.equals(WKConstant.USAGE_SPORT)) {
-                        WKConstant.WK_SPORTS.put(wk.getwId(), wk.getRoomC());
-                    }
-                    WKConstant.WK_CHECK.put(wk.getwId(), wk.getRoomA());
-                }
-            }
-        }
-    }
-
-    /**
-     * 随机获取一个账号进行发送
-     */
-    private JSONObject getRandomAccount(Integer sendType) {
-        JSONObject jsonObject = new JSONObject();
-
-        Map<String, String> wkInfo = WKConstant.WK_USAGE_INFO.get(sendType);
+            Map<String, String> wkInfo = WKConstant.WK_USAGE_INFO.get(sendType);
 
         if (wkInfo.keySet().size() > 1) {
             Random random = new Random();

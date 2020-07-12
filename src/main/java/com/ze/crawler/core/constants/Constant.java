@@ -16,7 +16,7 @@ public class Constant {
     // 超时时间 （单位：毫秒）
     public final static int SOCKET_TIMEOUT = 30000;
     // 执行器超时时间 （单位：秒）
-    public final static int EXECUTOR_TIMEOUT = 180;
+    public final static int EXECUTOR_TIMEOUT = 120;
     // 换行符
     public final static String NEW_LINE = System.getProperty("line.separator");
 

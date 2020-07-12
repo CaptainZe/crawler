@@ -11,6 +11,8 @@ public class Wk {
     private String roomA;
     private String roomB;
     private String roomC;
+    private String roomD;
+    private String roomE;
     private Integer usageScene;
     private String loginTime;
     private String enable;
@@ -63,6 +65,26 @@ public class Wk {
 
     public void setRoomC(String roomC) {
         this.roomC = roomC;
+    }
+
+    @Basic
+    @Column(name = "room_d")
+    public String getRoomD() {
+        return roomD;
+    }
+
+    public void setRoomD(String roomD) {
+        this.roomD = roomD;
+    }
+
+    @Basic
+    @Column(name = "room_e")
+    public String getRoomE() {
+        return roomE;
+    }
+
+    public void setRoomE(String roomE) {
+        this.roomE = roomE;
     }
 
     @Basic

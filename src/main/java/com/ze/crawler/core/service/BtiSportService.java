@@ -67,6 +67,30 @@ public class BtiSportService implements BaseService {
                     break;
                 }
             }
+
+            // 早盘
+            retryCount = 0;
+            while (true) {
+                String url = String.format(BTIConstant.BTI_EARLY_URL, branchId);
+                List list = HttpClientUtils.get(url, List.class, getRequestHeaders(), null, false);
+                if (list != null) {
+                    try {
+                        parseSports(taskId, type, list, appointedLeagues, appointedTeams);
+                    } catch (Exception e) {
+                        Map<String, String> data = new HashMap<>();
+                        data.put("url", url);
+                        data.put("result", JSON.toJSONString(list));
+                        data.put("retry_count", String.valueOf(retryCount));
+                        logService.log(Constant.LOG_TYPE_PARSE_SPORTS_ERROR, Constant.SPORTS_DISH_BTI.toString(), JSON.toJSONString(data), e);
+                    }
+                    break;
+                }
+
+                retryCount++;
+                if (retryCount >= Constant.RETRY_COUNT) {
+                    break;
+                }
+            }
         }
 
         long endTime = System.currentTimeMillis();
@@ -77,6 +101,10 @@ public class BtiSportService implements BaseService {
      * 体育解析
      */
     private void parseSports(String taskId, String type, List list, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+
         // 【1】是联赛列表
         List<List<Object>> leagueList = (List<List<Object>>) list.get(1);
         if (!CollectionUtils.isEmpty(leagueList)) {
@@ -113,7 +141,7 @@ public class BtiSportService implements BaseService {
 
                     for (List<Object> gameInfo : gameList) {
                         // 【14】联赛ID（盘口内的）
-                        Integer dishLeagueId = (Integer) gameInfo.get(14);
+                        Integer dishLeagueId = (Integer) gameInfo.get(9);
                         if (!leagueMap.containsKey(dishLeagueId)) {
                             continue;
                         }
@@ -208,11 +236,11 @@ public class BtiSportService implements BaseService {
                                 Map<String, String> dishMapping = Dictionary.SPORT_BTI_DISH_MAPPING.get(type);
 
                                 List<BtiSports> btiSportsList = new ArrayList<>();
-                                if (!CollectionUtils.isEmpty(oddsIdList)) {
-                                    for (Object oddsInfo : oddsIdList) {
+                                if (!CollectionUtils.isEmpty(oddsList)) {
+                                    for (Object oddsInfo : oddsList) {
                                         List<Object> oddsInfoList = (List<Object>) oddsInfo;
                                         // 判断是否是全场
-                                        Integer fullName = oddsIdList.get(6);
+                                        String fullName = (String) oddsInfoList.get(6);
                                         if (!BTIConstant.FULL_NAME.equals(fullName)) {
                                             continue;
                                         }
@@ -235,11 +263,19 @@ public class BtiSportService implements BaseService {
                                         BtiSports initBtiSports = gameMap.get(gameId);
 
                                         for (List<Object> oddsDetail : oddsDetails) {
+
+                                            int rfpIndex = 1;
+                                            int dxpIndex = 2;
+                                            if (oddsDetail.size() == 8) {
+                                                rfpIndex = 2;
+                                                dxpIndex = 3;
+                                            }
+
                                             // [2] 让分盘
-                                            List<Object> rfpInfo = (List<Object>) oddsDetail.get(2);
+                                            List<Object> rfpInfo = (List<Object>) oddsDetail.get(rfpIndex);
                                             if (!CollectionUtils.isEmpty(rfpInfo)) {
                                                 // 主队让分
-                                                BigDecimal homeTeamItem = (BigDecimal) rfpInfo.get(1);
+                                                BigDecimal homeTeamItem = new BigDecimal(getOddsItem(rfpInfo.get(1)));
                                                 BigDecimal guestTeamItem = homeTeamItem.negate();
 
                                                 // 主客队赔率
@@ -259,20 +295,20 @@ public class BtiSportService implements BaseService {
                                             }
 
                                             // [3] 大小盘
-                                            List<Object> dxpInfo = (List<Object>) oddsDetail.get(3);
+                                            List<Object> dxpInfo = (List<Object>) oddsDetail.get(dxpIndex);
                                             if (!CollectionUtils.isEmpty(dxpInfo)) {
                                                 // 大小数
-                                                BigDecimal dxItem = (BigDecimal) rfpInfo.get(1);
+                                                BigDecimal dxItem = new BigDecimal(getOddsItem(dxpInfo.get(1)));
 
                                                 // 主客队赔率
-                                                Integer homeTeamOdds = (Integer) rfpInfo.get(2);
-                                                Integer guestTeamOdds = (Integer) rfpInfo.get(4);
+                                                Integer homeTeamOdds = (Integer) dxpInfo.get(2);
+                                                Integer guestTeamOdds = (Integer) dxpInfo.get(4);
 
                                                 BtiSports btiSports = new BtiSports();
                                                 BeanUtils.copyProperties(initBtiSports, btiSports);
                                                 btiSports.setId(LangUtils.generateUuid());
-                                                btiSports.setDishId(dishMapping.get(BTIConstant.CUSTOM_DISH_NAME_FULL_RFP));
-                                                btiSports.setDishName(BTIConstant.CUSTOM_DISH_NAME_FULL_RFP);
+                                                btiSports.setDishId(dishMapping.get(BTIConstant.CUSTOM_DISH_NAME_FULL_DXP));
+                                                btiSports.setDishName(BTIConstant.CUSTOM_DISH_NAME_FULL_DXP);
                                                 btiSports.setHomeTeamOdds(getOdds(homeTeamOdds));
                                                 btiSports.setGuestTeamOdds(getOdds(guestTeamOdds));
                                                 btiSports.setHomeTeamItem(dxItem.toString());
@@ -364,6 +400,27 @@ public class BtiSportService implements BaseService {
         bigDecimal = bigDecimal.add(new BigDecimal(100));
         bigDecimal = bigDecimal.divide(new BigDecimal("100.0"), 2, BigDecimal.ROUND_DOWN);
         return bigDecimal.toString();
+    }
+
+    /**
+     * 获取item
+     * @param item
+     * @return
+     */
+    private String getOddsItem(Object item) {
+        String oddsItem = null;
+        try {
+            Integer tempItem = (Integer) item;
+            oddsItem = tempItem.toString();
+        } catch (Exception e) {
+            BigDecimal tempItem = (BigDecimal) item;
+            oddsItem = tempItem.toString();
+        }
+
+        if (oddsItem != null && !oddsItem.contains(".")) {
+            oddsItem = oddsItem + ".0";
+        }
+        return oddsItem;
     }
 
     /**

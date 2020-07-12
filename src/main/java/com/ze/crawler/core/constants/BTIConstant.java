@@ -7,7 +7,7 @@ public class BTIConstant {
 
     // 今日URL(%s替换替换顺序: branchID)
     public static final String BTI_TODAY_URL = "https://rks.btisports.io/pagemethods_ros.aspx/GetAsianSkinTodayMasterEvents?todayOffset=6&branchID=%s&leagueID=-1&timeZone=8";
-    // 早盘URL
+    // 早盘URL(%s替换替换顺序: branchID)
     public static final String BTI_EARLY_URL = "https://rks.btisports.io/pagemethods_ros.aspx/GetAsianSkinEarlyMarketMasterEvents?todayOffset=6&branchID=%s&leagueID=-1&day=0&timeZone=8";
     // 赔率URL
     public static final String BTI_ODDS_URL = "https://rks.btisports.io/pagemethods.aspx/UpdateAsianSkinEvents";

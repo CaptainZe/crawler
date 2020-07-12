@@ -29,7 +29,7 @@ public class DisplayService {
         String rpDishName = getDishName(rpDish);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("类型：").append(mainSports.getType()).append("_").append(mainSports.getDishName());
+        sb.append("类型：").append(getTypeName(mainSports.getType())).append("_").append(mainSports.getDishName());
         sb.append(Constant.NEW_LINE);
         sb.append(mainDishName).append("：").append(mainSports.getLeagueName());
         sb.append(Constant.NEW_LINE);
@@ -112,6 +112,21 @@ public class DisplayService {
         sb.append(Constant.NEW_LINE);
         sb.append("水量：").append(waterYield);
         return sb.toString();
+    }
+
+    /**
+     * 获取比赛类型名
+     * @param type
+     * @return
+     */
+    private String getTypeName(String type) {
+        if (Constant.SPORTS_TYPE_SOCCER.equalsIgnoreCase(type)) {
+            return "足球";
+        } else if (Constant.SPORTS_TYPE_BASKETBALL.equalsIgnoreCase(type)) {
+            return "篮球";
+        }
+
+        return type;
     }
 
     /**

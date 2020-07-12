@@ -119,8 +119,16 @@ public class ESportsExecutor {
                 esportsMapOrder = esportsMap;
             }
 
+            Integer sendType = WKConstant.SEND_TYPE_ESPORTS;
+            if (appointedLeagues != null) {
+                sendType = WKConstant.SEND_TYPE_ESPORTS_BP;
+            }
+            if (main != null) {
+                sendType = WKConstant.SEND_TYPE_ESPORTS_ZD;
+            }
+
             // 报水
-            waterCalculator.calculateWater(Dictionary.ESPORT_DISH_TYPE_MAPPING, esportsMapOrder, threshold, main, appointedLeagues == null ? WKConstant.SEND_TYPE_ESPORTS : WKConstant.SEND_TYPE_ESPORTS_BP);
+            waterCalculator.calculateWater(Dictionary.ESPORT_DISH_TYPE_MAPPING, esportsMapOrder, threshold, main, sendType);
 
             long endTime = System.currentTimeMillis();
             log.info("报水_" + type + "_" + taskId + "_[耗时（秒）: " + CommonUtils.getSeconds(endTime - startTime) + "]");
