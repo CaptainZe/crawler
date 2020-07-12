@@ -145,7 +145,7 @@ public class RgESportsService implements BaseService {
 
             // 赛事信息获取
             String leagueName = item.getTournamentName().trim();
-            String leagueId = Dictionary.ESPORT_RG_LEAGUE_MAPPING.get(leagueName);
+            String leagueId = Dictionary.ESPORT_RG_LEAGUE_MAPPING.get(type).get(leagueName);
             if (leagueId == null) {
                 continue;
             }
@@ -190,7 +190,7 @@ public class RgESportsService implements BaseService {
             }
 
             // 获取对应盘口字典表
-            Map<String, String> dishMapping = Dictionary.getEsportDishMappingByTypeAndDishType(type, Constant.ESPORTS_DISH_RG);
+            Map<String, String> dishMapping = Dictionary.ESPORT_RG_DISH_MAPPING.get(type);
 
             // 获取更多赔率
             int retryCount = 0;

@@ -108,7 +108,7 @@ public class ImESportsService implements BaseService {
                 }
                 // 联赛名
                 String leagueName = leagueNames.get(1).trim();
-                String leagueId = Dictionary.ESPORT_IM_LEAGUE_MAPPING.get(leagueName);
+                String leagueId = Dictionary.ESPORT_IM_LEAGUE_MAPPING.get(type).get(leagueName);
                 if (leagueId == null) {
                     continue;
                 }
@@ -222,9 +222,9 @@ public class ImESportsService implements BaseService {
      */
     private void parseMatchDetail(List<List<Object>> moreD, ImEsports initImEsports, String round) {
         // 获取对应盘口字典表
-        Map<String, String> dishMapping = Dictionary.getEsportDishMappingByTypeAndDishType(initImEsports.getType(), Constant.ESPORTS_DISH_IM);
+        Map<String, String> dishMapping = Dictionary.ESPORT_IM_DISH_MAPPING.get(initImEsports.getType());
         // 盘口显示名字典表
-        Map<String, String> displayMapping = Dictionary.getImDishDisplayMappingByType(initImEsports.getType());
+        Map<String, String> displayMapping = Dictionary.ESPORT_IM_DISH_DISPLAY_MAPPING.get(initImEsports.getType());
 
         // 详细盘口, 就一个
         List<Object> match = moreD.get(0);

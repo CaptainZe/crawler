@@ -117,13 +117,13 @@ public class TfESportsService implements BaseService {
      */
     private void parseEsports(String taskId, String type, List result, Set<String> appointedLeagues, List<TeamFilterModel> appointedTeams) {
         // 获取对应盘口字典表
-        Map<String, String> dishMapping = Dictionary.getEsportDishMappingByTypeAndDishType(type, Constant.ESPORTS_DISH_TF);
+        Map<String, String> dishMapping = Dictionary.ESPORT_TF_DISH_MAPPING.get(type);
 
         for (Object object : result) {
             TfESportsResultModel tfESportsResultModel = JSON.parseObject(JSON.toJSONString(object), TfESportsResultModel.class);
             // 联赛名
             String leagueName = tfESportsResultModel.getCompetitionName().trim();
-            String leagueId = Dictionary.ESPORT_TF_LEAGUE_MAPPING.get(leagueName);
+            String leagueId = Dictionary.ESPORT_TF_LEAGUE_MAPPING.get(type).get(leagueName);
             if (leagueId == null) {
                 continue;
             }

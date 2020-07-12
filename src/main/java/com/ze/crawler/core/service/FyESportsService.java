@@ -121,7 +121,7 @@ public class FyESportsService implements BaseService {
                     continue;
                 }
                 leagueName = leagueName.trim();
-                String leagueId = Dictionary.ESPORT_FY_LEAGUE_MAPPING.get(leagueName);
+                String leagueId = Dictionary.ESPORT_FY_LEAGUE_MAPPING.get(type).get(leagueName);
                 if (leagueId == null) {
                     continue;
                 }
@@ -171,7 +171,7 @@ public class FyESportsService implements BaseService {
                 initFyEsports.setStartTime(startTime);
 
                 // 获取对应盘口字典表
-                Map<String, String> dishMapping = Dictionary.getEsportDishMappingByTypeAndDishType(type, Constant.ESPORTS_DISH_FY);
+                Map<String, String> dishMapping = Dictionary.ESPORT_FY_DISH_MAPPING.get(type);
 
                 List<FyEsports> fyEsportsList = new ArrayList<>();
                 // 获取赔率信息

@@ -198,7 +198,7 @@ public class MappingSupportService {
                     continue;
                 }
 
-                String leagueId = Dictionary.ESPORT_PB_LEAGUE_MAPPING.get(leagueName);
+                String leagueId = Dictionary.ESPORT_PB_LEAGUE_MAPPING.get(type).get(leagueName);
 
                 // 具体比赛列表
                 List<List<Object>> games = (List<List<Object>>) league.get(2);
@@ -358,7 +358,7 @@ public class MappingSupportService {
 
                 // 赛事信息获取
                 String leagueName = item.getTournamentName().trim();
-                String leagueId = Dictionary.ESPORT_RG_LEAGUE_MAPPING.get(leagueName);
+                String leagueId = Dictionary.ESPORT_RG_LEAGUE_MAPPING.get(type).get(leagueName);
 
                 // 队伍信息
                 String homeTeamName = null;
@@ -478,7 +478,7 @@ public class MappingSupportService {
 
                 // 联赛名
                 String leagueName = tfESportsResultModel.getCompetitionName().trim();
-                String leagueId = Dictionary.ESPORT_TF_LEAGUE_MAPPING.get(leagueName);
+                String leagueId = Dictionary.ESPORT_TF_LEAGUE_MAPPING.get(type).get(leagueName);
 
                 // 主客队信息
                 String homeTeamName = null;
@@ -590,7 +590,7 @@ public class MappingSupportService {
                             // 联赛名
                             String leagueName = (String) league.get("BaseLGName");
                             leagueName = leagueName.trim();
-                            String leagueId = Dictionary.ESPORT_IM_LEAGUE_MAPPING.get(leagueName);
+                            String leagueId = Dictionary.ESPORT_IM_LEAGUE_MAPPING.get(type).get(leagueName);
 
                             List<Map<String, Object>> games = (List<Map<String, Object>>) league.get("ParentMatch");
                             if (!CollectionUtils.isEmpty(games)) {
@@ -723,7 +723,7 @@ public class MappingSupportService {
                         // 联赛名
                         String leagueName = (String) match.get("LeagueName");
                         leagueName = leagueName.trim();
-                        String leagueId = Dictionary.ESPORT_FY_LEAGUE_MAPPING.get(leagueName);
+                        String leagueId = Dictionary.ESPORT_FY_LEAGUE_MAPPING.get(type).get(leagueName);
 
 
                         // 主客队信息

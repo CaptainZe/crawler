@@ -141,7 +141,7 @@ public class PbESportsService implements BaseService {
                             }
 
                             // 赛事信息获取
-                            String leagueId = Dictionary.ESPORT_PB_LEAGUE_MAPPING.get(leagueName);
+                            String leagueId = Dictionary.ESPORT_PB_LEAGUE_MAPPING.get(type).get(leagueName);
                             if (leagueId == null) {
                                 continue;
                             }
@@ -252,7 +252,7 @@ public class PbESportsService implements BaseService {
      */
     private void dealLoLOrDotaOrCsGoNormal(Integer meParam, PbEsports initPbEsports, Map<String, List<Object>> dishMap) {
         // 获取对应盘口字典表
-        Map<String, String> dishMapping = Dictionary.getEsportDishMappingByTypeAndDishType(initPbEsports.getType(), Constant.ESPORTS_DISH_PB);
+        Map<String, String> dishMapping = Dictionary.ESPORT_PB_DISH_MAPPING.get(initPbEsports.getType());
         // 爬取的最大地图数
         int maxMap = 1;
 
@@ -399,7 +399,7 @@ public class PbESportsService implements BaseService {
      */
     private void dealLoLOrDotaNormalMore(PbEsports initPbEsports, Map<String, List<Object>> moreMap, int maxMap) {
         // 获取对应盘口字典表
-        Map<String, String> dishMapping = Dictionary.getEsportDishMappingByTypeAndDishType(initPbEsports.getType(), Constant.ESPORTS_DISH_PB);
+        Map<String, String> dishMapping = Dictionary.ESPORT_PB_DISH_MAPPING.get(initPbEsports.getType());
 
         List<PbEsports> pbEsportsList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(moreMap)) {
@@ -637,7 +637,7 @@ public class PbESportsService implements BaseService {
      */
     private void dealLoLOrDotaKillMore(PbEsports initPbEsports, Map<String, List<Object>> moreMap) {
         // 获取对应盘口字典表
-        Map<String, String> dishMapping = Dictionary.getEsportDishMappingByTypeAndDishType(initPbEsports.getType(), Constant.ESPORTS_DISH_PB);
+        Map<String, String> dishMapping = Dictionary.ESPORT_PB_DISH_MAPPING.get(initPbEsports.getType());
 
         List<PbEsports> pbEsportsList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(moreMap)) {
@@ -866,7 +866,7 @@ public class PbESportsService implements BaseService {
      */
     private void dealCsGoMore(PbEsports initPbEsports, Map<String, List<Object>> moreMap, int maxMap) {
         // 获取对应盘口字典表
-        Map<String, String> dishMapping = Dictionary.getEsportDishMappingByTypeAndDishType(initPbEsports.getType(), Constant.ESPORTS_DISH_PB);
+        Map<String, String> dishMapping = Dictionary.ESPORT_PB_DISH_MAPPING.get(initPbEsports.getType());
 
         List<PbEsports> pbEsportsList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(moreMap)) {
