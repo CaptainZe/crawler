@@ -263,6 +263,9 @@ public class BtiSportService implements BaseService {
                                         BtiSports initBtiSports = gameMap.get(gameId);
 
                                         for (List<Object> oddsDetail : oddsDetails) {
+                                            if (oddsDetail.size() != 8 && oddsDetail.size() != 7) {
+                                                continue;
+                                            }
 
                                             int rfpIndex = 1;
                                             int dxpIndex = 2;

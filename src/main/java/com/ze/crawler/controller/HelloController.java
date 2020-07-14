@@ -61,7 +61,7 @@ public class HelloController {
 //        pbSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
 //        imSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
 //        ybbSportsService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
-        btiSportService.crawler("110", Constant.SPORTS_TYPE_SOCCER,null, null);
+        btiSportService.crawler("111", Constant.SPORTS_TYPE_SOCCER,null, null);
     }
 
     @RequestMapping("/executor")
