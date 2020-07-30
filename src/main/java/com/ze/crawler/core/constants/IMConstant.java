@@ -23,7 +23,7 @@ public class IMConstant {
     /**
      * 一些常量
      */
-    public final static Integer GAME_STATUS_V1 = -1; // 未开始
+    public final static Integer GAME_STATUS_V1 = 101; // 未开始
     public final static Integer DISH_STATUS_V1 = 1; // 未锁
     public final static Integer HOME_TEAM_ODDS_CODE_V1 = 1;
     public final static Integer GUEST_TEAM_ODDS_CODE_V1 = 2;

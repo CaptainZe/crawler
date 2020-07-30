@@ -8,9 +8,11 @@ import java.util.Map;
  */
 public class WKConstant {
     // 微控域名
-    public final static String DOMAIN = "http://xingshenwk.com/";
+    // public final static String DOMAIN = "http://xingshenwk.com/";
+    public final static String DOMAIN = "http://39.106.205.87:7415/";
     // Authorization 登录一次永不失效
-    public final static String AUTHORIZATION = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXNzd29yZCI6ImUxMGFkYzM5NDliYTU5YWJiZTU2ZTA1N2YyMGY4ODNld1BDUDZvSVgyI0goMjVhcyIsImlzcyI6InhpbmdzaGVuZyIsImFjY291bnQiOiIxNTk1OTA0Njg5NCJ9.WA93YzyXsAcIjS0tvwPk0a886L_D20OpyLAWCqgo3x8";
+    // public final static String AUTHORIZATION = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXNzd29yZCI6ImUxMGFkYzM5NDliYTU5YWJiZTU2ZTA1N2YyMGY4ODNld1BDUDZvSVgyI0goMjVhcyIsImlzcyI6InhpbmdzaGVuZyIsImFjY291bnQiOiIxNTk1OTA0Njg5NCJ9.WA93YzyXsAcIjS0tvwPk0a886L_D20OpyLAWCqgo3x8";
+    public final static String AUTHORIZATION = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNTk1OTA0Njg5NCIsInNjb3BlIjpbIm5vcm1hbCJdfQ.G2bkHupVoDFurLu6ynC3D0IKpA8XHQtbmqH-zLCOQkkXj75GnWebVVZJiy5wJ3oD7HevW8eZQOnzkTdec6F6hA";
     // 重试文本
     public final static String TRY_AGAIN = "请再试一次！";
 
