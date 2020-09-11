@@ -551,6 +551,9 @@ public class PbESportsService implements BaseService {
             if ("不是".equals(n)) {
                 pbEsports.setHomeTeamOdds(odds.toString());
                 pbEsports.setHomeExtraDishName(n);
+            } else if ("否".equals(n)) {
+                pbEsports.setHomeTeamOdds(odds.toString());
+                pbEsports.setHomeExtraDishName(n);
             } else {
                 pbEsports.setGuestTeamOdds(odds.toString());
                 pbEsports.setGuestExtraDishName(n);

@@ -113,6 +113,10 @@ public class WeiKongService {
                         if (response.get("message").equals("二次登录失败，请重新扫码登录")) {
                             return "二次登录失败，请重新扫码登录";
                         }
+                        // message -> 登录设备已更换，请进行扫码登录
+                        if (response.get("message").equals("登录设备已更换，请进行扫码登录")) {
+                            return "登录设备已更换，请进行扫码登录";
+                        }
 
                         Map<String, Object> data = (Map<String, Object>) response.get("data");
                         String wId = (String) data.get("wId");

@@ -108,7 +108,7 @@ public class CrawlerTaskV2 {
             esportType.add(Constant.ESPORTS_TYPE_KPL);
 
             for (String type : esportType) {
-                eSportsExecutor.executor(LangUtils.generateUuid(), type, null, null, threshold, Constant.ESPORTS_DISH_IM);
+                eSportsExecutor.executor(LangUtils.generateUuid(), type, null, null, threshold, Constant.ESPORTS_DISH_TF);
 
                 System.out.println(type + " 执行完成");
             }
@@ -139,9 +139,6 @@ public class CrawlerTaskV2 {
 
     /* 体育 */
 
-    /**
-     * 足球
-     */
     @Scheduled(initialDelay = 1000 * 30, fixedDelay = 1000 * 60 * 5)
     public void sportRun() {
         System.out.println("体育 执行开始");
