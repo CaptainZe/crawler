@@ -444,6 +444,8 @@ public class ImESportsServiceV1 implements BaseService {
         body.put("Token", null);
         body.put("BaseLGIds", Collections.singletonList(-99));
         body.put("SportId", sportId);
+        body.put("MatchCnt", 200);
+        body.put("SortType", 1);
         return body;
     }
 

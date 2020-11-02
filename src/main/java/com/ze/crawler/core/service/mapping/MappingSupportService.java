@@ -675,6 +675,8 @@ public class MappingSupportService {
         body.put("Token", null);
         body.put("BaseLGIds", Collections.singletonList(-99));
         body.put("SportId", sportId);
+        body.put("MatchCnt", 200);
+        body.put("SortType", 1);
         return body;
     }
     /* ====================== IM电竞 - end  ====================== */

@@ -63,11 +63,11 @@ public class SportsExecutor {
         CrawlerThread pb = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, pbSportsService);
         CrawlerThread im = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, imSportsService);
         CrawlerThread ybb = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, ybbSportsService);
-        CrawlerThread bti = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, btiSportService);
+//        CrawlerThread bti = new CrawlerThread(taskId, type, appointedLeagues, appointedTeams, btiSportService);
         threads.add(pb);
         threads.add(im);
         threads.add(ybb);
-        threads.add(bti);
+//        threads.add(bti);
 
         try {
             // 执行
